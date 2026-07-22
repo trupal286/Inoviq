@@ -1,0 +1,13 @@
+{
+  "name": "inoviq",
+  "version": "1.0.0",
+  "description": "Inoviq - Digitalized visiting cards dashboard",
+  "main": "main/index.html",
+  "scripts": {
+    "dev": "http-server main -p 8080 -o --no-cache",
+    "start": "http-server main -p 8080"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

@@ -1,130 +1,328 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="digiCardApp">
+
 <head>
-<meta charset="UTF-8">
-<title>Inoviq Dashboard</title>
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
-<link rel="stylesheet" href="dashboard.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Inoviq — Digitalize your visiting card. Build, share via QR, and swap details the moment you meet someone.">
+  <title>Inoviq — Your Digital Card Catalog</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css?v=3">
 </head>
+
 <body ng-controller="DashboardController as vm">
 
-<div class="app-shell">
+  <div class="wrap">
 
-  <!-- ================= SIDEBAR ================= -->
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="mark">ID</div>
-      <div class="name">INOVIQ</div>
-    </div>
-
-    <div class="nav-section">
-      <div class="nav-label">Menu</div>
-      <div
-        class="nav-item"
-        ng-repeat="item in vm.navItems"
-        ng-class="{active: item.active}"
-        ng-click="vm.setActiveNav(item)">
-        {{ item.label }}
+    <!-- ===== NAV ===== -->
+    <nav class="topnav">
+      <div class="logo">i<span>noviq</span></div>
+      <div class="nav-links">
+        <span ng-repeat="item in vm.navItems" ng-class="{active: item.active}" ng-click="vm.setActiveNav(item)">{{
+          item.label }}</span>
       </div>
-    </div>
-
-    <div class="sidebar-footer">
-      <div class="avatar">TP</div>
-      <div>
-        <div class="u-name">Trupal Panchal</div>
-        <div class="u-email">trupl&#64;gmail.com</div>
-      </div>
-    </div>
-  </aside>
-
-  <!-- ================= MAIN ================= -->
-  <div class="main">
-
-    <!-- Title bar -->
-    <header class="titlebar">
-      <div>
-        <h1>My Cards</h1>
-        <div class="sub">All your digitalised visiting cards, saved in one place</div>
-      </div>
-      <div class="titlebar-right">
-        <div class="search">
-          <input
-            type="text"
-            placeholder="Search cards..."
-            ng-model="vm.searchTerm">
+      <div class="nav-right">
+        <div class="search-wrap">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
+          <input type="text" placeholder="Search…" ng-model="vm.searchTerm" id="nav-search-input">
         </div>
-        <button class="btn-new" ng-click="vm.onCreateCard()">Add New Card</button>
-        <div class="avatar">TP</div>
+        <button class="btn-primary" ng-click="vm.onCreateCard()" id="btn-create-top">+ Create Card</button>
+        <div class="nav-avatar" title="Trupal Panchal">TP</div>
       </div>
-    </header>
+    </nav>
 
-    <!-- Content -->
-    <main class="content">
-
-      <div class="stats-row">
-        <div class="stat-card">
-          <div class="n">{{ vm.totalCards() }}</div>
-          <div class="l">Cards Saved</div>
-        </div>
-        <div class="stat-card">
-          <div class="n">{{ vm.templatesUsedCount() }}</div>
-          <div class="l">Templates Used</div>
+    <!-- ===== HERO ===== -->
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">No. {{ vm.totalCards() }} cards filed — issued digitally</div>
+        <h1>Hand someone<br>your card, <em>without</em><br>the paper.</h1>
+        <p class="sub">Build a card, generate its QR, and swap details the moment you meet someone — every detail filed
+          straight into their contacts.</p>
+        <div class="cta-row">
+          <button class="btn-primary btn-lg" ng-click="vm.onCreateCard()" id="btn-hero-create">Create your card</button>
+          <button class="btn-ghost btn-lg" id="btn-browse">Browse templates</button>
         </div>
       </div>
 
-      <!-- Featured card -->
-      <div class="featured" ng-if="vm.featuredCard()">
-        <div class="featured-label">Recently updated</div>
-        <div class="featured-card">
-          <div class="featured-left">
-            <div class="chip-lg">{{ vm.featuredCard().initials }}</div>
-            <div>
-              <div class="f-nm">{{ vm.featuredCard().fullName }}</div>
-              <div class="f-ti">{{ vm.featuredCard().jobTitle }} &middot; {{ vm.featuredCard().company }}</div>
-              <div class="f-tag">{{ vm.featuredCard().templateLabel }}</div>
+      <!-- Hero card stage -->
+      <div class="stage">
+        <div class="card-scene" id="cardScene">
+
+          <!-- Pixel dissolve overlay — filled by JS -->
+          <div class="pixel-overlay" id="pixelOverlay"></div>
+
+          <!-- 3-D flip card -->
+          <div class="card-flip" id="heroCard">
+            <div class="face front">
+              <div class="card-header">
+                <div class="card-id">CARD · NO. 001{{ vm.heroCard.id }}</div>
+                <div class="card-name">{{ vm.heroCard.fullName }}</div>
+                <div class="card-role">{{ vm.heroCard.jobTitle }} — {{ vm.heroCard.company }}</div>
+              </div>
+              <div class="card-foot">
+                <span class="card-url">{{ vm.heroCard.company | lowercase }}.io</span>
+                <div class="card-mark">{{ vm.heroCard.initials }}</div>
+              </div>
+            </div>
+            <div class="face back">
+              <div class="qr-block" id="qrBlock"></div>
+              <div class="enc-ticker" id="encTicker">SCAN TO SAVE · NFC · 256-BIT</div>
+              <small class="back-label">SCAN TO SAVE CONTACT</small>
             </div>
           </div>
-          <button class="btn-outline-light" ng-click="vm.onEditCard(vm.featuredCard())">Edit card</button>
+
+          <div class="card-hint">hover to flip</div>
+          <button class="btn-shuffle" id="btn-shuffle" ng-click="vm.shuffleHeroCard()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
+              <polyline points="16 3 21 3 21 8" />
+              <line x1="4" y1="20" x2="21" y2="3" />
+              <polyline points="21 16 21 21 16 21" />
+              <line x1="15" y1="15" x2="21" y2="21" />
+            </svg>
+            Shuffle card
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== STATS STRIP ===== -->
+    <div class="stats-strip">
+      <div class="stat-item">
+        <div class="stat-num">{{ vm.totalCards() }}</div>
+        <div class="stat-lbl">Cards on file</div>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-item">
+        <div class="stat-num">{{ vm.templatesUsedCount() }}</div>
+        <div class="stat-lbl">Templates used</div>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-item">
+        <div class="stat-num">1 QR</div>
+        <div class="stat-lbl">Per card</div>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-item">
+        <div class="stat-num">&#8734;</div>
+        <div class="stat-lbl">Shares</div>
+      </div>
+    </div>
+
+    <!-- ===== TEMPLATES ===== -->
+    <section class="catalog" id="templates">
+      <div class="catalog-head">
+        <div>
+          <div class="eyebrow-small">04 of 12 shown</div>
+          <div class="catalog-title">Ready-made templates</div>
+        </div>
+        <button class="btn-ghost" id="btn-all-tpl">View all 12 &rarr;</button>
+      </div>
+      <div class="rail">
+        <div class="tpl" id="tpl-01">
+          <div class="tpl-num">01</div>
+          <div class="tpl-swatch s1"><span class="swatch-aa">Aa</span></div>
+          <div class="tpl-name">Ledger</div>
+          <div class="tpl-tag">Studio &amp; consulting</div>
+        </div>
+        <div class="tpl" id="tpl-02">
+          <div class="tpl-num">02</div>
+          <div class="tpl-swatch s2"><span class="swatch-aa">Aa</span></div>
+          <div class="tpl-name">Midnight Desk</div>
+          <div class="tpl-tag">Tech &amp; founders</div>
+        </div>
+        <div class="tpl" id="tpl-03">
+          <div class="tpl-num">03</div>
+          <div class="tpl-swatch s3"><span class="swatch-aa">Aa</span></div>
+          <div class="tpl-name">Stamped</div>
+          <div class="tpl-tag">Creative &amp; agency</div>
+        </div>
+        <div class="tpl" id="tpl-04">
+          <div class="tpl-num">04</div>
+          <div class="tpl-swatch s4"><span class="swatch-aa">Aa</span></div>
+          <div class="tpl-name">Brass Rule</div>
+          <div class="tpl-tag">Finance &amp; legal</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== MY CARDS ===== -->
+    <section class="my-cards-section" id="my-cards">
+      <div class="catalog-head">
+        <div>
+          <div class="eyebrow-small">Your collection</div>
+          <div class="catalog-title">My Cards</div>
+        </div>
+        <div class="search-wrap">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
+          <input type="text" placeholder="Filter cards…" ng-model="vm.searchTerm" id="search-my-cards">
         </div>
       </div>
 
-      <div class="section-head">
-        <h2>All Cards</h2>
-      </div>
-
-      <div class="card-grid">
-
-        <div class="vcard" ng-repeat="card in vm.filteredCards() track by card.id">
-          <div class="top">
-            <div class="chip" ng-style="{background: card.color}">{{ card.initials }}</div>
-            <div class="menu-dot" ng-click="vm.onDeleteCard(card)">&#8942;</div>
+      <div class="cards-list">
+        <div class="card-row" ng-repeat="card in vm.filteredCards() track by card.id" id="card-{{ card.id }}">
+          <div class="row-chip" ng-style="{background: card.color}">{{ card.initials }}</div>
+          <div class="row-info">
+            <div class="row-name">{{ card.fullName }}</div>
+            <div class="row-role">{{ card.jobTitle }} &middot; {{ card.company }}</div>
           </div>
-          <div class="nm">{{ card.fullName }}</div>
-          <div class="ti">{{ card.jobTitle }}</div>
-          <div class="co">{{ card.company }}</div>
-          <div class="divider"></div>
-          <div class="meta">
-            <span class="tag">{{ card.templateLabel }}</span>
-            <span class="saved-badge">Saved</span>
+          <div class="row-badge">{{ card.templateLabel }}</div>
+          <div class="row-actions">
+            <button class="btn-icon" ng-click="vm.onEditCard(card)" title="Edit card">&#9998;</button>
+            <button class="btn-icon btn-del" ng-click="vm.onDeleteCard(card)" title="Delete card">&#10005;</button>
           </div>
         </div>
 
-        <div class="add-vcard" ng-click="vm.onCreateCard()">
-          <div class="plus-circle">+</div>
-          Create New Card
+        <p class="empty-state" ng-if="vm.filteredCards().length === 0 && vm.searchTerm">
+          No cards match &ldquo;{{ vm.searchTerm }}&rdquo;.
+        </p>
+
+        <div class="card-row row-add" ng-click="vm.onCreateCard()" id="btn-add-row">
+          <div class="row-chip add-chip">+</div>
+          <div class="row-info">
+            <div class="row-name">Add a new card</div>
+            <div class="row-role">Start blank or choose a template</div>
+          </div>
         </div>
-
       </div>
+    </section>
 
-      <p class="empty-state" ng-if="vm.filteredCards().length === 0 && vm.searchTerm">
-        No cards match "{{ vm.searchTerm }}".
-      </p>
+    <!-- ===== HOW IT WORKS ===== -->
+    <section class="how-section" id="how-it-works">
+      <div class="eyebrow-small">Three steps</div>
+      <div class="how-title">From pocket to digital in minutes</div>
+      <div class="how-grid">
+        <div class="how-step">
+          <div class="step-num">01</div>
+          <div class="step-title">Build your card</div>
+          <p class="step-body">Pick a template or start blank. Add your name, role, company, and social links. Your
+            card, your identity.</p>
+        </div>
+        <div class="how-step">
+          <div class="step-num">02</div>
+          <div class="step-title">Generate a QR</div>
+          <p class="step-body">Each saved card instantly gets a unique QR code. Share it on-screen, print it, or embed
+            it anywhere.</p>
+        </div>
+        <div class="how-step">
+          <div class="step-num">03</div>
+          <div class="step-title">Scan &amp; save</div>
+          <p class="step-body">The other person scans your QR — their contacts update instantly. No typing, no paper to
+            lose.</p>
+        </div>
+      </div>
+    </section>
 
-    </main>
-  </div>
+    <!-- ===== FOOTER ===== -->
+    <footer class="site-footer">
+      <div class="logo">i<span>noviq</span></div>
+      <div class="footer-tag">Digital visiting cards for people who move fast.</div>
+      <div class="footer-links">
+        <span>Templates</span>
+        <span>Scan &amp; Save</span>
+        <span>Contacts</span>
+        <span>Settings</span>
+      </div>
+    </footer>
 
-</div>
+  </div><!-- /wrap -->
 
-<script src="app.js"></script>
+  <script src="app.js?v=3"></script>
+  <script>
+    /* ================================================================
+       PIXEL-DISSOLVE SHUFFLE + ENC TICKER — Evervault-inspired effects
+       ================================================================ */
+    (function () {
+      'use strict';
+
+      var COLS = 17, ROWS = 11;
+      var overlay, pixels = [];
+      var palette = ['#2F5233', '#1F3A24', '#B08D57', '#9C3D3D', '#1B2740', '#3a3a38', '#8a6d3f'];
+      var enc = '█▓▒░■□▪▫◆◇●○▲▼';
+      var ticker = document.getElementById('encTicker');
+      var originalTicker = ticker ? ticker.textContent : '';
+      var tickerTimer;
+
+      /* Build pixel grid once DOM ready */
+      document.addEventListener('DOMContentLoaded', function () {
+        overlay = document.getElementById('pixelOverlay');
+        if (!overlay) return;
+
+        overlay.style.display = 'grid';
+        overlay.style.gridTemplateColumns = 'repeat(' + COLS + ', 1fr)';
+        overlay.style.gridTemplateRows = 'repeat(' + ROWS + ', 1fr)';
+
+        for (var i = 0; i < COLS * ROWS; i++) {
+          var px = document.createElement('div');
+          px.className = 'px';
+          overlay.appendChild(px);
+          pixels.push(px);
+        }
+
+        /* Evervault ticker on card hover */
+        var heroCard = document.getElementById('heroCard');
+        if (heroCard) {
+          heroCard.addEventListener('mouseenter', function () { startTicker(); });
+          heroCard.addEventListener('mouseleave', function () {
+            clearInterval(tickerTimer);
+            if (ticker) ticker.textContent = originalTicker;
+          });
+        }
+      });
+
+      /* Scatter pixels in, run callback, scatter back out */
+      window._pixelShuffle = function (callback) {
+        if (!overlay) { if (typeof callback === 'function') callback(); return; }
+
+        /* Phase 1 — pixels rush in */
+        pixels.forEach(function (px) {
+          px.style.transitionDelay = (Math.random() * 260) + 'ms';
+          px.style.background = palette[Math.floor(Math.random() * palette.length)];
+          px.style.opacity = '1';
+          px.style.transform = 'scale(1)';
+        });
+
+        /* Phase 2 — data swap then pixels retreat */
+        setTimeout(function () {
+          if (typeof callback === 'function') callback();
+          setTimeout(function () {
+            pixels.forEach(function (px) {
+              px.style.transitionDelay = (Math.random() * 260) + 'ms';
+              px.style.opacity = '0';
+              px.style.transform = 'scale(0) rotate(45deg)';
+            });
+          }, 200);
+        }, 380);
+      };
+
+      /* Glitchy encrypted ticker */
+      function startTicker() {
+        if (!ticker) return;
+        clearInterval(tickerTimer);
+        var frame = 0;
+        tickerTimer = setInterval(function () {
+          if (frame > 28) { ticker.textContent = originalTicker; clearInterval(tickerTimer); return; }
+          ticker.textContent = originalTicker.split('').map(function (ch) {
+            if (ch === ' ' || ch === '·') return ch;
+            return Math.random() > 0.35 ? enc[Math.floor(Math.random() * enc.length)] : ch;
+          }).join('');
+          frame++;
+        }, 55);
+      }
+
+    })();
+  </script>
 </body>
+
 </html>
