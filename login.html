@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sign in to Inoviq — your digital card catalog.">
+  <title>Sign in — Inoviq</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="login.css">
+</head>
+
+<body>
+
+  <div class="login-shell">
+
+    <!-- ===== LEFT: EDITORIAL COPY ===== -->
+    <div class="login-copy">
+      <a href="dashboard.html" class="logo">i<span>noviq</span></a>
+
+      <div class="copy-body">
+        <div class="eyebrow">Member access</div>
+        <h1>Welcome back<br>to your <em>catalog</em>.</h1>
+        <p class="copy-sub">Sign in to manage your cards, share your QR, and see who's saved you back.</p>
+      </div>
+
+      <div class="copy-index">
+        <div><strong>5</strong>cards filed</div>
+        <div><strong>4</strong>templates used</div>
+        <div><strong>256-bit</strong>encrypted</div>
+      </div>
+    </div>
+
+    <!-- ===== RIGHT: LOGIN CARD ===== -->
+    <div class="login-stage">
+      <form class="login-card" id="loginForm" novalidate>
+        <div class="card-id"></div>
+        <div class="card-title">Sign in</div>
+        <div class="card-tag">Enter your details to open your account.</div>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <div class="field-input">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/>
+            </svg>
+            <input type="email" id="email" placeholder="you@company.com" autocomplete="email" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="field-input">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+            </svg>
+            <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" required>
+            <button type="button" class="field-toggle" id="togglePw">Show</button>
+          </div>
+        </div>
+
+        <p class="error-msg" id="errorMsg">Check your email and password, then try again.</p>
+
+        <div class="field-row">
+          <label class="remember">
+            <input type="checkbox" id="remember">
+            Keep me signed in
+          </label>
+          <a href="#" class="link-quiet">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn-stamp" id="submitBtn">
+          Sign in
+          <span class="stamp-mark">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M20 6 9 17l-5-5"/>
+            </svg>
+            Verified
+          </span>
+        </button>
+
+        <div class="divider">or</div>
+
+        <p class="card-foot">New here? <a href="#">Create an account</a></p>
+      </form>
+
+      <div class="stage-hint">encrypted · issued digitally</div>
+    </div>
+
+  </div><!-- /login-shell -->
+
+  <script src="login.js?v=1"></script>
+</body>
+
+</html>
