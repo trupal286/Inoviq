@@ -74,6 +74,7 @@ visiting-card-app/
 ---
 ## Folder Structure 
 
+```
 inoviq/
 ├── backend/                              # Django project
 │   ├── manage.py
@@ -182,5 +183,5 @@ inoviq/
 │
 ├── docker-compose.yml                    # backend + mongo + nginx services
 └── .gitignore
-
+```
 ---
