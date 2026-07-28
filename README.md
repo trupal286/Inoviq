@@ -76,58 +76,6 @@ visiting-card-app/
 
 ```
 inoviq/
-├── backend/                              # Django project
-│   ├── manage.py
-│   ├── requirements.txt
-│   ├── .env.example
-│   │
-│   ├── config/                           # project-level settings
-│   │   ├── __init__.py
-│   │   ├── settings.py                   # MongoDB/Djongo config, JWT, CORS
-│   │   ├── urls.py                       # root URL router → includes each app's urls
-│   │   └── wsgi.py
-│   │
-│   ├── users/                            # auth app
-│   │   ├── models.py                     # User document (mongoengine/Djongo)
-│   │   ├── serializers.py                # signup/login serializers
-│   │   ├── views.py                      # SignupView, LoginView, MeView
-│   │   ├── urls.py
-│   │   └── permissions.py                # JWT auth guard
-│   │
-│   ├── templates_module/                 # ready-made template definitions
-│   │   ├── models.py                     # Template document (name, previewImage, layoutId)
-│   │   ├── serializers.py
-│   │   ├── views.py                      # list templates
-│   │   ├── urls.py
-│   │   └── fixtures/
-│   │       └── default_templates.json    # seed data for the template gallery
-│   │
-│   ├── cards/                            # card creation + QR
-│   │   ├── models.py                     # Card document (all fields: name, designation, company, logo, phone, email, website, address, workInfo, socials, tags)
-│   │   ├── serializers.py
-│   │   ├── views.py                      # CRUD (create/edit/delete/list own cards)
-│   │   ├── urls.py
-│   │   ├── qr_generator.py               # builds QR (encodes a link/token, not raw text)
-│   │   └── tests.py
-│   │
-│   ├── scanning/                         # OCR + logo detection
-│   │   ├── views.py                      # ScanUploadView (accepts photo/QR token)
-│   │   ├── urls.py
-│   │   ├── ocr_service.py                # Tesseract / Google Vision text extraction
-│   │   ├── logo_detector.py              # OpenCV logo/region detection
-│   │   └── utils.py                      # image preprocessing (crop, deskew, grayscale)
-│   │
-│   ├── contacts/                         # saved/received contacts
-│   │   ├── models.py                     # Contact document (linked to source card or manual scan)
-│   │   ├── serializers.py
-│   │   ├── views.py                      # save/list/search/filter/delete contacts
-│   │   ├── urls.py
-│   │   └── vcf_export.py                 # generates .vcf for "export to phone contacts"
-│   │
-│   └── common/
-│       ├── mongo_utils.py                # shared Djongo/PyMongo connection helpers
-│       └── pagination.py
-│
 ├── frontend/                             # AngularJS app
 │   ├── index.html
 │   ├── app/
@@ -173,15 +121,11 @@ inoviq/
 │   │
 │   └── assets/
 │       ├── css/
-│       │   └── theme.css                
+│       │   └── theme.css                 # lavender/white shared theme
 │       ├── images/
 │       └── fonts/
 │
 ├── docs/
 │   ├── README.md
-│   └── WORKFLOW.md
-│
-├── docker-compose.yml                    # backend + mongo + nginx services
-└── .gitignore
 ```
 ---
