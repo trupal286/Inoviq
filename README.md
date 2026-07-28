@@ -74,58 +74,31 @@ visiting-card-app/
 ---
 ## Folder Structure 
 
-```
+
 inoviq/
 ├── frontend/                             # AngularJS app
-│   ├── index.html
-│   ├── app/
-│   │   ├── app.module.js                 # angular.module('inoviqApp', [...])
-│   │   ├── app.routes.js                 # ngRoute / ui-router config
-│   │   │
-│   │   ├── components/
-│   │   │   ├── card-builder/
-│   │   │   │   ├── card-builder.component.js
-│   │   │   │   ├── card-builder.html
-│   │   │   │   └── card-builder.css
-│   │   │   ├── template-gallery/
-│   │   │   │   ├── template-gallery.component.js
-│   │   │   │   └── template-gallery.html
-│   │   │   ├── qr-display/
-│   │   │   │   ├── qr-display.component.js   # renders generated QR (angularjs-qrcode)
-│   │   │   │   └── qr-display.html
-│   │   │   ├── qr-scanner/
-│   │   │   │   ├── qr-scanner.component.js   # camera access, decode QR/photo
-│   │   │   │   └── qr-scanner.html
-│   │   │   └── contact-list/
-│   │   │       ├── contact-list.component.js
-│   │   │       └── contact-list.html
-│   │   │
-│   │   ├── controllers/
-│   │   │   ├── dashboard.controller.js
-│   │   │   ├── login.controller.js
-│   │   │   └── signup.controller.js
-│   │   │
-│   │   ├── services/
-│   │   │   ├── api.service.js            # $http wrapper for all backend calls
-│   │   │   ├── auth.service.js           # JWT storage, login/logout
-│   │   │   ├── card.service.js
-│   │   │   ├── scan.service.js
-│   │   │   └── contact.service.js
-│   │   │
-│   │   └── views/
-│   │       ├── login.html
-│   │       ├── signup.html
-│   │       ├── dashboard.html
-│   │       ├── create-card.html
-│   │       └── my-contacts.html
+│   ├── Client/
+│   │   ├── Pages/
+│   │   │   ├── login.html
+│   │   │   ├── index.html
+│   │   │   ├── dashboard.html
+│   │   │   ├── create-card.html
+│   │   │   ├── contacts.html
+│   │   │   ├── scan.html
+│   │   │   └── templates.html
+│   │   ├── Css/
+│   │   │   └── style.css
+│   │   └── App.js
 │   │
-│   └── assets/
-│       ├── css/
-│       │   └── theme.css                 # lavender/white shared theme
-│       ├── images/
-│       └── fonts/
+│   └── Server/
+│       ├── authController.js
+│       ├── cardController.js
+│       ├── contactController.js
+│       ├── scanController.js
+│       ├── templateController.js
+│       └── server.js   
 │
 ├── docs/
 │   ├── README.md
-```
+
 ---
