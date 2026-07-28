@@ -173,7 +173,7 @@ inoviq/
 │   │
 │   └── assets/
 │       ├── css/
-│       │   └── theme.css                 # lavender/white shared theme
+│       │   └── theme.css                
 │       ├── images/
 │       └── fonts/
 │
