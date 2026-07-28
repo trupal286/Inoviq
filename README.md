@@ -76,112 +76,29 @@ visiting-card-app/
 
 ```
 inoviq/
-├── backend/                              # Django project
-│   ├── manage.py
-│   ├── requirements.txt
-│   ├── .env.example
-│   │
-│   ├── config/                           # project-level settings
-│   │   ├── __init__.py
-│   │   ├── settings.py                   # MongoDB/Djongo config, JWT, CORS
-│   │   ├── urls.py                       # root URL router → includes each app's urls
-│   │   └── wsgi.py
-│   │
-│   ├── users/                            # auth app
-│   │   ├── models.py                     # User document (mongoengine/Djongo)
-│   │   ├── serializers.py                # signup/login serializers
-│   │   ├── views.py                      # SignupView, LoginView, MeView
-│   │   ├── urls.py
-│   │   └── permissions.py                # JWT auth guard
-│   │
-│   ├── templates_module/                 # ready-made template definitions
-│   │   ├── models.py                     # Template document (name, previewImage, layoutId)
-│   │   ├── serializers.py
-│   │   ├── views.py                      # list templates
-│   │   ├── urls.py
-│   │   └── fixtures/
-│   │       └── default_templates.json    # seed data for the template gallery
-│   │
-│   ├── cards/                            # card creation + QR
-│   │   ├── models.py                     # Card document (all fields: name, designation, company, logo, phone, email, website, address, workInfo, socials, tags)
-│   │   ├── serializers.py
-│   │   ├── views.py                      # CRUD (create/edit/delete/list own cards)
-│   │   ├── urls.py
-│   │   ├── qr_generator.py               # builds QR (encodes a link/token, not raw text)
-│   │   └── tests.py
-│   │
-│   ├── scanning/                         # OCR + logo detection
-│   │   ├── views.py                      # ScanUploadView (accepts photo/QR token)
-│   │   ├── urls.py
-│   │   ├── ocr_service.py                # Tesseract / Google Vision text extraction
-│   │   ├── logo_detector.py              # OpenCV logo/region detection
-│   │   └── utils.py                      # image preprocessing (crop, deskew, grayscale)
-│   │
-│   ├── contacts/                         # saved/received contacts
-│   │   ├── models.py                     # Contact document (linked to source card or manual scan)
-│   │   ├── serializers.py
-│   │   ├── views.py                      # save/list/search/filter/delete contacts
-│   │   ├── urls.py
-│   │   └── vcf_export.py                 # generates .vcf for "export to phone contacts"
-│   │
-│   └── common/
-│       ├── mongo_utils.py                # shared Djongo/PyMongo connection helpers
-│       └── pagination.py
-│
 ├── frontend/                             # AngularJS app
-│   ├── index.html
-│   ├── app/
-│   │   ├── app.module.js                 # angular.module('inoviqApp', [...])
-│   │   ├── app.routes.js                 # ngRoute / ui-router config
-│   │   │
-│   │   ├── components/
-│   │   │   ├── card-builder/
-│   │   │   │   ├── card-builder.component.js
-│   │   │   │   ├── card-builder.html
-│   │   │   │   └── card-builder.css
-│   │   │   ├── template-gallery/
-│   │   │   │   ├── template-gallery.component.js
-│   │   │   │   └── template-gallery.html
-│   │   │   ├── qr-display/
-│   │   │   │   ├── qr-display.component.js   # renders generated QR (angularjs-qrcode)
-│   │   │   │   └── qr-display.html
-│   │   │   ├── qr-scanner/
-│   │   │   │   ├── qr-scanner.component.js   # camera access, decode QR/photo
-│   │   │   │   └── qr-scanner.html
-│   │   │   └── contact-list/
-│   │   │       ├── contact-list.component.js
-│   │   │       └── contact-list.html
-│   │   │
-│   │   ├── controllers/
-│   │   │   ├── dashboard.controller.js
-│   │   │   ├── login.controller.js
-│   │   │   └── signup.controller.js
-│   │   │
-│   │   ├── services/
-│   │   │   ├── api.service.js            # $http wrapper for all backend calls
-│   │   │   ├── auth.service.js           # JWT storage, login/logout
-│   │   │   ├── card.service.js
-│   │   │   ├── scan.service.js
-│   │   │   └── contact.service.js
-│   │   │
-│   │   └── views/
-│   │       ├── login.html
-│   │       ├── signup.html
-│   │       ├── dashboard.html
-│   │       ├── create-card.html
-│   │       └── my-contacts.html
+│   ├── Client/
+│   │   ├── Pages/
+│   │   │   ├── login.html
+│   │   │   ├── index.html
+│   │   │   ├── dashboard.html
+│   │   │   ├── create-card.html
+│   │   │   ├── contacts.html
+│   │   │   ├── scan.html
+│   │   │   └── templates.html
+│   │   ├── Css/
+│   │   │   └── style.css
+│   │   └── App.js
 │   │
-│   └── assets/
-│       ├── css/
-│       │   └── theme.css                 # lavender/white shared theme
-│       ├── images/
-│       └── fonts/
+│   └── Server/
+│       ├── authController.js
+│       ├── cardController.js
+│       ├── contactController.js
+│       ├── scanController.js
+│       ├── templateController.js
+│       └── server.js   
 │
 ├── docs/
 │   ├── README.md
-│   └── WORKFLOW.md
-│
-├── docker-compose.yml                    # backend + mongo + nginx services
-└── .gitignore
 ```
 ---
