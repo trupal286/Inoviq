@@ -13,51 +13,95 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="dashboard.css?v=3">
+  <link rel="stylesheet" href="../style.css">
 </head>
 
 <body ng-controller="DashboardController as vm">
 
   <div class="wrap">
 
-    <!-- ===== NAV ===== -->
-    <nav class="topnav">
-      <div class="logo">i<span>noviq</span></div>
-      <div class="nav-links">
-        <span ng-repeat="item in vm.navItems" ng-class="{active: item.active}" ng-click="vm.setActiveNav(item)">{{
-          item.label }}</span>
-      </div>
-      <div class="nav-right">
-        <div class="search-wrap">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <circle cx="11" cy="11" r="8" />
-            <path d="m21 21-4.35-4.35" />
-          </svg>
-          <input type="text" placeholder="Search…" ng-model="vm.searchTerm" id="nav-search-input">
-        </div>
-        <button class="btn-primary" ng-click="vm.onCreateCard()" id="btn-create-top">+ Create Card</button>
-        <div class="nav-avatar" title="Trupal Panchal">TP</div>
-      </div>
-    </nav>
+    <!-- ===== NAV HEADER ===== -->
+    <header class="nav-header">
+      <div class="nav-topbar">
+        <a href="index.html" class="brand-logo">
+          i<span>noviq</span>
+          <span class="brand-badge">PRO</span>
+        </a>
 
-    <!-- ===== HERO ===== -->
-    <section class="hero">
+        <div class="nav-links">
+          <span ng-repeat="item in vm.navItems" ng-class="{active: item.active}" ng-click="vm.setActiveNav(item)">{{ item.label }}</span>
+        </div>
+
+        <div class="nav-actions">
+          <div class="nav-search-wrap">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+            <input type="text" placeholder="Search cards..." ng-model="vm.searchTerm" id="nav-search-input">
+          </div>
+
+          <button class="theme-toggle-btn" id="themeToggle" title="Toggle Theme">🌙</button>
+
+          <button class="btn-primary" ng-click="vm.onCreateCard()" id="btn-create-top">+ Create Card</button>
+          
+          <a href="login.html" class="user-pill">
+            <div class="avatar-circle" title="Trupal Panchal">TP</div>
+            <span>Account</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Tactical File Folder Navigation Tabs -->
+      <nav class="folder-tabs-bar">
+        <a href="#hero" class="folder-tab active" id="tab-all">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+          </svg>
+          All Cards
+          <span class="tab-count">{{ vm.totalCards() }}</span>
+        </a>
+        <a href="#templates" class="folder-tab" id="tab-templates">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+          </svg>
+          Templates
+          <span class="tab-count">12</span>
+        </a>
+        <a href="#my-cards" class="folder-tab" id="tab-my-cards">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          My Collection
+          <span class="tab-count">{{ vm.cards.length }}</span>
+        </a>
+        <a href="#how-it-works" class="folder-tab" id="tab-how">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          How It Works
+        </a>
+      </nav>
+    </header>
+
+    <!-- ===== HERO SECTION ===== -->
+    <section class="hero" id="hero">
       <div class="hero-copy">
         <div class="eyebrow">No. {{ vm.totalCards() }} cards filed — issued digitally</div>
         <h1>Hand someone<br>your card, <em>without</em><br>the paper.</h1>
-        <p class="sub">Build a card, generate its QR, and swap details the moment you meet someone — every detail filed
-          straight into their contacts.</p>
+        <p class="sub">Build a card, generate its QR, and swap details the moment you meet someone — every detail filed straight into their contacts.</p>
         <div class="cta-row">
           <button class="btn-primary btn-lg" ng-click="vm.onCreateCard()" id="btn-hero-create">Create your card</button>
-          <button class="btn-ghost btn-lg" id="btn-browse">Browse templates</button>
+          <a href="#templates" class="btn-ghost btn-lg" id="btn-browse">Browse templates</a>
         </div>
       </div>
 
-      <!-- Hero card stage -->
+      <!-- Hero 3D Card Stage -->
       <div class="stage">
         <div class="card-scene" id="cardScene">
-
-          <!-- Pixel dissolve overlay — filled by JS -->
           <div class="pixel-overlay" id="pixelOverlay"></div>
 
           <!-- 3-D flip card -->
@@ -74,7 +118,14 @@
               </div>
             </div>
             <div class="face back">
-              <div class="qr-block" id="qrBlock"></div>
+              <div class="qr-block" id="qrBlock">
+                <svg width="68" height="68" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <rect x="3" y="3" width="7" height="7" />
+                  <rect x="14" y="3" width="7" height="7" />
+                  <rect x="3" y="14" width="7" height="7" />
+                  <path d="M14 14h3v3h-3zM18 18h3v3h-3zM14 18h3v3h-3zM18 14h3v3h-3z" />
+                </svg>
+              </div>
               <div class="enc-ticker" id="encTicker">SCAN TO SAVE · NFC · 256-BIT</div>
               <small class="back-label">SCAN TO SAVE CONTACT</small>
             </div>
@@ -117,7 +168,7 @@
       </div>
     </div>
 
-    <!-- ===== TEMPLATES ===== -->
+    <!-- ===== TEMPLATES CATALOG ===== -->
     <section class="catalog" id="templates">
       <div class="catalog-head">
         <div>
@@ -127,25 +178,25 @@
         <button class="btn-ghost" id="btn-all-tpl">View all 12 &rarr;</button>
       </div>
       <div class="rail">
-        <div class="tpl" id="tpl-01">
+        <div class="tpl" id="tpl-01" ng-click="vm.selectTemplate('Ledger')">
           <div class="tpl-num">01</div>
           <div class="tpl-swatch s1"><span class="swatch-aa">Aa</span></div>
           <div class="tpl-name">Ledger</div>
           <div class="tpl-tag">Studio &amp; consulting</div>
         </div>
-        <div class="tpl" id="tpl-02">
+        <div class="tpl" id="tpl-02" ng-click="vm.selectTemplate('Midnight Desk')">
           <div class="tpl-num">02</div>
           <div class="tpl-swatch s2"><span class="swatch-aa">Aa</span></div>
           <div class="tpl-name">Midnight Desk</div>
           <div class="tpl-tag">Tech &amp; founders</div>
         </div>
-        <div class="tpl" id="tpl-03">
+        <div class="tpl" id="tpl-03" ng-click="vm.selectTemplate('Stamped')">
           <div class="tpl-num">03</div>
           <div class="tpl-swatch s3"><span class="swatch-aa">Aa</span></div>
           <div class="tpl-name">Stamped</div>
           <div class="tpl-tag">Creative &amp; agency</div>
         </div>
-        <div class="tpl" id="tpl-04">
+        <div class="tpl" id="tpl-04" ng-click="vm.selectTemplate('Brass Rule')">
           <div class="tpl-num">04</div>
           <div class="tpl-swatch s4"><span class="swatch-aa">Aa</span></div>
           <div class="tpl-name">Brass Rule</div>
@@ -161,7 +212,7 @@
           <div class="eyebrow-small">Your collection</div>
           <div class="catalog-title">My Cards</div>
         </div>
-        <div class="search-wrap">
+        <div class="nav-search-wrap">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <circle cx="11" cy="11" r="8" />
             <path d="m21 21-4.35-4.35" />
@@ -206,33 +257,30 @@
         <div class="how-step">
           <div class="step-num">01</div>
           <div class="step-title">Build your card</div>
-          <p class="step-body">Pick a template or start blank. Add your name, role, company, and social links. Your
-            card, your identity.</p>
+          <p class="step-body">Pick a template or start blank. Add your name, role, company, and social links. Your card, your identity.</p>
         </div>
         <div class="how-step">
           <div class="step-num">02</div>
           <div class="step-title">Generate a QR</div>
-          <p class="step-body">Each saved card instantly gets a unique QR code. Share it on-screen, print it, or embed
-            it anywhere.</p>
+          <p class="step-body">Each saved card instantly gets a unique QR code. Share it on-screen, print it, or embed it anywhere.</p>
         </div>
         <div class="how-step">
           <div class="step-num">03</div>
           <div class="step-title">Scan &amp; save</div>
-          <p class="step-body">The other person scans your QR — their contacts update instantly. No typing, no paper to
-            lose.</p>
+          <p class="step-body">The other person scans your QR — their contacts update instantly. No typing, no paper to lose.</p>
         </div>
       </div>
     </section>
 
     <!-- ===== FOOTER ===== -->
     <footer class="site-footer">
-      <div class="logo">i<span>noviq</span></div>
+      <a href="index.html" class="brand-logo">i<span>noviq</span></a>
       <div class="footer-tag">Digital visiting cards for people who move fast.</div>
       <div class="footer-links">
-        <span>Templates</span>
-        <span>Scan &amp; Save</span>
-        <span>Contacts</span>
-        <span>Settings</span>
+        <a href="#templates">Templates</a>
+        <a href="#how-it-works">Scan &amp; Save</a>
+        <a href="#my-cards">Contacts</a>
+        <a href="login.html">Sign In</a>
       </div>
     </footer>
 
@@ -241,11 +289,35 @@
   <script src="app.js?v=3"></script>
   <script>
     /* ================================================================
-       PIXEL-DISSOLVE SHUFFLE + ENC TICKER — Evervault-inspired effects
+       THEME TOGGLE + PIXEL DISSOLVE & ENC TICKER
        ================================================================ */
     (function () {
       'use strict';
 
+      // Theme Switcher Toggle
+      var themeBtn = document.getElementById('themeToggle');
+      var currentTheme = localStorage.getItem('inoviq_theme') || 'light';
+
+      function applyTheme(theme) {
+        if (theme === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+          if (themeBtn) themeBtn.textContent = '☀️';
+        } else {
+          document.documentElement.removeAttribute('data-theme');
+          if (themeBtn) themeBtn.textContent = '🌙';
+        }
+      }
+      applyTheme(currentTheme);
+
+      if (themeBtn) {
+        themeBtn.addEventListener('click', function () {
+          currentTheme = (currentTheme === 'light') ? 'dark' : 'light';
+          localStorage.setItem('inoviq_theme', currentTheme);
+          applyTheme(currentTheme);
+        });
+      }
+
+      // Pixel Grid Effect
       var COLS = 17, ROWS = 11;
       var overlay, pixels = [];
       var palette = ['#2F5233', '#1F3A24', '#B08D57', '#9C3D3D', '#1B2740', '#3a3a38', '#8a6d3f'];
@@ -254,7 +326,6 @@
       var originalTicker = ticker ? ticker.textContent : '';
       var tickerTimer;
 
-      /* Build pixel grid once DOM ready */
       document.addEventListener('DOMContentLoaded', function () {
         overlay = document.getElementById('pixelOverlay');
         if (!overlay) return;
@@ -270,7 +341,6 @@
           pixels.push(px);
         }
 
-        /* Evervault ticker on card hover */
         var heroCard = document.getElementById('heroCard');
         if (heroCard) {
           heroCard.addEventListener('mouseenter', function () { startTicker(); });
@@ -281,11 +351,9 @@
         }
       });
 
-      /* Scatter pixels in, run callback, scatter back out */
       window._pixelShuffle = function (callback) {
         if (!overlay) { if (typeof callback === 'function') callback(); return; }
 
-        /* Phase 1 — pixels rush in */
         pixels.forEach(function (px) {
           px.style.transitionDelay = (Math.random() * 260) + 'ms';
           px.style.background = palette[Math.floor(Math.random() * palette.length)];
@@ -293,7 +361,6 @@
           px.style.transform = 'scale(1)';
         });
 
-        /* Phase 2 — data swap then pixels retreat */
         setTimeout(function () {
           if (typeof callback === 'function') callback();
           setTimeout(function () {
@@ -306,7 +373,6 @@
         }, 380);
       };
 
-      /* Glitchy encrypted ticker */
       function startTicker() {
         if (!ticker) return;
         clearInterval(tickerTimer);
@@ -321,6 +387,14 @@
         }, 55);
       }
 
+      // Folder tabs active class switching
+      var folderTabs = document.querySelectorAll('.folder-tab');
+      folderTabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          folderTabs.forEach(function(t) { t.classList.remove('active'); });
+          tab.classList.add('active');
+        });
+      });
     })();
   </script>
 </body>
