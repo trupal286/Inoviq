@@ -4,13 +4,13 @@
   "description": "Inoviq — Digitalized visiting cards dashboard & catalog",
   "main": "Client/Pages/index.html",
   "scripts": {
-    "dev": "npx -y http-server . -p 3000 --no-cache",
-    "start": "npx -y http-server . -p 3000"
+    "dev": "node Server/server.js",
+    "start": "node Server/server.js"
   },
   "devDependencies": {
     "http-server": "^14.1.1"
   },
   "dependencies": {
-    "express": "^4.19.2"
+    "express": "^4.22.2"
   }
 }

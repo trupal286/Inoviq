@@ -12,6 +12,13 @@
     href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="../style.css">
+  <!-- Apply saved theme before paint to prevent flash -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('inoviq_theme') || 'light';
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
+  </script>
 </head>
 
 <body>
@@ -21,7 +28,7 @@
     <!-- ===== LEFT: EDITORIAL COPY ===== -->
     <div class="login-copy">
       <div style="display: flex; align-items: center; justify-content: space-between;">
-        <a href="index.html" class="brand-logo">i<span>noviq</span></a>
+        <a href="dashboard.html" class="brand-logo">i<span>noviq</span></a>
         <button class="theme-toggle-btn" id="themeToggle" title="Toggle Theme">🌙</button>
       </div>
 
@@ -42,16 +49,32 @@
     <div class="login-stage">
       <form class="login-card" id="loginForm" novalidate>
         <div class="card-id">AUTHENTICATION · CARD 001</div>
-        <div class="card-title">Sign in</div>
+        <div class="card-title">Log in</div>
         <div class="card-tag">Enter your details to open your account.</div>
 
+        <!-- Email / Username switcher -->
         <div class="field">
-          <label for="email">Email</label>
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:7px;">
+            <label for="identifier" style="margin-bottom:0;">Email or Username</label>
+            <div style="display:flex; gap:0; border:1px solid var(--border-line); border-radius:6px; overflow:hidden; font-family:var(--font-mono); font-size:10px;">
+              <button type="button" id="tabEmail"
+                style="padding:3px 10px; background:var(--soot); color:var(--plaster); border:none; cursor:pointer; transition:all 0.18s;">Email</button>
+              <button type="button" id="tabUsername"
+                style="padding:3px 10px; background:transparent; color:var(--ink-muted); border:none; cursor:pointer; transition:all 0.18s;">Username</button>
+            </div>
+          </div>
           <div class="field-input">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/>
+            <!-- Email icon -->
+            <svg id="iconEmail" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 6h16v12H4z" />
+              <path d="m4 7 8 6 8-6" />
             </svg>
-            <input type="email" id="email" placeholder="you@company.com" autocomplete="email" required>
+            <!-- Username icon -->
+            <svg id="iconUsername" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
+              <circle cx="12" cy="8" r="4" />
+              <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+            </svg>
+            <input type="text" id="identifier" placeholder="you@company.com" autocomplete="email" required>
           </div>
         </div>
 
@@ -59,7 +82,8 @@
           <label for="password">Password</label>
           <div class="field-input">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+              <rect x="5" y="11" width="14" height="9" rx="1.5" />
+              <path d="M8 11V7a4 4 0 0 1 8 0v4" />
             </svg>
             <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" required>
             <button type="button" class="field-toggle" id="togglePw">Show</button>
@@ -80,7 +104,7 @@
           Sign in
           <span class="stamp-mark">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <path d="M20 6 9 17l-5-5"/>
+              <path d="M20 6 9 17l-5-5" />
             </svg>
             Verified
           </span>
@@ -98,8 +122,10 @@
 
   <script src="login.js?v=1"></script>
   <script>
-    (function() {
+    (function () {
       'use strict';
+
+      /* ── Theme toggle ── */
       var themeBtn = document.getElementById('themeToggle');
       var currentTheme = localStorage.getItem('inoviq_theme') || 'light';
 
@@ -111,16 +137,42 @@
           document.documentElement.removeAttribute('data-theme');
           if (themeBtn) themeBtn.textContent = '🌙';
         }
+        localStorage.setItem('inoviq_theme', theme);
       }
       applyTheme(currentTheme);
 
       if (themeBtn) {
         themeBtn.addEventListener('click', function () {
           currentTheme = (currentTheme === 'light') ? 'dark' : 'light';
-          localStorage.setItem('inoviq_theme', currentTheme);
           applyTheme(currentTheme);
         });
       }
+
+      /* ── Email / Username tab switcher ── */
+      var tabEmail    = document.getElementById('tabEmail');
+      var tabUsername = document.getElementById('tabUsername');
+      var iconEmail   = document.getElementById('iconEmail');
+      var iconUser    = document.getElementById('iconUsername');
+      var idInput     = document.getElementById('identifier');
+      var isEmail     = true;
+
+      function setTab(email) {
+        isEmail = email;
+        var activeStyle    = { background: 'var(--soot)',      color: 'var(--plaster)' };
+        var inactiveStyle  = { background: 'transparent',      color: 'var(--ink-muted)' };
+        Object.assign(tabEmail.style,    email ? activeStyle : inactiveStyle);
+        Object.assign(tabUsername.style, email ? inactiveStyle : activeStyle);
+        iconEmail.style.display = email ? '' : 'none';
+        iconUser.style.display  = email ? 'none' : '';
+        idInput.type        = email ? 'text' : 'text';
+        idInput.placeholder = email ? 'you@company.com' : '@username';
+        idInput.autocomplete = email ? 'email' : 'username';
+        idInput.value = '';
+        idInput.focus();
+      }
+
+      tabEmail.addEventListener('click',    function () { setTab(true);  });
+      tabUsername.addEventListener('click', function () { setTab(false); });
     })();
   </script>
 </body>
