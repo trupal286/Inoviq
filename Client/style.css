@@ -1006,6 +1006,47 @@ body {
   box-shadow: 0 0 0 3px rgba(105, 124, 112, 0.18);
 }
 
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Password Strength Indicator */
+.strength-bar-wrap {
+  margin-top: 6px;
+  display: flex;
+  gap: 4px;
+}
+.strength-seg {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--border-line);
+  transition: background 0.3s ease;
+}
+.strength-seg.weak   { background: #C0392B; }
+.strength-seg.fair   { background: #E67E22; }
+.strength-seg.good   { background: var(--moss); }
+.strength-seg.strong { background: #27AE60; }
+.strength-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-light);
+  margin-top: 4px;
+  height: 14px;
+  transition: color 0.3s ease;
+}
+
+.step-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--moss);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+
 .color-swatch-picker {
   display: flex;
   gap: 12px;
