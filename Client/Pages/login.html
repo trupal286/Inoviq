@@ -1,8 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="digiCardApp">
 
 <head>
   <meta charset="UTF-8">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Sign in to Inoviq — your digital card catalog.">
   <title>Sign in — Inoviq</title>
@@ -175,6 +175,10 @@
       tabUsername.addEventListener('click', function () { setTab(false); });
     })();
   </script>
+
+  <!-- Liquid Glass Dock Navigation (AngularJS Component) -->
+  <liquid-dock></liquid-dock>
+  <script src="../app.js"></script>
 </body>
 
 </html>
