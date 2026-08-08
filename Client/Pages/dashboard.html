@@ -14,7 +14,6 @@
     href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="../style.css">
-  <link rel="stylesheet" href="../../dashboard.css">
 </head>
 
 <body ng-controller="DashboardController as vm">
@@ -24,9 +23,11 @@
     <!-- ===== NAV HEADER ===== -->
     <header class="nav-header">
       <div class="nav-topbar">
-        <a href="dashboard.html" class="brand-logo">
+        <a href="index.html" class="brand-logo">
           i<span>noviq</span>
+          <span class="brand-badge">PRO</span>
         </a>
+
         <div class="nav-links">
           <span ng-repeat="item in vm.navItems" ng-class="{active: item.active}" ng-click="vm.setActiveNav(item)">{{
             item.label }}</span>
@@ -278,7 +279,7 @@
 
     <!-- ===== FOOTER ===== -->
     <footer class="site-footer">
-      <a href="dashboard.html" class="brand-logo">i<span>noviq</span></a>
+      <a href="index.html" class="brand-logo">i<span>noviq</span></a>
       <div class="footer-tag">Digital visiting cards for people who move fast.</div>
       <div class="footer-links">
         <a href="#templates">Templates</a>
