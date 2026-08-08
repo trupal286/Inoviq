@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Create your Inoviq account — start building your digital card catalog today.">
+  <title>Create Account — Inoviq Digital Catalog</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=IBM+Plex+Mono:wght@400;500;600&family=Work+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Core & Page Stylesheets -->
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../signup.css">
+
+  <!-- Apply saved theme before paint to prevent flash -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('inoviq_theme') || 'light';
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
+  </script>
+</head>
+
+<body>
+
+  <div class="app-shell">
+
+    <!-- Header Navigation -->
+    <header class="nav-header">
+      <div class="nav-topbar">
+        <a href="dashboard.html" class="brand-logo">
+          i<span>noviq</span>
+          <span class="brand-badge">Create Account</span>
+        </a>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <button class="theme-toggle-btn" id="themeToggle" title="Toggle Theme">🌙</button>
+          <a href="login.html" class="btn-secondary">&larr; Back to Sign In</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="auth-shell">
+
+      <!-- Left Info Panel -->
+      <div class="auth-copy-panel">
+        <div>
+          <a href="dashboard.html" class="brand-logo" style="font-size: 30px;">i<span>noviq</span></a>
+          <div style="margin-top: 40px;">
+            <div class="step-badge">New Member</div>
+            <h1 class="hero-title"
+              style="font-family: var(--font-serif); font-size: 38px; font-weight: 500; margin-top: 12px; line-height: 1.1;">
+              Your digital identity, <em>beautifully filed</em>.
+            </h1>
+            <p style="font-size: 14.5px; color: var(--ink-muted); margin-top: 16px; line-height: 1.6;">
+              Create your Inoviq account in seconds. Design cards, generate QR codes, and share your contact with a
+              single tap.
+            </p>
+          </div>
+
+          <div class="feature-list">
+            <div class="feature-item">
+              <div class="feature-dot">🗂️</div>
+              <span>Unlimited digital business cards across all your personas</span>
+            </div>
+            <div class="feature-item">
+              <div class="feature-dot">📡</div>
+              <span>Live QR scan analytics — see who scanned, when and where</span>
+            </div>
+            <div class="feature-item">
+              <div class="feature-dot">🔒</div>
+              <span>256-bit end-to-end encrypted contact data storage</span>
+            </div>
+            <div class="feature-item">
+              <div class="feature-dot">🎨</div>
+              <span>7 premium templates — no design experience required</span>
+            </div>
+          </div>
+        </div>
+
+        <div
+          style="font-family: var(--font-mono); font-size: 11px; color: var(--ink-light); display: flex; gap: 24px; margin-top: 40px;">
+          <div><strong
+              style="display: block; font-family: var(--font-serif); font-size: 22px; color: var(--soot);">Free</strong>Forever
+            Plan</div>
+          <div><strong
+              style="display: block; font-family: var(--font-serif); font-size: 22px; color: var(--soot);">7</strong>Templates
+          </div>
+          <div><strong
+              style="display: block; font-family: var(--font-serif); font-size: 22px; color: var(--soot);">256-bit</strong>Encrypted
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Form Panel -->
+      <div class="auth-stage-panel">
+        <form class="auth-card" id="signupForm" onsubmit="handleSignup(event)">
+
+          <div class="step-badge">NEW MEMBER &middot; INOVIQ</div>
+          <h2 style="font-family: var(--font-serif); font-size: 24px; margin-bottom: 4px;">Create Account</h2>
+          <p style="font-size: 13px; color: var(--ink-muted); margin-bottom: 22px;">Fill in your details to get started
+            for free.</p>
+
+          <!-- Name Row -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="signupFirstName">First Name</label>
+              <input type="text" id="signupFirstName" class="form-control" placeholder="Trupal" required
+                autocomplete="given-name">
+            </div>
+            <div class="form-group">
+              <label for="signupLastName">Last Name</label>
+              <input type="text" id="signupLastName" class="form-control" placeholder="Panchal" required
+                autocomplete="family-name">
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label for="signupEmail">Email Address</label>
+            <input type="email" id="signupEmail" class="form-control" placeholder="you@example.com" required
+              autocomplete="email">
+          </div>
+
+          <!-- Phone (optional) -->
+          <div class="form-group">
+            <label for="signupPhone">
+              Phone
+              <span style="font-family:var(--font-mono);font-size:10px;color:var(--ink-light);">OPTIONAL</span>
+            </label>
+            <input type="tel" id="signupPhone" class="form-control" placeholder="+91 98765 43210" autocomplete="tel">
+          </div>
+
+          <!-- Password -->
+          <div class="form-group">
+            <label for="signupPassword">Password</label>
+            <input type="password" id="signupPassword" class="form-control" placeholder="Min. 8 characters" required
+              autocomplete="new-password" oninput="checkStrength(this.value)">
+            <div class="strength-bar-wrap">
+              <div class="strength-seg" id="seg1"></div>
+              <div class="strength-seg" id="seg2"></div>
+              <div class="strength-seg" id="seg3"></div>
+              <div class="strength-seg" id="seg4"></div>
+            </div>
+            <div class="strength-label" id="strengthLabel"></div>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="form-group">
+            <label for="signupConfirm">Confirm Password</label>
+            <input type="password" id="signupConfirm" class="form-control" placeholder="Repeat your password" required
+              autocomplete="new-password">
+          </div>
+
+          <!-- Terms -->
+          <div class="terms-row">
+            <input type="checkbox" id="agreeTerms" required>
+            <label for="agreeTerms">
+              I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. My data is encrypted
+              and never sold.
+            </label>
+          </div>
+
+          <button type="submit" class="stamp-button" id="signupBtn">
+            Create My Account &rarr;
+          </button>
+
+          <div class="auth-divider">
+            Already have an account? <a href="login.html">Sign In</a>
+          </div>
+
+        </form>
+      </div>
+
+    </div><!-- /auth-shell -->
+
+    <footer class="site-footer">
+      <a href="dashboard.html" class="brand-logo" style="font-size: 18px;">i<span>noviq</span></a>
+      <span>Encrypted Digital Identity Service &middot; 2026</span>
+    </footer>
+
+  </div>
+
+  <script src="../app.js"></script>
+  <script>
+    /* ── Password Strength Checker ── */
+    function checkStrength(val) {
+      var segs = [
+        document.getElementById('seg1'),
+        document.getElementById('seg2'),
+        document.getElementById('seg3'),
+        document.getElementById('seg4')
+      ];
+      var label = document.getElementById('strengthLabel');
+
+      segs.forEach(function (s) { s.className = 'strength-seg'; });
+      label.textContent = '';
+      label.style.color = 'var(--ink-light)';
+
+      if (!val) return;
+
+      var score = 0;
+      if (val.length >= 8) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+
+      var levels = ['weak', 'fair', 'good', 'strong'];
+      var colors = { weak: '#C0392B', fair: '#E67E22', good: 'var(--moss)', strong: '#27AE60' };
+      var texts = { weak: 'Weak', fair: 'Fair', good: 'Good', strong: 'Strong 💪' };
+
+      if (score === 0) return;
+      var level = levels[score - 1];
+      for (var i = 0; i < score; i++) { segs[i].classList.add(level); }
+      label.textContent = texts[level];
+      label.style.color = colors[level];
+    }
+
+    /* ── Form Submit Handler ── */
+    function handleSignup(e) {
+      e.preventDefault();
+
+      var pass = document.getElementById('signupPassword').value;
+      var confirm = document.getElementById('signupConfirm');
+      var btn = document.getElementById('signupBtn');
+
+      if (pass !== confirm.value) {
+        confirm.style.borderColor = 'var(--stamp-red)';
+        confirm.style.boxShadow = '0 0 0 3px rgba(156,61,61,0.15)';
+        confirm.focus();
+        return;
+      }
+
+      btn.textContent = 'Creating account\u2026';
+      btn.disabled = true;
+
+      setTimeout(function () {
+        window.location.href = 'login.html?registered=1';
+      }, 1200);
+    }
+
+    /* ── Reset confirm border on re-type & Theme Toggle ── */
+    document.addEventListener('DOMContentLoaded', function () {
+      var confirm = document.getElementById('signupConfirm');
+      if (confirm) {
+        confirm.addEventListener('input', function () {
+          confirm.style.borderColor = '';
+          confirm.style.boxShadow = '';
+        });
+      }
+
+      var themeBtn = document.getElementById('themeToggle');
+      if (themeBtn) {
+        themeBtn.addEventListener('click', function () {
+          var current = document.documentElement.getAttribute('data-theme') || 'light';
+          var next = current === 'dark' ? 'light' : 'dark';
+          document.documentElement.setAttribute('data-theme', next);
+          localStorage.setItem('inoviq_theme', next);
+          themeBtn.textContent = next === 'dark' ? '☀️' : '🌙';
+        });
+        var activeTheme = localStorage.getItem('inoviq_theme') || 'light';
+        themeBtn.textContent = activeTheme === 'dark' ? '☀️' : '🌙';
+      }
+    });
+  </script>
+</body>
+
+</html>
