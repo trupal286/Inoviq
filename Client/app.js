@@ -1,5 +1,6 @@
 /* ==========================================================================
    INOVIQ — AngularJS Master Application & Liquid Glass Dock Directive
+   Pure AngularJS Architecture with Synchronized Circle + Icon Elevation
    ========================================================================== */
 
 (function () {
@@ -110,7 +111,7 @@
   }]);
 
   /* --------------------------------------------------------------------------
-     DockController & Liquid Glass Dock Directive
+     DockController & Liquid Glass Dock Directive (Pure AngularJS)
      -------------------------------------------------------------------------- */
   app.controller('DockController', ['$scope', '$window', function ($scope, $window) {
     var dock = this;
@@ -118,22 +119,23 @@
     dock.currentTheme = localStorage.getItem('inoviq_theme') || 'light';
 
     dock.items = [
-      { id: 'home', title: 'Dashboard', href: 'dashboard.html#hero' },
+      { id: 'home', title: 'Home', href: 'dashboard.html#hero' },
       { id: 'templates', title: 'Templates', href: 'dashboard.html#templates' },
-      { id: 'cards', title: 'My Collection', href: 'dashboard.html#my-cards' },
+      { id: 'cards', title: 'Collection', href: 'dashboard.html#my-cards' },
       { id: 'how', title: 'Scan & Import', href: 'dashboard.html#how-it-works' },
       { id: 'create', title: 'Create Card', action: 'create' },
-      { id: 'theme', title: 'Toggle Theme', action: 'theme', isThemeBtn: true },
+      { id: 'theme', title: 'Theme', action: 'theme', isThemeBtn: true },
       { id: 'account', title: 'Account', href: 'login.html' }
     ];
 
     dock.activeId = 'home';
+    dock.hoveredIndex = -1;
 
     dock.checkActive = function () {
       var path = $window.location.pathname;
       var hash = $window.location.hash;
 
-      if (path.indexOf('login.html') !== -1) {
+      if (path.indexOf('login.html') !== -1 || path.indexOf('signup.html') !== -1) {
         dock.activeId = 'account';
       } else if (hash === '#templates') {
         dock.activeId = 'templates';
@@ -153,6 +155,61 @@
         dock.checkActive();
       });
     });
+
+    dock.getItemIndex = function (id) {
+      for (var i = 0; i < dock.items.length; i++) {
+        if (dock.items[i].id === id) return i;
+      }
+      return 0;
+    };
+
+    dock.getIndicatorIndex = function () {
+      if (dock.hoveredIndex >= 0) {
+        return dock.hoveredIndex;
+      }
+      return dock.getItemIndex(dock.activeId);
+    };
+
+    /* Pure AngularJS Math calculations for 100% exact alignment and synchronized elevation */
+    dock.getPillX = function () {
+      var idx = dock.getIndicatorIndex();
+      return 10 + (idx * 54);
+    };
+
+    dock.getPillTranslateY = function () {
+      var idx = dock.getIndicatorIndex();
+      return dock.getItemTranslateY(idx);
+    };
+
+    dock.getPillScale = function () {
+      return dock.hoveredIndex >= 0 ? 1.35 : 1;
+    };
+
+    dock.getItemScale = function (index) {
+      if (dock.hoveredIndex < 0) return 1;
+      var dist = Math.abs(index - dock.hoveredIndex);
+      if (dist === 0) return 1.45;
+      if (dist === 1) return 1.22;
+      if (dist === 2) return 1.08;
+      return 1;
+    };
+
+    dock.getItemTranslateY = function (index) {
+      if (dock.hoveredIndex < 0) return 0;
+      var dist = Math.abs(index - dock.hoveredIndex);
+      if (dist === 0) return -14;
+      if (dist === 1) return -6;
+      if (dist === 2) return -2;
+      return 0;
+    };
+
+    dock.onMouseEnter = function (index) {
+      dock.hoveredIndex = index;
+    };
+
+    dock.onMouseLeave = function () {
+      dock.hoveredIndex = -1;
+    };
 
     dock.onItemClick = function (item, $event) {
       if (item.action === 'create') {
@@ -199,13 +256,23 @@
       controllerAs: 'dock',
       template:
         '<nav class="liquid-dock-container" aria-label="Liquid Glass Dock Navigation">' +
-          '<div class="liquid-dock-glass">' +
+          '<div class="liquid-dock-glass" ng-mouseleave="dock.onMouseLeave()">' +
+            '<!-- Sliding Glass Circle Pill (Moves X and Y along with active/hovered icon) -->' +
+            '<span class="dock-slide-pill" ' +
+                  'ng-class="{ \'pill-hovered\': dock.hoveredIndex >= 0 }" ' +
+                  'ng-style="{ ' +
+                    'left: dock.getPillX() + \'px\', ' +
+                    'transform: \'translateY(\' + dock.getPillTranslateY() + \'px) scale(\' + dock.getPillScale() + \')\' ' +
+                  '}">' +
+            '</span>' +
+            '<!-- Dock Item Buttons (No title attribute to remove ugly browser native tooltip) -->' +
             '<a ng-repeat="item in dock.items track by item.id" ' +
                'ng-href="{{ item.href || \'javascript:void(0);\' }}" ' +
                'class="liquid-dock-item" ' +
                'ng-class="{ active: dock.activeId === item.id }" ' +
+               'ng-mouseenter="dock.onMouseEnter($index)" ' +
                'ng-click="dock.onItemClick(item, $event)" ' +
-               'title="{{ item.title }}">' +
+               'ng-style="{ transform: \'translateY(\' + dock.getItemTranslateY($index) + \'px) scale(\' + dock.getItemScale($index) + \')\' }">' +
               '<span class="dock-icon-wrapper">' +
                 '<!-- Home -->' +
                 '<svg ng-if="item.id === \'home\'" class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
@@ -218,7 +285,7 @@
                   '<line x1="3" y1="9" x2="21" y2="9"/>' +
                   '<line x1="9" y1="21" x2="9" y2="9"/>' +
                 '</svg>' +
-                '<!-- My Collection -->' +
+                '<!-- Collection -->' +
                 '<svg ng-if="item.id === \'cards\'" class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
                   '<rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>' +
                   '<line x1="12" y1="18" x2="12.01" y2="18"/>' +
@@ -251,7 +318,7 @@
               '</span>' +
               '<span class="dock-dot"></span>' +
               '<span class="dock-tooltip">{{ item.title }}</span>' +
-            '</a>' +
+              '</a>' +
           '</div>' +
         '</nav>'
     };

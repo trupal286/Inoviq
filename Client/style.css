@@ -1455,7 +1455,7 @@ body {
 }
 
 /* ==========================================================================
-   LIQUID GLASS DOCK NAVIGATION (AngularJS Powered)
+   LIQUID GLASS DOCK (Pure AngularJS Animation & Alignment)
    ========================================================================== */
 
 .liquid-dock-container {
@@ -1469,155 +1469,173 @@ body {
 
 .liquid-dock-glass {
   pointer-events: auto;
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
+  gap: 10px;
+  padding: 8px 10px;
   border-radius: 9999px;
   
   /* Ultra-sleek Liquid Glassmorphic styling */
-  background: rgba(255, 253, 248, 0.68);
-  -webkit-backdrop-filter: blur(20px) saturate(200%);
-  backdrop-filter: blur(20px) saturate(200%);
+  background: rgba(255, 253, 248, 0.75);
+  -webkit-backdrop-filter: blur(24px) saturate(210%);
+  backdrop-filter: blur(24px) saturate(210%);
   
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.8);
   box-shadow: 
-    0 18px 40px -10px rgba(45, 53, 54, 0.18),
-    0 4px 14px rgba(45, 53, 54, 0.08),
-    inset 0 1.5px 1px rgba(255, 255, 255, 0.95),
+    0 22px 50px -10px rgba(45, 53, 54, 0.24),
+    0 6px 20px rgba(45, 53, 54, 0.08),
+    inset 0 1.5px 1.5px rgba(255, 255, 255, 0.95),
     inset 0 -1px 1px rgba(0, 0, 0, 0.04);
 
   transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 [data-theme="dark"] .liquid-dock-glass {
-  background: rgba(28, 36, 38, 0.76);
-  border: 1px solid rgba(242, 239, 226, 0.2);
+  background: rgba(20, 24, 26, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   box-shadow: 
-    0 18px 44px -8px rgba(0, 0, 0, 0.55),
-    0 4px 14px rgba(0, 0, 0, 0.35),
-    inset 0 1.5px 1px rgba(255, 255, 255, 0.18),
-    inset 0 -1px 1px rgba(0, 0, 0, 0.45);
+    0 22px 54px -8px rgba(0, 0, 0, 0.7),
+    0 6px 20px rgba(0, 0, 0, 0.45),
+    inset 0 1.5px 1.5px rgba(255, 255, 255, 0.22),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.6);
 }
 
-/* Dock Item Button */
+/* Sliding Glass Pill Circle — Positioned via pure AngularJS left & transform calculation */
+.dock-slide-pill {
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.98);
+  box-shadow: 
+    0 10px 28px -4px rgba(45, 53, 54, 0.28),
+    0 0 20px rgba(255, 255, 255, 0.75),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.95);
+  pointer-events: none;
+  z-index: 1;
+  transition: left 0.34s cubic-bezier(0.175, 0.885, 0.32, 1.25), transform 0.34s cubic-bezier(0.175, 0.885, 0.32, 1.25), box-shadow 0.25s ease;
+}
+
+[data-theme="dark"] .dock-slide-pill {
+  background: rgba(255, 255, 255, 0.24);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 
+    0 10px 28px -4px rgba(0, 0, 0, 0.6),
+    0 0 20px rgba(255, 255, 255, 0.25),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.35);
+}
+
+.dock-slide-pill.pill-hovered {
+  box-shadow: 
+    0 12px 32px -2px rgba(45, 53, 54, 0.32),
+    0 0 24px rgba(255, 255, 255, 0.9),
+    inset 0 1.5px 1px rgba(255, 255, 255, 1);
+}
+
+/* Elevated Dock Item Button */
 .liquid-dock-item {
   position: relative;
+  z-index: 2;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 44px;
   height: 44px;
-  border-radius: 14px;
+  border-radius: 50%;
   color: var(--ink-primary);
   text-decoration: none;
-  background: rgba(255, 255, 255, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.45);
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  background: transparent;
+  border: none;
   cursor: pointer;
+  transition: transform 0.34s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.22s ease;
+  transform-origin: center bottom;
 }
 
 [data-theme="dark"] .liquid-dock-item {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-/* Liquid Magnification Hover & Active States */
-.liquid-dock-item:hover {
-  transform: translateY(-6px) scale(1.15);
-  background: rgba(255, 255, 255, 0.9);
-  border-color: rgba(255, 255, 255, 0.95);
-  box-shadow: 
-    0 8px 22px -4px rgba(45, 53, 54, 0.22),
-    0 0 14px rgba(152, 170, 157, 0.45);
-  color: var(--soot);
-}
-
-[data-theme="dark"] .liquid-dock-item:hover {
-  background: rgba(255, 255, 255, 0.22);
-  border-color: rgba(255, 255, 255, 0.35);
-  box-shadow: 
-    0 8px 22px -4px rgba(0, 0, 0, 0.45),
-    0 0 14px rgba(255, 255, 255, 0.2);
-  color: var(--plaster);
+  color: rgba(242, 239, 226, 0.8);
 }
 
 .liquid-dock-item:active {
-  transform: translateY(-2px) scale(1.05);
+  transform: translateY(-4px) scale(1.15) !important;
 }
 
-/* Icon Sizing & Alignment */
+/* SVG Icon */
 .dock-icon-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
 }
 
 .dock-icon {
-  width: 20px;
-  height: 20px;
-  transition: stroke 0.2s ease, transform 0.2s ease;
+  width: 22px;
+  height: 22px;
+  transition: stroke 0.2s ease;
 }
 
-/* Active State Dot Indicator */
+/* Active Indicator Dot */
 .dock-dot {
   position: absolute;
   bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%) scale(0);
   width: 4px;
   height: 4px;
   border-radius: 50%;
   background: var(--ink-primary);
   opacity: 0;
-  transform: scale(0);
-  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+[data-theme="dark"] .dock-dot {
+  background: rgba(242, 239, 226, 0.9);
 }
 
 .liquid-dock-item.active .dock-dot {
   opacity: 1;
-  transform: scale(1);
+  transform: translateX(-50%) scale(1);
 }
 
-.liquid-dock-item.active {
-  background: rgba(255, 255, 255, 0.95);
-  border-color: var(--moss);
-  box-shadow: 0 4px 14px rgba(105, 124, 112, 0.3);
-}
-
-[data-theme="dark"] .liquid-dock-item.active {
-  background: rgba(255, 255, 255, 0.25);
-  border-color: var(--baby-blue);
-  box-shadow: 0 4px 14px rgba(177, 212, 208, 0.3);
-}
-
-/* Liquid Tooltip on Hover */
+/* Compact & Elegant Floating Tooltip Bubble Above Icon */
 .dock-tooltip {
   position: absolute;
-  top: -40px;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px) scale(0.88);
   padding: 4px 10px;
-  background: rgba(45, 53, 54, 0.92);
+  background: rgba(18, 20, 22, 0.92);
   color: #FFFDF8;
+  border: 1px solid rgba(255, 255, 255, 0.16);
   font-family: var(--font-sans);
   font-size: 11px;
   font-weight: 500;
+  letter-spacing: 0.1px;
   border-radius: 6px;
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
-  transform: translateY(6px) scale(0.95);
-  transition: opacity 0.2s ease, transform 0.2s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+  z-index: 20;
 }
 
 [data-theme="dark"] .dock-tooltip {
-  background: rgba(242, 239, 226, 0.95);
-  color: #1A2223;
+  background: rgba(242, 239, 226, 0.96);
+  color: #121416;
+  border: 1px solid rgba(0, 0, 0, 0.15);
 }
 
 .liquid-dock-item:hover .dock-tooltip {
   opacity: 1;
-  transform: translateY(0) scale(1);
+  transform: translateX(-50%) translateY(0) scale(1);
 }
+
+
+
+
 
