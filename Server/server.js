@@ -4,8 +4,9 @@ const path = require('path');
 const app = express();
 const PORT = 3000;
 
-// Serve static files from Client/Pages (HTML, JS) and Client (CSS)
+// Serve static files from Client/Pages, Client/Style, and Client
 app.use(express.static(path.join(__dirname, '../Client/Pages')));
+app.use(express.static(path.join(__dirname, '../Client/Style')));
 app.use(express.static(path.join(__dirname, '../Client')));
 
 // Root → dashboard.html
