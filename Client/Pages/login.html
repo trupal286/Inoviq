@@ -56,7 +56,8 @@
         <div class="field">
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:7px;">
             <label for="identifier" style="margin-bottom:0;">Email or Username</label>
-            <div style="display:flex; gap:0; border:1px solid var(--border-line); border-radius:6px; overflow:hidden; font-family:var(--font-mono); font-size:10px;">
+            <div
+              style="display:flex; gap:0; border:1px solid var(--border-line); border-radius:6px; overflow:hidden; font-family:var(--font-mono); font-size:10px;">
               <button type="button" id="tabEmail"
                 style="padding:3px 10px; background:var(--soot); color:var(--plaster); border:none; cursor:pointer; transition:all 0.18s;">Email</button>
               <button type="button" id="tabUsername"
@@ -65,12 +66,14 @@
           </div>
           <div class="field-input">
             <!-- Email icon -->
-            <svg id="iconEmail" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg id="iconEmail" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
               <path d="M4 6h16v12H4z" />
               <path d="m4 7 8 6 8-6" />
             </svg>
             <!-- Username icon -->
-            <svg id="iconUsername" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
+            <svg id="iconUsername" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" style="display:none;">
               <circle cx="12" cy="8" r="4" />
               <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
             </svg>
@@ -149,29 +152,29 @@
       }
 
       /* ── Email / Username tab switcher ── */
-      var tabEmail    = document.getElementById('tabEmail');
+      var tabEmail = document.getElementById('tabEmail');
       var tabUsername = document.getElementById('tabUsername');
-      var iconEmail   = document.getElementById('iconEmail');
-      var iconUser    = document.getElementById('iconUsername');
-      var idInput     = document.getElementById('identifier');
-      var isEmail     = true;
+      var iconEmail = document.getElementById('iconEmail');
+      var iconUser = document.getElementById('iconUsername');
+      var idInput = document.getElementById('identifier');
+      var isEmail = true;
 
       function setTab(email) {
         isEmail = email;
-        var activeStyle    = { background: 'var(--soot)',      color: 'var(--plaster)' };
-        var inactiveStyle  = { background: 'transparent',      color: 'var(--ink-muted)' };
-        Object.assign(tabEmail.style,    email ? activeStyle : inactiveStyle);
+        var activeStyle = { background: 'var(--soot)', color: 'var(--plaster)' };
+        var inactiveStyle = { background: 'transparent', color: 'var(--ink-muted)' };
+        Object.assign(tabEmail.style, email ? activeStyle : inactiveStyle);
         Object.assign(tabUsername.style, email ? inactiveStyle : activeStyle);
         iconEmail.style.display = email ? '' : 'none';
-        iconUser.style.display  = email ? 'none' : '';
-        idInput.type        = email ? 'text' : 'text';
+        iconUser.style.display = email ? 'none' : '';
+        idInput.type = email ? 'text' : 'text';
         idInput.placeholder = email ? 'you@company.com' : '@username';
         idInput.autocomplete = email ? 'email' : 'username';
         idInput.value = '';
         idInput.focus();
       }
 
-      tabEmail.addEventListener('click',    function () { setTab(true);  });
+      tabEmail.addEventListener('click', function () { setTab(true); });
       tabUsername.addEventListener('click', function () { setTab(false); });
     })();
   </script>
