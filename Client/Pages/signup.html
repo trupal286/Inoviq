@@ -6,18 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Create your Inoviq account — start building your digital card catalog today.">
   <title>Create Account — Inoviq Digital Catalog</title>
-
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=IBM+Plex+Mono:wght@400;500;600&family=Work+Sans:wght@400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
     rel="stylesheet">
-
-  <!-- Core & Page Stylesheets -->
   <link rel="stylesheet" href="../Style/style.css">
   <link rel="stylesheet" href="../Style/signup.css">
-
   <!-- Apply saved theme before paint to prevent flash -->
   <script>
     (function () {
@@ -29,164 +24,139 @@
 
 <body>
 
-  <div class="app-shell">
+  <div class="login-shell">
 
-    <!-- Header Navigation -->
-    <header class="nav-header">
-      <div class="nav-topbar">
-        <a href="dashboard.html" class="brand-logo">
-          i<span>noviq</span>
-          <span class="brand-badge">Create Account</span>
-        </a>
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <button class="theme-toggle-btn" id="themeToggle" title="Toggle Theme">🌙</button>
-          <a href="login.html" class="btn-secondary">&larr; Back to Sign In</a>
-        </div>
-      </div>
-    </header>
-
-    <div class="auth-shell">
-
-      <!-- Left Info Panel -->
-      <div class="auth-copy-panel">
-        <div>
-          <a href="dashboard.html" class="brand-logo" style="font-size: 30px;">i<span>noviq</span></a>
-          <div style="margin-top: 40px;">
-            <div class="step-badge">New Member</div>
-            <h1 class="hero-title"
-              style="font-family: var(--font-serif); font-size: 38px; font-weight: 500; margin-top: 12px; line-height: 1.1;">
-              Your digital identity, <em>beautifully filed</em>.
-            </h1>
-            <p style="font-size: 14.5px; color: var(--ink-muted); margin-top: 16px; line-height: 1.6;">
-              Create your Inoviq account in seconds. Design cards, generate QR codes, and share your contact with a
-              single tap.
-            </p>
-          </div>
-
-          <div class="feature-list">
-            <div class="feature-item">
-              <div class="feature-dot">🗂️</div>
-              <span>Unlimited digital business cards across all your personas</span>
-            </div>
-            <div class="feature-item">
-              <div class="feature-dot">📡</div>
-              <span>Live QR scan analytics — see who scanned, when and where</span>
-            </div>
-            <div class="feature-item">
-              <div class="feature-dot">🔒</div>
-              <span>256-bit end-to-end encrypted contact data storage</span>
-            </div>
-            <div class="feature-item">
-              <div class="feature-dot">🎨</div>
-              <span>7 premium templates — no design experience required</span>
-            </div>
-          </div>
-        </div>
-
-        <div
-          style="font-family: var(--font-mono); font-size: 11px; color: var(--ink-light); display: flex; gap: 24px; margin-top: 40px;">
-          <div><strong
-              style="display: block; font-family: var(--font-serif); font-size: 22px; color: var(--soot);">Free</strong>Forever
-            Plan</div>
-          <div><strong
-              style="display: block; font-family: var(--font-serif); font-size: 22px; color: var(--soot);">7</strong>Templates
-          </div>
-          <div><strong
-              style="display: block; font-family: var(--font-serif); font-size: 22px; color: var(--soot);">256-bit</strong>Encrypted
-          </div>
-        </div>
+    <!-- ===== LEFT: EDITORIAL COPY ===== -->
+    <div class="login-copy">
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <a class="brand-logo">i<span>noviq</span></a>
+        <button class="theme-toggle-btn" id="themeToggle" title="Toggle Theme">🌙</button>
       </div>
 
-      <!-- Right Form Panel -->
-      <div class="auth-stage-panel">
-        <form class="auth-card" id="signupForm" onsubmit="handleSignup(event)">
+      <div class="copy-body">
+        <div class="eyebrow">New member</div>
+        <h1>Start building<br>your <em>catalog</em>.</h1>
+        <p class="copy-sub">Create your account to design cards, share QR codes, and connect seamlessly.</p>
+      </div>
 
-          <div class="step-badge">NEW MEMBER &middot; INOVIQ</div>
-          <h2 style="font-family: var(--font-serif); font-size: 24px; margin-bottom: 4px;">Create Account</h2>
-          <p style="font-size: 13px; color: var(--ink-muted); margin-bottom: 22px;">Fill in your details to get started
-            for free.</p>
+      <div class="copy-index">
+        <div><strong>Free</strong>forever plan</div>
+        <div><strong>7</strong>templates</div>
+        <div><strong>256-bit</strong>encrypted</div>
+      </div>
+    </div>
 
-          <!-- Name Row -->
-          <div class="form-row">
-            <div class="form-group">
-              <label for="signupFirstName">First Name</label>
-              <input type="text" id="signupFirstName" class="form-control" placeholder="Trupal" required
-                autocomplete="given-name">
+    <!-- ===== RIGHT: SIGNUP CARD ===== -->
+    <div class="login-stage">
+      <form class="login-card signup-card" id="signupForm" onsubmit="handleSignup(event)">
+        <div class="card-id">REGISTRATION · CARD 002</div>
+        <div class="card-title">Create Account</div>
+        <div class="card-tag">Fill in your details to get started for free.</div>
+
+        <!-- Name Row -->
+        <div class="field-row-double">
+          <div class="field">
+            <label for="signupFirstName">First Name</label>
+            <div class="field-input">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+              </svg>
+              <input type="text" id="signupFirstName" placeholder="Trupal" required autocomplete="given-name">
             </div>
-            <div class="form-group">
-              <label for="signupLastName">Last Name</label>
-              <input type="text" id="signupLastName" class="form-control" placeholder="Panchal" required
-                autocomplete="family-name">
+          </div>
+          <div class="field">
+            <label for="signupLastName">Last Name</label>
+            <div class="field-input">
+              <input type="text" id="signupLastName" placeholder="Panchal" required autocomplete="family-name">
             </div>
           </div>
+        </div>
 
-          <!-- Email -->
-          <div class="form-group">
-            <label for="signupEmail">Email Address</label>
-            <input type="email" id="signupEmail" class="form-control" placeholder="you@example.com" required
-              autocomplete="email">
+        <!-- Email -->
+        <div class="field">
+          <label for="signupEmail">Email Address</label>
+          <div class="field-input">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 6h16v12H4z" />
+              <path d="m4 7 8 6 8-6" />
+            </svg>
+            <input type="email" id="signupEmail" placeholder="you@example.com" required autocomplete="email">
           </div>
+        </div>
 
-          <!-- Phone (optional) -->
-          <div class="form-group">
-            <label for="signupPhone">
-              Phone
-              <span style="font-family:var(--font-mono);font-size:10px;color:var(--ink-light);">OPTIONAL</span>
-            </label>
-            <input type="tel" id="signupPhone" class="form-control" placeholder="+91 98765 43210" autocomplete="tel">
+        <!-- Phone (optional) -->
+        <div class="field">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
+            <label for="signupPhone" style="margin-bottom:0;">Phone</label>
+            <span
+              style="font-family:var(--font-mono);font-size:9.5px;color:var(--ink-light);letter-spacing:0.06em;">OPTIONAL</span>
           </div>
+          <div class="field-input">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+            </svg>
+            <input type="tel" id="signupPhone" placeholder="+91 98765 43210" autocomplete="tel">
+          </div>
+        </div>
 
-          <!-- Password -->
-          <div class="form-group">
-            <label for="signupPassword">Password</label>
-            <input type="password" id="signupPassword" class="form-control" placeholder="Min. 8 characters" required
+        <!-- Password -->
+        <div class="field">
+          <label for="signupPassword">Password</label>
+          <div class="field-input">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="5" y="11" width="14" height="9" rx="1.5" />
+              <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+            </svg>
+            <input type="password" id="signupPassword" placeholder="Min. 8 characters" required
               autocomplete="new-password" oninput="checkStrength(this.value)">
-            <div class="strength-bar-wrap">
-              <div class="strength-seg" id="seg1"></div>
-              <div class="strength-seg" id="seg2"></div>
-              <div class="strength-seg" id="seg3"></div>
-              <div class="strength-seg" id="seg4"></div>
-            </div>
-            <div class="strength-label" id="strengthLabel"></div>
           </div>
+          <div class="strength-bar-wrap">
+            <div class="strength-seg" id="seg1"></div>
+            <div class="strength-seg" id="seg2"></div>
+            <div class="strength-seg" id="seg3"></div>
+            <div class="strength-seg" id="seg4"></div>
+          </div>
+          <div class="strength-label" id="strengthLabel"></div>
+        </div>
 
-          <!-- Confirm Password -->
-          <div class="form-group">
-            <label for="signupConfirm">Confirm Password</label>
-            <input type="password" id="signupConfirm" class="form-control" placeholder="Repeat your password" required
+        <!-- Confirm Password -->
+        <div class="field">
+          <label for="signupConfirm">Confirm Password</label>
+          <div class="field-input">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="5" y="11" width="14" height="9" rx="1.5" />
+              <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+            </svg>
+            <input type="password" id="signupConfirm" placeholder="Repeat your password" required
               autocomplete="new-password">
           </div>
+        </div>
 
-          <!-- Terms -->
-          <div class="terms-row">
-            <input type="checkbox" id="agreeTerms" required>
-            <label for="agreeTerms">
-              I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. My data is encrypted
-              and never sold.
-            </label>
-          </div>
+        <!-- Terms -->
+        <div class="terms-row">
+          <input type="checkbox" id="agreeTerms" required>
+          <label for="agreeTerms">
+            I agree to the <a href="#">Terms</a> and <a href="#">Privacy Policy</a>. Data is encrypted.
+          </label>
+        </div>
 
-          <button type="submit" class="stamp-button" id="signupBtn">
-            Create My Account &rarr;
-          </button>
+        <!-- Submit Button -->
+        <button type="submit" class="btn-stamp" id="signupBtn">
+          Create My Account &rarr;
+        </button>
 
-          <div class="auth-divider">
-            Already have an account? <a href="login.html">Sign In</a>
-          </div>
+        <div class="divider">or</div>
 
-        </form>
-      </div>
+        <p class="card-foot">Already have an account? <a href="login.html">Sign in</a></p>
+      </form>
 
-    </div><!-- /auth-shell -->
+      <div class="stage-hint">encrypted · issued digitally</div>
+    </div>
 
-    <footer class="site-footer">
-      <a href="dashboard.html" class="brand-logo" style="font-size: 18px;">i<span>noviq</span></a>
-      <span>Encrypted Digital Identity Service &middot; 2026</span>
-    </footer>
+  </div><!-- /login-shell -->
 
-  </div>
-
-  <script src="../app.js"></script>
   <script>
     /* ── Password Strength Checker ── */
     function checkStrength(val) {
@@ -198,9 +168,11 @@
       ];
       var label = document.getElementById('strengthLabel');
 
-      segs.forEach(function (s) { s.className = 'strength-seg'; });
-      label.textContent = '';
-      label.style.color = 'var(--ink-light)';
+      segs.forEach(function (s) { if (s) s.className = 'strength-seg'; });
+      if (label) {
+        label.textContent = '';
+        label.style.color = 'var(--ink-light)';
+      }
 
       if (!val) return;
 
@@ -216,9 +188,11 @@
 
       if (score === 0) return;
       var level = levels[score - 1];
-      for (var i = 0; i < score; i++) { segs[i].classList.add(level); }
-      label.textContent = texts[level];
-      label.style.color = colors[level];
+      for (var i = 0; i < score; i++) { if (segs[i]) segs[i].classList.add(level); }
+      if (label) {
+        label.textContent = texts[level];
+        label.style.color = colors[level];
+      }
     }
 
     /* ── Form Submit Handler ── */
@@ -244,7 +218,7 @@
       }, 1200);
     }
 
-    /* ── Reset confirm border on re-type & Theme Toggle ── */
+    /* ── Theme Toggle & Event Handlers ── */
     document.addEventListener('DOMContentLoaded', function () {
       var confirm = document.getElementById('signupConfirm');
       if (confirm) {
@@ -255,16 +229,25 @@
       }
 
       var themeBtn = document.getElementById('themeToggle');
+      var currentTheme = localStorage.getItem('inoviq_theme') || 'light';
+
+      function applyTheme(theme) {
+        if (theme === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+          if (themeBtn) themeBtn.textContent = '☀️';
+        } else {
+          document.documentElement.removeAttribute('data-theme');
+          if (themeBtn) themeBtn.textContent = '🌙';
+        }
+        localStorage.setItem('inoviq_theme', theme);
+      }
+      applyTheme(currentTheme);
+
       if (themeBtn) {
         themeBtn.addEventListener('click', function () {
-          var current = document.documentElement.getAttribute('data-theme') || 'light';
-          var next = current === 'dark' ? 'light' : 'dark';
-          document.documentElement.setAttribute('data-theme', next);
-          localStorage.setItem('inoviq_theme', next);
-          themeBtn.textContent = next === 'dark' ? '☀️' : '🌙';
+          currentTheme = (currentTheme === 'light') ? 'dark' : 'light';
+          applyTheme(currentTheme);
         });
-        var activeTheme = localStorage.getItem('inoviq_theme') || 'light';
-        themeBtn.textContent = activeTheme === 'dark' ? '☀️' : '🌙';
       }
     });
   </script>
