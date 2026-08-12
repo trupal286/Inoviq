@@ -537,33 +537,19 @@ body {
 }
 
 .pixel-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 10;
-  pointer-events: none;
-}
-.pixel-overlay .px {
-  opacity: 0;
-  transform: scale(0.5);
-  transition: opacity 0.25s ease, transform 0.25s ease, background-color 0.25s ease;
+  display: none;
 }
 
 .card-flip {
   width: 100%;
   height: 230px;
   position: relative;
-  transform-style: preserve-3d;
-  transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   cursor: pointer;
-}
-.card-scene:hover .card-flip, .card-flip.is-flipped {
-  transform: rotateY(180deg);
 }
 
 .face {
   position: absolute;
   inset: 0;
-  backface-visibility: hidden;
   border-radius: 16px;
   padding: 28px;
   box-shadow: var(--shadow-3d);
@@ -571,21 +557,33 @@ body {
   flex-direction: column;
   justify-content: space-between;
   border: 1px solid var(--border-dark);
+  transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
 .face.front {
   background: linear-gradient(135deg, var(--soot) 0%, #1A2223 100%);
   color: var(--plaster);
+  opacity: 1;
+  z-index: 1;
 }
 
 .face.back {
   background: linear-gradient(135deg, #1F2728 0%, var(--espresso) 100%);
   color: var(--plaster);
-  transform: rotateY(180deg);
   align-items: center;
   justify-content: center;
   text-align: center;
   gap: 12px;
+  opacity: 0;
+  z-index: 2;
+}
+
+.card-scene:hover .face.front, .card-flip.is-flipped .face.front {
+  opacity: 0;
+}
+
+.card-scene:hover .face.back, .card-flip.is-flipped .face.back {
+  opacity: 1;
 }
 
 .card-header {
