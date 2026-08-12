@@ -111,6 +111,90 @@
   }]);
 
   /* --------------------------------------------------------------------------
+     CreateCardController
+     -------------------------------------------------------------------------- */
+  app.controller('CreateCardController', ['$scope', '$window', function ($scope, $window) {
+    var vm = this;
+
+    vm.cardData = {
+      fullName: 'Trupal Panchal',
+      jobTitle: 'Product Manager & Founder',
+      company: 'Loop Studio',
+      email: 'you@company.com',
+      phone: '+1 (555) 000-0000',
+      website: 'https://company.io',
+      bio: 'Crafting digital products with tactile aesthetics and human-centered design.',
+      templateStyle: 'Dark Charcoal',
+      color: '#2D3536',
+      accentColor: '#B1D4D0',
+      bgGradient: 'linear-gradient(135deg, #2D3536 0%, #1A2223 100%)'
+    };
+
+    vm.isFlipped = false;
+    vm.saveSuccess = false;
+
+    vm.colorSwatches = [
+      { name: 'Dark Charcoal', color: '#2D3536', accent: '#B1D4D0', gradient: 'linear-gradient(135deg, #2D3536 0%, #1A2223 100%)' },
+      { name: 'Deep Espresso', color: '#52352D', accent: '#F2EFE2', gradient: 'linear-gradient(135deg, #52352D 0%, #36221C 100%)' },
+      { name: 'Midnight Navy', color: '#1B2740', accent: '#67C3F3', gradient: 'linear-gradient(135deg, #1B2740 0%, #0F1726 100%)' },
+      { name: 'Forest Moss',   color: '#697C70', accent: '#F2EFE2', gradient: 'linear-gradient(135deg, #697C70 0%, #46554D 100%)' },
+      { name: 'Eucalyptus',    color: '#98AA9D', accent: '#2D3536', gradient: 'linear-gradient(135deg, #98AA9D 0%, #76897B 100%)' },
+      { name: 'Warm Cream',    color: '#F2EFE2', accent: '#52352D', gradient: 'linear-gradient(135deg, #F2EFE2 0%, #E2DDD0 100%)' },
+      { name: 'Cyber Teal',    color: '#104F55', accent: '#B1D4D0', gradient: 'linear-gradient(135deg, #104F55 0%, #082F33 100%)' }
+    ];
+
+    vm.templates = [
+      { id: 'ledger', name: 'Ledger Pro', tag: 'Minimal Tactile' },
+      { id: 'midnight', name: 'Midnight Desk', tag: 'Executive Dark' },
+      { id: 'brass', name: 'Brass Rule', tag: 'Classic Serif' },
+      { id: 'stamped', name: 'Stamped Gold', tag: 'Premium Foil' }
+    ];
+    vm.selectedTemplate = vm.templates[0];
+
+    vm.selectSwatch = function (swatch) {
+      vm.cardData.templateStyle = swatch.name;
+      vm.cardData.color = swatch.color;
+      vm.cardData.accentColor = swatch.accent;
+      vm.cardData.bgGradient = swatch.gradient;
+    };
+
+    vm.selectTemplate = function (tpl) {
+      vm.selectedTemplate = tpl;
+    };
+
+    vm.getInitials = function () {
+      if (!vm.cardData.fullName) return 'YN';
+      var parts = vm.cardData.fullName.trim().split(/\s+/);
+      if (parts.length >= 2) {
+        return (parts[0][0] + parts[1][0]).toUpperCase();
+      } else if (parts[0].length > 0) {
+        return parts[0].substring(0, 2).toUpperCase();
+      }
+      return 'YN';
+    };
+
+    vm.toggleFlip = function () {
+      vm.isFlipped = !vm.isFlipped;
+    };
+
+    vm.onSaveCard = function () {
+      vm.saveSuccess = true;
+      setTimeout(function () {
+        $scope.$apply(function () {
+          vm.saveSuccess = false;
+        });
+      }, 4000);
+    };
+
+    vm.copyCardLink = function () {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText($window.location.origin + '/create-card?card=' + encodeURIComponent(vm.cardData.fullName));
+      }
+      alert('Card Public Link copied to clipboard!');
+    };
+  }]);
+
+  /* --------------------------------------------------------------------------
      DockController & Apple-Style Floating Dock Directive (macOS Proximity Magnification)
      -------------------------------------------------------------------------- */
   app.controller('DockController', ['$scope', '$window', '$document', function ($scope, $window, $document) {
@@ -125,7 +209,7 @@
       { id: 'cards', title: 'Saved Catalog', href: 'dashboard.html#my-cards' },
       { id: 'how', title: 'Scan & Import', href: 'dashboard.html#how-it-works' },
       { type: 'divider' },
-      { id: 'create', title: 'Create Card', action: 'create' },
+      { id: 'create', title: 'Create Card', href: 'create-card.html' },
       { id: 'theme', title: 'Toggle Theme', action: 'theme', isThemeBtn: true },
       { id: 'account', title: 'Account', href: 'login.html' }
     ];
@@ -140,6 +224,8 @@
 
       if (path.indexOf('login.html') !== -1 || path.indexOf('signup.html') !== -1) {
         dock.activeId = 'account';
+      } else if (path.indexOf('create-card') !== -1 || path.indexOf('create-card.html') !== -1) {
+        dock.activeId = 'create';
       } else if (hash === '#templates') {
         dock.activeId = 'templates';
       } else if (hash === '#my-cards') {

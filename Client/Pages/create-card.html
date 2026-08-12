@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="digiCardApp">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Inoviq Card Builder — Create your custom digital business card with live interactive preview and dynamic QR generation.">
+  <title>Inoviq — Create Custom Card</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../Style/style.css">
+</head>
+
+<body ng-controller="CreateCardController as vm">
+
+  <div class="wrap">
+
+    <!-- ===== NAV HEADER ===== -->
+    <header class="nav-header">
+      <div class="nav-topbar">
+        <a href="dashboard.html" class="brand-logo">
+          i<span>noviq</span>
+          <span class="brand-badge card-builder-badge">CARD BUILDER</span>
+        </a>
+
+        <div class="nav-actions">
+          <button class="theme-toggle-btn" id="themeToggle" title="Toggle Theme">🌙</button>
+          <a href="dashboard.html" class="btn-secondary" id="btn-back-dashboard">← Back to Dashboard</a>
+        </div>
+      </div>
+
+      <!-- Tactical File Folder Navigation Tabs -->
+      <nav class="folder-tabs-bar">
+        <a href="dashboard.html" class="folder-tab" id="tab-dashboard">
+          Dashboard
+        </a>
+        <a href="create-card.html" class="folder-tab active" id="tab-create-card">
+          Create Card
+        </a>
+        <a href="dashboard.html#templates" class="folder-tab" id="tab-templates-gallery">
+          Templates Gallery
+        </a>
+        <a href="dashboard.html#my-cards" class="folder-tab" id="tab-saved-catalog">
+          Saved Catalog
+        </a>
+      </nav>
+    </header>
+
+    <!-- ===== CARD BUILDER MAIN STAGE ===== -->
+    <main class="builder-stage">
+
+      <!-- LEFT COLUMN: CREATION FORM -->
+      <div class="builder-form-panel">
+        <div class="builder-form-card">
+          <div class="form-header-group">
+            <span class="form-eyebrow">DIGITAL IDENTIFIER CREATION</span>
+            <h1 class="form-title">Build Your Custom Card</h1>
+          </div>
+
+          <form ng-submit="vm.onSaveCard()" novalidate class="builder-form">
+            <!-- FULL NAME -->
+            <div class="form-field-group">
+              <label class="form-label" for="card-fullname">FULL NAME *</label>
+              <input type="text" id="card-fullname" class="form-input-text" ng-model="vm.cardData.fullName"
+                placeholder="e.g. Trupal Panchal" required>
+            </div>
+
+            <!-- JOB TITLE & ROLE -->
+            <div class="form-field-group">
+              <label class="form-label" for="card-jobtitle">JOB TITLE &amp; ROLE</label>
+              <input type="text" id="card-jobtitle" class="form-input-text" ng-model="vm.cardData.jobTitle"
+                placeholder="e.g. Product Manager &amp; Founder">
+            </div>
+
+            <!-- COMPANY / STUDIO -->
+            <div class="form-field-group">
+              <label class="form-label" for="card-company">COMPANY / STUDIO *</label>
+              <input type="text" id="card-company" class="form-input-text" ng-model="vm.cardData.company"
+                placeholder="e.g. Loop Studio" required>
+            </div>
+
+            <!-- EMAIL ADDRESS -->
+            <div class="form-field-group">
+              <label class="form-label" for="card-email">EMAIL ADDRESS</label>
+              <input type="email" id="card-email" class="form-input-text" ng-model="vm.cardData.email"
+                placeholder="you@company.com">
+            </div>
+
+            <!-- PHONE NUMBER -->
+            <div class="form-field-group">
+              <label class="form-label" for="card-phone">PHONE NUMBER</label>
+              <input type="text" id="card-phone" class="form-input-text" ng-model="vm.cardData.phone"
+                placeholder="+1 (555) 000-0000">
+            </div>
+
+            <!-- WEBSITE URL -->
+            <div class="form-field-group">
+              <label class="form-label" for="card-website">WEBSITE URL</label>
+              <input type="url" id="card-website" class="form-input-text" ng-model="vm.cardData.website"
+                placeholder="https://company.io">
+            </div>
+
+            <!-- WORK INFO & BIO -->
+            <div class="form-field-group">
+              <label class="form-label" for="card-bio">WORK INFO &amp; BIO</label>
+              <textarea id="card-bio" class="form-textarea" rows="3" ng-model="vm.cardData.bio"
+                placeholder="Brief tagline or description..."></textarea>
+            </div>
+
+            <!-- COLOR PALETTE REFERENCE -->
+            <div class="form-field-group">
+              <label class="form-label">COLOR PALETTE REFERENCE</label>
+              <div class="swatches-row">
+                <button type="button" class="swatch-btn" ng-repeat="swatch in vm.colorSwatches"
+                  ng-class="{active: vm.cardData.templateStyle === swatch.name}" ng-style="{'background-color': swatch.color}"
+                  ng-click="vm.selectSwatch(swatch)" title="{{ swatch.name }}">
+                </button>
+              </div>
+              <span class="swatch-selected-name">Active Theme: <strong>{{ vm.cardData.templateStyle }}</strong></span>
+            </div>
+
+            <!-- TEMPLATE PRESETS -->
+            <div class="form-field-group">
+              <label class="form-label">TEMPLATE STYLE PRESET</label>
+              <div class="template-selector-row">
+                <button type="button" class="template-pill-btn" ng-repeat="tpl in vm.templates"
+                  ng-class="{active: vm.selectedTemplate.id === tpl.id}" ng-click="vm.selectTemplate(tpl)">
+                  <span>{{ tpl.name }}</span>
+                  <small>{{ tpl.tag }}</small>
+                </button>
+              </div>
+            </div>
+
+            <!-- SUBMIT BUTTON -->
+            <div class="form-submit-row">
+              <button type="submit" class="btn-save-card" id="btn-save-card">
+                Save &amp; Issue Digital Card
+              </button>
+            </div>
+
+            <!-- TOAST BANNER -->
+            <div class="save-toast-banner" ng-if="vm.saveSuccess">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              Card issued successfully! Saved to your Digital Catalog.
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: REAL-TIME LIVE PREVIEW -->
+      <div class="builder-preview-panel">
+        <div class="preview-sticky-wrap">
+          <div class="preview-header">
+            <span class="preview-eyebrow">REAL-TIME PREVIEW</span>
+            <button type="button" class="btn-flip-toggle" ng-click="vm.toggleFlip()" title="Flip Card View">
+              🔄 {{ vm.isFlipped ? 'View Front Side' : 'View Back Side' }}
+            </button>
+          </div>
+
+          <!-- 3D LIVE CARD PREVIEW CONTAINER -->
+          <div class="live-card-stage" ng-class="{'is-flipped': vm.isFlipped}">
+            
+            <!-- CARD FRONT -->
+            <div class="live-card-front" ng-style="{'background': vm.cardData.bgGradient}">
+              <div class="card-top-sub">
+                <span class="card-brand-tag">INOVIQ · {{ vm.cardData.templateStyle | uppercase }} LIVE PREVIEW</span>
+                <span class="card-template-tag">{{ vm.selectedTemplate.name }}</span>
+              </div>
+
+              <div class="card-main-content">
+                <h2 class="card-holder-name">{{ vm.cardData.fullName || 'Your Name' }}</h2>
+                <p class="card-holder-role">
+                  {{ vm.cardData.jobTitle || 'Designation' }} · {{ vm.cardData.company || 'Company Name' }}
+                </p>
+
+                <div class="card-meta-details" ng-if="vm.cardData.email || vm.cardData.phone || vm.cardData.website">
+                  <p ng-if="vm.cardData.email">✉️ {{ vm.cardData.email }}</p>
+                  <p ng-if="vm.cardData.phone">📞 {{ vm.cardData.phone }}</p>
+                  <p ng-if="vm.cardData.website">🌐 {{ vm.cardData.website }}</p>
+                </div>
+
+                <p class="card-bio-snippet" ng-if="vm.cardData.bio">
+                  "{{ vm.cardData.bio }}"
+                </p>
+              </div>
+
+              <!-- CARD BOTTOM ROW: DYNAMIC QR & INITIALS BADGE -->
+              <div class="card-bottom-row">
+                <div class="qr-code-box" title="Scan to Save Contact">
+                  <svg viewBox="0 0 100 100" width="46" height="46" fill="currentColor">
+                    <!-- Stylized Vector QR Code -->
+                    <rect x="0" y="0" width="30" height="30" rx="4"/>
+                    <rect x="5" y="5" width="20" height="20" fill="#fff"/>
+                    <rect x="10" y="10" width="10" height="10"/>
+
+                    <rect x="70" y="0" width="30" height="30" rx="4"/>
+                    <rect x="75" y="5" width="20" height="20" fill="#fff"/>
+                    <rect x="80" y="10" width="10" height="10"/>
+
+                    <rect x="0" y="70" width="30" height="30" rx="4"/>
+                    <rect x="5" y="75" width="20" height="20" fill="#fff"/>
+                    <rect x="10" y="80" width="10" height="10"/>
+
+                    <rect x="40" y="10" width="15" height="15" rx="2"/>
+                    <rect x="40" y="35" width="20" height="10" rx="2"/>
+                    <rect x="70" y="40" width="15" height="15" rx="2"/>
+                    <rect x="35" y="70" width="25" height="25" rx="2"/>
+                    <rect x="70" y="70" width="10" height="25" rx="2"/>
+                    <rect x="85" y="85" width="15" height="15" rx="2"/>
+                  </svg>
+                </div>
+
+                <div class="card-initials-pill" ng-style="{'color': vm.cardData.accentColor}">
+                  {{ vm.getInitials() }}
+                </div>
+              </div>
+            </div>
+
+            <!-- CARD BACK -->
+            <div class="live-card-back" ng-style="{'background': vm.cardData.bgGradient}">
+              <div class="card-back-brand">i<span>noviq</span></div>
+              <div class="card-back-emblem">{{ vm.getInitials() }}</div>
+              <p class="card-back-holder">{{ vm.cardData.fullName || 'Your Name' }}</p>
+              <div class="card-back-qr-large">
+                <svg viewBox="0 0 100 100" width="90" height="90" fill="currentColor">
+                  <rect x="0" y="0" width="30" height="30" rx="4"/>
+                  <rect x="5" y="5" width="20" height="20" fill="#fff"/>
+                  <rect x="10" y="10" width="10" height="10"/>
+
+                  <rect x="70" y="0" width="30" height="30" rx="4"/>
+                  <rect x="75" y="5" width="20" height="20" fill="#fff"/>
+                  <rect x="80" y="10" width="10" height="10"/>
+
+                  <rect x="0" y="70" width="30" height="30" rx="4"/>
+                  <rect x="5" y="75" width="20" height="20" fill="#fff"/>
+                  <rect x="10" y="80" width="10" height="10"/>
+
+                  <rect x="40" y="10" width="15" height="15" rx="2"/>
+                  <rect x="40" y="35" width="20" height="10" rx="2"/>
+                  <rect x="70" y="40" width="15" height="15" rx="2"/>
+                  <rect x="35" y="70" width="25" height="25" rx="2"/>
+                  <rect x="70" y="70" width="10" height="25" rx="2"/>
+                  <rect x="85" y="85" width="15" height="15" rx="2"/>
+                </svg>
+              </div>
+              <p class="card-back-hint">SCAN TO ADD DIRECT TO CONTACTS</p>
+            </div>
+
+          </div>
+
+          <!-- SPECIFICATIONS TAG BADGE -->
+          <div class="spec-tag-container">
+            <span class="spec-tag-badge">785 × 1120 spec</span>
+          </div>
+
+          <p class="preview-caption">
+            This card automatically generates a unique QR code upon saving for instant contact swapping.
+          </p>
+
+          <!-- PREVIEW ACTIONS ROW -->
+          <div class="preview-actions-row">
+            <button type="button" class="btn-preview-action" ng-click="vm.copyCardLink()">
+              🔗 Copy Public Link
+            </button>
+            <button type="button" class="btn-preview-action" ng-click="vm.toggleFlip()">
+              🎴 Flip Card
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- ===== FLOATING LIQUID GLASS DOCK ===== -->
+    <liquid-dock></liquid-dock>
+
+  </div>
+
+  <script src="../app.js"></script>
+</body>
+
+</html>
