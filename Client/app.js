@@ -111,25 +111,28 @@
   }]);
 
   /* --------------------------------------------------------------------------
-     DockController & Liquid Glass Dock Directive (Pure AngularJS)
+     DockController & Apple-Style Floating Dock Directive (macOS Proximity Magnification)
      -------------------------------------------------------------------------- */
-  app.controller('DockController', ['$scope', '$window', function ($scope, $window) {
+  app.controller('DockController', ['$scope', '$window', '$document', function ($scope, $window, $document) {
     var dock = this;
 
     dock.currentTheme = localStorage.getItem('inoviq_theme') || 'light';
 
+    /* Navigation items — 'divider' type creates a visual separator */
     dock.items = [
       { id: 'home', title: 'Home', href: 'dashboard.html#hero' },
       { id: 'templates', title: 'Templates', href: 'dashboard.html#templates' },
-      { id: 'cards', title: 'Collection', href: 'dashboard.html#my-cards' },
+      { id: 'cards', title: 'Saved Catalog', href: 'dashboard.html#my-cards' },
       { id: 'how', title: 'Scan & Import', href: 'dashboard.html#how-it-works' },
+      { type: 'divider' },
       { id: 'create', title: 'Create Card', action: 'create' },
-      { id: 'theme', title: 'Theme', action: 'theme', isThemeBtn: true },
+      { id: 'theme', title: 'Toggle Theme', action: 'theme', isThemeBtn: true },
       { id: 'account', title: 'Account', href: 'login.html' }
     ];
 
     dock.activeId = 'home';
-    dock.hoveredIndex = -1;
+    dock.mouseX = -1;      /* Raw pixel X position relative to dock */
+    dock.isHovering = false;
 
     dock.checkActive = function () {
       var path = $window.location.pathname;
@@ -156,59 +159,59 @@
       });
     });
 
-    dock.getItemIndex = function (id) {
-      for (var i = 0; i < dock.items.length; i++) {
-        if (dock.items[i].id === id) return i;
-      }
-      return 0;
+    /* ---- macOS Proximity Magnification Math ---- */
+    var BASE_SIZE = 44;      /* default icon container size in px */
+    var MAX_SCALE = 1.65;    /* peak magnification */
+    var PROXIMITY = 140;     /* influence radius in px (how far magnification reaches) */
+
+    dock.onDockMouseMove = function ($event) {
+      var dockEl = $event.currentTarget;
+      var rect = dockEl.getBoundingClientRect();
+      dock.mouseX = $event.clientX - rect.left;
+      dock.isHovering = true;
     };
 
-    dock.getIndicatorIndex = function () {
-      if (dock.hoveredIndex >= 0) {
-        return dock.hoveredIndex;
-      }
-      return dock.getItemIndex(dock.activeId);
+    dock.onDockMouseLeave = function () {
+      dock.mouseX = -1;
+      dock.isHovering = false;
     };
 
-    /* Pure AngularJS Math calculations for 100% exact alignment and synchronized elevation */
-    dock.getPillX = function () {
-      var idx = dock.getIndicatorIndex();
-      return 10 + (idx * 54);
-    };
-
-    dock.getPillTranslateY = function () {
-      var idx = dock.getIndicatorIndex();
-      return dock.getItemTranslateY(idx);
-    };
-
-    dock.getPillScale = function () {
-      return dock.hoveredIndex >= 0 ? 1.35 : 1;
-    };
-
+    /* Gaussian-style falloff for smooth magnification */
     dock.getItemScale = function (index) {
-      if (dock.hoveredIndex < 0) return 1;
-      var dist = Math.abs(index - dock.hoveredIndex);
-      if (dist === 0) return 1.45;
-      if (dist === 1) return 1.22;
-      if (dist === 2) return 1.08;
-      return 1;
+      if (!dock.isHovering || dock.mouseX < 0) return 1;
+      var itemCenter = dock._getItemCenterX(index);
+      var dist = Math.abs(dock.mouseX - itemCenter);
+      if (dist > PROXIMITY) return 1;
+      /* Gaussian curve: e^(-(dist^2)/(2*sigma^2)) */
+      var sigma = PROXIMITY / 2.5;
+      var factor = Math.exp(-(dist * dist) / (2 * sigma * sigma));
+      return 1 + (MAX_SCALE - 1) * factor;
     };
 
     dock.getItemTranslateY = function (index) {
-      if (dock.hoveredIndex < 0) return 0;
-      var dist = Math.abs(index - dock.hoveredIndex);
-      if (dist === 0) return -14;
-      if (dist === 1) return -6;
-      if (dist === 2) return -2;
-      return 0;
+      var scale = dock.getItemScale(index);
+      /* Lift proportional to scale increase */
+      return -(scale - 1) * BASE_SIZE * 0.55;
     };
 
-    dock.onMouseEnter = function (index) {
-      dock.hoveredIndex = index;
-    };
-
-    dock.onMouseLeave = function () {
-      dock.hoveredIndex = -1;
+    /* Calculate approximate center X of each item in the dock */
+    dock._getItemCenterX = function (index) {
+      /* Account for padding (16px) + gap (6px between items) + dividers (12px wide) */
+      var x = 16; /* left padding */
+      var navItems = dock.items;
+      for (var i = 0; i < index; i++) {
+        if (navItems[i].type === 'divider') {
+          x += 12 + 6; /* divider width + gap */
+        } else {
+          x += BASE_SIZE + 6; /* item width + gap */
+        }
+      }
+      if (navItems[index] && navItems[index].type === 'divider') {
+        x += 6; /* half of divider */
+      } else {
+        x += BASE_SIZE / 2; /* center of item */
+      }
+      return x;
     };
 
     dock.onItemClick = function (item, $event) {
@@ -255,72 +258,98 @@
       controller: 'DockController',
       controllerAs: 'dock',
       template:
-        '<nav class="liquid-dock-container" aria-label="Liquid Glass Dock Navigation">' +
-          '<div class="liquid-dock-glass" ng-mouseleave="dock.onMouseLeave()">' +
-            '<!-- Sliding Glass Circle Pill (Moves X and Y along with active/hovered icon) -->' +
-            '<span class="dock-slide-pill" ' +
-                  'ng-class="{ \'pill-hovered\': dock.hoveredIndex >= 0 }" ' +
-                  'ng-style="{ ' +
-                    'left: dock.getPillX() + \'px\', ' +
-                    'transform: \'translateY(\' + dock.getPillTranslateY() + \'px) scale(\' + dock.getPillScale() + \')\' ' +
-                  '}">' +
-            '</span>' +
-            '<!-- Dock Item Buttons (No title attribute to remove ugly browser native tooltip) -->' +
-            '<a ng-repeat="item in dock.items track by item.id" ' +
-               'ng-href="{{ item.href || \'javascript:void(0);\' }}" ' +
-               'class="liquid-dock-item" ' +
-               'ng-class="{ active: dock.activeId === item.id }" ' +
-               'ng-mouseenter="dock.onMouseEnter($index)" ' +
-               'ng-click="dock.onItemClick(item, $event)" ' +
-               'ng-style="{ transform: \'translateY(\' + dock.getItemTranslateY($index) + \'px) scale(\' + dock.getItemScale($index) + \')\' }">' +
-              '<span class="dock-icon-wrapper">' +
-                '<!-- Home -->' +
-                '<svg ng-if="item.id === \'home\'" class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
-                  '<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>' +
-                  '<polyline points="9 22 9 12 15 12 15 22"/>' +
+        '<div class="apple-dock-container" id="appleDockContainer">' +
+          '<div class="apple-dock" id="appleDock" ' +
+               'ng-mousemove="dock.onDockMouseMove($event)" ' +
+               'ng-mouseleave="dock.onDockMouseLeave()">' +
+
+            /* ---- Home ---- */
+            '<a href="dashboard.html#hero" class="apple-dock-item" ' +
+               'ng-class="{ active: dock.activeId === \'home\' }" ' +
+               'ng-click="dock.activeId = \'home\'" ' +
+               'ng-style="{ transform: \'translateY(\' + dock.getItemTranslateY(0) + \'px) scale(\' + dock.getItemScale(0) + \')\' }">' +
+              '<span class="apple-dock-tooltip">Home</span>' +
+              '<div class="apple-dock-icon">' +
+                '<svg viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>' +
+              '</div>' +
+            '</a>' +
+
+            /* ---- Templates ---- */
+            '<a href="dashboard.html#templates" class="apple-dock-item" ' +
+               'ng-class="{ active: dock.activeId === \'templates\' }" ' +
+               'ng-click="dock.activeId = \'templates\'" ' +
+               'ng-style="{ transform: \'translateY(\' + dock.getItemTranslateY(1) + \'px) scale(\' + dock.getItemScale(1) + \')\' }">' +
+              '<span class="apple-dock-tooltip">Templates</span>' +
+              '<div class="apple-dock-icon">' +
+                '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>' +
+              '</div>' +
+            '</a>' +
+
+            /* ---- Saved Catalog ---- */
+            '<a href="dashboard.html#my-cards" class="apple-dock-item" ' +
+               'ng-class="{ active: dock.activeId === \'cards\' }" ' +
+               'ng-click="dock.activeId = \'cards\'" ' +
+               'ng-style="{ transform: \'translateY(\' + dock.getItemTranslateY(2) + \'px) scale(\' + dock.getItemScale(2) + \')\' }">' +
+              '<span class="apple-dock-tooltip">Saved Catalog</span>' +
+              '<div class="apple-dock-icon">' +
+                '<svg viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/></svg>' +
+              '</div>' +
+            '</a>' +
+
+            /* ---- Scan & Import ---- */
+            '<a href="dashboard.html#how-it-works" class="apple-dock-item" ' +
+               'ng-class="{ active: dock.activeId === \'how\' }" ' +
+               'ng-click="dock.activeId = \'how\'" ' +
+               'ng-style="{ transform: \'translateY(\' + dock.getItemTranslateY(3) + \'px) scale(\' + dock.getItemScale(3) + \')\' }">' +
+              '<span class="apple-dock-tooltip">Scan &amp; Import</span>' +
+              '<div class="apple-dock-icon">' +
+                '<svg viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/></svg>' +
+              '</div>' +
+            '</a>' +
+
+            /* ---- Divider ---- */
+            '<div class="apple-dock-divider"></div>' +
+
+            /* ---- Create Card ---- */
+            '<a href="javascript:void(0);" class="apple-dock-item" ' +
+               'ng-click="dock.onItemClick({action: \'create\'}, $event)" ' +
+               'ng-style="{ transform: \'translateY(\' + dock.getItemTranslateY(5) + \'px) scale(\' + dock.getItemScale(5) + \')\' }">' +
+              '<span class="apple-dock-tooltip">Create Card</span>' +
+              '<div class="apple-dock-icon">' +
+                '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>' +
+              '</div>' +
+            '</a>' +
+
+            /* ---- Theme Toggle ---- */
+            '<button class="apple-dock-item" ng-click="dock.toggleTheme()" ' +
+               'ng-style="{ transform: \'translateY(\' + dock.getItemTranslateY(6) + \'px) scale(\' + dock.getItemScale(6) + \')\' }">' +
+              '<span class="apple-dock-tooltip">Toggle Theme</span>' +
+              '<div class="apple-dock-icon">' +
+                '<svg ng-if="dock.currentTheme === \'dark\'" viewBox="0 0 24 24">' +
+                  '<circle cx="12" cy="12" r="4"/>' +
+                  '<path d="M12 2v2"/><path d="M12 20v2"/>' +
+                  '<path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/>' +
+                  '<path d="M2 12h2"/><path d="M20 12h2"/>' +
+                  '<path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>' +
                 '</svg>' +
-                '<!-- Templates -->' +
-                '<svg ng-if="item.id === \'templates\'" class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
-                  '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>' +
-                  '<line x1="3" y1="9" x2="21" y2="9"/>' +
-                  '<line x1="9" y1="21" x2="9" y2="9"/>' +
-                '</svg>' +
-                '<!-- Collection -->' +
-                '<svg ng-if="item.id === \'cards\'" class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
-                  '<rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>' +
-                  '<line x1="12" y1="18" x2="12.01" y2="18"/>' +
-                '</svg>' +
-                '<!-- Scan & Import -->' +
-                '<svg ng-if="item.id === \'how\'" class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
-                  '<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>' +
-                '</svg>' +
-                '<!-- Create Card -->' +
-                '<svg ng-if="item.id === \'create\'" class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
-                  '<line x1="12" y1="5" x2="12" y2="19"/>' +
-                  '<line x1="5" y1="12" x2="19" y2="12"/>' +
-                '</svg>' +
-                '<!-- Theme Toggle -->' +
-                '<svg ng-if="item.id === \'theme\' && dock.currentTheme === \'dark\'" class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
-                  '<circle cx="12" cy="12" r="5"/>' +
-                  '<line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>' +
-                  '<line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>' +
-                  '<line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>' +
-                  '<line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>' +
-                '</svg>' +
-                '<svg ng-if="item.id === \'theme\' && dock.currentTheme !== \'dark\'" class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+                '<svg ng-if="dock.currentTheme !== \'dark\'" viewBox="0 0 24 24">' +
                   '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>' +
                 '</svg>' +
-                '<!-- Account -->' +
-                '<svg ng-if="item.id === \'account\'" class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
-                  '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>' +
-                  '<circle cx="12" cy="7" r="4"/>' +
-                '</svg>' +
-              '</span>' +
-              '<span class="dock-dot"></span>' +
-              '<span class="dock-tooltip">{{ item.title }}</span>' +
-              '</a>' +
+              '</div>' +
+            '</button>' +
+
+            /* ---- Account ---- */
+            '<a href="login.html" class="apple-dock-item" ' +
+               'ng-class="{ active: dock.activeId === \'account\' }" ' +
+               'ng-style="{ transform: \'translateY(\' + dock.getItemTranslateY(7) + \'px) scale(\' + dock.getItemScale(7) + \')\' }">' +
+              '<span class="apple-dock-tooltip">Account</span>' +
+              '<div class="apple-dock-icon">' +
+                '<svg viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>' +
+              '</div>' +
+            '</a>' +
+
           '</div>' +
-        '</nav>'
+        '</div>'
     };
   });
 
