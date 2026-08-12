@@ -5,12 +5,16 @@ const app = express();
 const PORT = 3000;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 // Serve static files from Client root, Client/Pages, and Client/Style
 =======
 // Serve static files from Client/Pages, Client/Style, and Client
 app.use(express.static(path.join(__dirname, '../Client/Pages')));
 app.use(express.static(path.join(__dirname, '../Client/Style')));
 >>>>>>> 91d7d95b267cae83893bbcda411d1f6fcf2eb405
+=======
+// Serve static files from Client root, Client/Pages, and Client/Style
+>>>>>>> aefdf6ed9186bc53a39425c2c599834175a53fa5
 app.use(express.static(path.join(__dirname, '../Client')));
 app.use(express.static(path.join(__dirname, '../Client/Pages')));
 app.use('/Style', express.static(path.join(__dirname, '../Client/Style')));
