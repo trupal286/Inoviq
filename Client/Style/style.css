@@ -188,26 +188,28 @@ body {
 .nav-search-wrap, .search-wrap {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   background: var(--paper-card);
-  border: 1px solid var(--border-line);
-  border-radius: 20px;
-  padding: 8px 16px;
-  width: 240px;
+  border: 1.5px solid var(--border-line);
+  border-radius: 24px;
+  padding: 10px 20px;
+  flex: 1;
+  max-width: 500px;
+  margin: 0 20px;
   box-shadow: var(--shadow-sm);
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
 }
 .nav-search-wrap:focus-within, .search-wrap:focus-within {
   border-color: var(--moss);
-  box-shadow: 0 0 0 3px rgba(105, 124, 112, 0.18);
-  width: 280px;
+  box-shadow: 0 0 0 4px rgba(105, 124, 112, 0.18);
+  max-width: 540px;
 }
 .nav-search-wrap input, .search-wrap input {
   border: none;
   outline: none;
   background: transparent;
   font-family: var(--font-sans);
-  font-size: 13.5px;
+  font-size: 14.5px;
   color: var(--ink-primary);
   width: 100%;
 }
