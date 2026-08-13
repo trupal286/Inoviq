@@ -285,84 +285,10 @@
         });
       }
 
-      // Pixel Grid Effect
-      var COLS = 17, ROWS = 11;
-      var overlay, pixels = [];
-      var palette = ['#2F5233', '#1F3A24', '#B08D57', '#9C3D3D', '#1B2740', '#3a3a38', '#8a6d3f'];
-      var enc = '█▓▒░■□▪▫◆◇●○▲▼';
-      var ticker = document.getElementById('encTicker');
-      var originalTicker = ticker ? ticker.textContent : '';
-      var tickerTimer;
-
-      document.addEventListener('DOMContentLoaded', function () {
-        overlay = document.getElementById('pixelOverlay');
-        if (!overlay) return;
-
-        overlay.style.display = 'grid';
-        overlay.style.gridTemplateColumns = 'repeat(' + COLS + ', 1fr)';
-        overlay.style.gridTemplateRows = 'repeat(' + ROWS + ', 1fr)';
-
-        for (var i = 0; i < COLS * ROWS; i++) {
-          var px = document.createElement('div');
-          px.className = 'px';
-          overlay.appendChild(px);
-          pixels.push(px);
-        }
-
-        var heroCard = document.getElementById('heroCard');
-        if (heroCard) {
-          heroCard.addEventListener('mouseenter', function () { startTicker(); });
-          heroCard.addEventListener('mouseleave', function () {
-            clearInterval(tickerTimer);
-            if (ticker) ticker.textContent = originalTicker;
-          });
-        }
-      });
-
+      // Clean shuffle callback without glitch/pixel animations
       window._pixelShuffle = function (callback) {
-        if (!overlay) { if (typeof callback === 'function') callback(); return; }
-
-        pixels.forEach(function (px) {
-          px.style.transitionDelay = (Math.random() * 260) + 'ms';
-          px.style.background = palette[Math.floor(Math.random() * palette.length)];
-          px.style.opacity = '1';
-          px.style.transform = 'scale(1)';
-        });
-
-        setTimeout(function () {
-          if (typeof callback === 'function') callback();
-          setTimeout(function () {
-            pixels.forEach(function (px) {
-              px.style.transitionDelay = (Math.random() * 260) + 'ms';
-              px.style.opacity = '0';
-              px.style.transform = 'scale(0) rotate(45deg)';
-            });
-          }, 200);
-        }, 380);
+        if (typeof callback === 'function') callback();
       };
-
-      function startTicker() {
-        if (!ticker) return;
-        clearInterval(tickerTimer);
-        var frame = 0;
-        tickerTimer = setInterval(function () {
-          if (frame > 28) { ticker.textContent = originalTicker; clearInterval(tickerTimer); return; }
-          ticker.textContent = originalTicker.split('').map(function (ch) {
-            if (ch === ' ' || ch === '·') return ch;
-            return Math.random() > 0.35 ? enc[Math.floor(Math.random() * enc.length)] : ch;
-          }).join('');
-          frame++;
-        }, 55);
-      }
-
-      // Folder tabs active class switching
-      var folderTabs = document.querySelectorAll('.folder-tab');
-      folderTabs.forEach(function (tab) {
-        tab.addEventListener('click', function () {
-          folderTabs.forEach(function (t) { t.classList.remove('active'); });
-          tab.classList.add('active');
-        });
-      });
     })();
   </script>
 </body>
