@@ -2164,3 +2164,210 @@ body {
   border-color: var(--border-dark);
 }
 
+/* ==========================================================================
+   AUTH MODAL & ACCOUNT DROPDOWN SYSTEM
+   ========================================================================== */
+
+.auth-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(45, 53, 54, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.auth-modal-backdrop.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.auth-modal-card {
+  background: var(--paper-card);
+  border: 1.5px solid var(--border-dark);
+  border-radius: 20px;
+  padding: 32px 28px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: var(--shadow-3d);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transform: translateY(12px) scale(0.96);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.auth-modal-backdrop.is-open .auth-modal-card {
+  transform: translateY(0) scale(1);
+}
+
+.auth-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--ink-muted);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 50%;
+  transition: color 0.15s ease;
+}
+.auth-modal-close:hover {
+  color: var(--ink-primary);
+}
+
+.auth-modal-card .card-id {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--moss);
+  text-transform: uppercase;
+}
+
+.auth-modal-title {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--ink-primary);
+  line-height: 1.2;
+}
+
+.auth-modal-desc {
+  font-size: 14px;
+  color: var(--ink-muted);
+  line-height: 1.5;
+}
+
+.auth-action-name {
+  font-weight: 600;
+  color: var(--ink-primary);
+}
+
+.auth-modal-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.btn-auth-modal {
+  width: 100%;
+  justify-content: center;
+  padding: 12px 20px;
+  font-size: 14px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.auth-modal-foot {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-light);
+  text-align: center;
+  margin-top: 4px;
+}
+
+/* Account Dropdown Menu */
+.account-menu-container {
+  position: relative;
+}
+
+.guest-pill {
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+.guest-pill:hover {
+  border-color: var(--moss);
+  background: var(--mist);
+}
+.guest-avatar {
+  background: var(--moss) !important;
+  color: var(--plaster) !important;
+}
+
+.account-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 230px;
+  background: var(--paper-card);
+  border: 1.5px solid var(--border-line);
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: var(--shadow-lg);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  animation: dropdownFadeIn 0.18s ease-out;
+}
+
+@keyframes dropdownFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.account-dropdown-header {
+  padding: 6px 10px 10px;
+}
+.dropdown-user-name, .user-name {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-primary);
+}
+.dropdown-user-email, .user-email {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-dropdown-divider {
+  height: 1px;
+  background: var(--border-line);
+  margin: 4px 0;
+}
+
+.account-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink-primary);
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.account-dropdown-item:hover {
+  background: rgba(105, 124, 112, 0.12);
+}
+
+.btn-logout-item {
+  color: var(--stamp-red);
+}
+.btn-logout-item:hover {
+  background: rgba(156, 61, 61, 0.1);
+}
+
+

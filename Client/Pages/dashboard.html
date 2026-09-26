@@ -37,11 +37,39 @@
         </div>
 
         <div class="nav-actions">
-          <a href="create-card.html" class="btn-primary" id="btn-create-top">+ Create Card</a>
+          <a href="javascript:void(0)" ng-click="vm.requireAuth('Create Card', 'create-card.html')" class="btn-primary" id="btn-create-top">+ Create Card</a>
 
-          <a href="login.html" class="user-pill">
-            <div class="avatar-circle" title="Trupal Panchal">TP</div>
-            <span>Account</span>
+          <!-- Logged-in Account Dropdown -->
+          <div class="account-menu-container" ng-if="vm.isLoggedIn">
+            <button class="user-pill" ng-click="vm.toggleAccountMenu($event)" id="btn-account-user">
+              <div class="avatar-circle" title="{{ vm.currentUser.name }}">{{ vm.currentUser.initials }}</div>
+              <span>{{ vm.currentUser.name }}</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+
+            <div class="account-dropdown-menu" ng-if="vm.showAccountMenu" ng-click="$event.stopPropagation()">
+              <div class="account-dropdown-header">
+                <div class="user-name">{{ vm.currentUser.name }}</div>
+                <div class="user-email">{{ vm.currentUser.email }}</div>
+              </div>
+              <div class="account-dropdown-divider"></div>
+              <a href="dashboard.html" class="account-dropdown-item">📊 Dashboard</a>
+              <a href="create-card.html" class="account-dropdown-item">✨ Create Card</a>
+              <a href="dashboard.html#my-cards" class="account-dropdown-item">📇 Saved Catalog</a>
+              <div class="account-dropdown-divider"></div>
+              <button class="account-dropdown-item btn-logout-item" ng-click="vm.logout()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Log Out
+              </button>
+            </div>
+          </div>
+
+          <!-- Guest State Account Button -->
+          <a href="javascript:void(0)" ng-if="!vm.isLoggedIn" ng-click="vm.requireAuth('Account Options', 'dashboard.html')" class="user-pill guest-pill" id="btn-account-guest">
+            <div class="avatar-circle guest-avatar">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            </div>
+            <span>Log In / Sign Up</span>
           </a>
         </div>
       </div>
@@ -55,7 +83,7 @@
         <p class="sub">Build a card, generate its QR, and swap details the moment you meet someone — every detail filed
           straight into their contacts.</p>
         <div class="cta-row">
-          <a href="create-card.html" class="btn-primary btn-lg" id="btn-hero-create">Create your card</a>
+          <a href="javascript:void(0)" ng-click="vm.requireAuth('Create Card', 'create-card.html')" class="btn-primary btn-lg" id="btn-hero-create">Create your card</a>
           <a href="#templates" class="btn-ghost btn-lg" id="btn-browse">Browse templates</a>
         </div>
       </div>
@@ -79,7 +107,7 @@
               </div>
             </div>
             <div class="face back">
-              <div class="qr-block" id="qrBlock">
+              <div class="qr-block" id="qrBlock" ng-click="vm.onQrClick()" style="cursor:pointer;" title="Scan to Save Contact">
                 <svg width="68" height="68" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                   <rect x="3" y="3" width="7" height="7" />
                   <rect x="14" y="3" width="7" height="7" />
@@ -243,10 +271,32 @@
       <div class="footer-links">
         <a href="#templates">Templates</a>
         <a href="#how-it-works">Scan &amp; Save</a>
-        <a href="#my-cards">Contacts</a>
-        <a href="login.html">Sign In</a>
+        <a href="javascript:void(0)" ng-click="vm.requireAuth('Saved Catalog', 'dashboard.html#my-cards')">Contacts</a>
+        <a href="login.html" ng-if="!vm.isLoggedIn">Sign In</a>
+        <a href="javascript:void(0)" ng-if="vm.isLoggedIn" ng-click="vm.logout()">Log Out</a>
       </div>
     </footer>
+
+  </div><!-- /wrap -->
+
+  <!-- Auth Prompt Modal Component -->
+  <div class="auth-modal-backdrop" ng-class="{'is-open': vm.showAuthModal}" ng-click="vm.closeAuthModal($event)">
+    <div class="auth-modal-card" ng-click="$event.stopPropagation()">
+      <button class="auth-modal-close" ng-click="vm.closeAuthModal($event)">&times;</button>
+      <div class="card-id">AUTHENTICATION REQUIRED</div>
+      <h3 class="auth-modal-title">Sign in to continue</h3>
+      <p class="auth-modal-desc">
+        You need an Inoviq account to <span class="auth-action-name">{{ vm.authModalAction }}</span>.
+      </p>
+      <div class="auth-modal-buttons">
+        <a ng-href="{{ vm.getSignupUrl() }}" class="btn-primary btn-auth-modal">Create Account</a>
+        <a ng-href="{{ vm.getLoginUrl() }}" class="btn-secondary btn-auth-modal">Log In</a>
+      </div>
+      <div class="auth-modal-foot">
+        <span>🔒 256-bit encrypted · Free forever</span>
+      </div>
+    </div>
+  </div>
 
   </div><!-- /wrap -->
 

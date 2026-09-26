@@ -9,10 +9,118 @@
   var app = angular.module('digiCardApp', []);
 
   /* --------------------------------------------------------------------------
+     AuthService Factory
+     -------------------------------------------------------------------------- */
+  app.factory('AuthService', ['$window', '$rootScope', function ($window, $rootScope) {
+    var service = {};
+
+    service.getUser = function () {
+      try {
+        var data = $window.localStorage.getItem('inoviq_user');
+        return data ? JSON.parse(data) : null;
+      } catch (e) {
+        return null;
+      }
+    };
+
+    service.isLoggedIn = function () {
+      return !!service.getUser();
+    };
+
+    service.setUser = function (user) {
+      $window.localStorage.setItem('inoviq_user', JSON.stringify(user));
+      $rootScope.$broadcast('authChange', user);
+    };
+
+    service.logout = function () {
+      $window.localStorage.removeItem('inoviq_user');
+      $rootScope.$broadcast('authChange', null);
+    };
+
+    return service;
+  }]);
+
+  /* --------------------------------------------------------------------------
      DashboardController
      -------------------------------------------------------------------------- */
-  app.controller('DashboardController', ['$scope', '$window', function ($scope, $window) {
+  app.controller('DashboardController', ['$scope', '$window', '$rootScope', 'AuthService', function ($scope, $window, $rootScope, AuthService) {
     var vm = this;
+
+    vm.currentUser = AuthService.getUser();
+    vm.isLoggedIn = AuthService.isLoggedIn();
+
+    $rootScope.$on('authChange', function (evt, user) {
+      vm.currentUser = user;
+      vm.isLoggedIn = !!user;
+    });
+
+    vm.showAuthModal = false;
+    vm.authModalAction = '';
+    vm.targetReturnUrl = '';
+    vm.showAccountMenu = false;
+
+    vm.requireAuth = function (actionName, targetUrl) {
+      if (AuthService.isLoggedIn()) {
+        if (targetUrl && targetUrl !== ($window.location.pathname + $window.location.hash)) {
+          $window.location.href = targetUrl;
+        }
+        return true;
+      }
+      vm.authModalAction = actionName || 'access this feature';
+      vm.targetReturnUrl = targetUrl || ($window.location.pathname + $window.location.hash);
+      vm.showAuthModal = true;
+      return false;
+    };
+
+    vm.getLoginUrl = function () {
+      var ret = vm.targetReturnUrl || 'dashboard.html';
+      $window.sessionStorage.setItem('returnUrl', ret);
+      return 'login.html?returnUrl=' + encodeURIComponent(ret);
+    };
+
+    vm.getSignupUrl = function () {
+      var ret = vm.targetReturnUrl || 'dashboard.html';
+      $window.sessionStorage.setItem('returnUrl', ret);
+      return 'signup.html?returnUrl=' + encodeURIComponent(ret);
+    };
+
+    vm.closeAuthModal = function (evt) {
+      if (evt) evt.stopPropagation();
+      vm.showAuthModal = false;
+    };
+
+    vm.toggleAccountMenu = function (evt) {
+      if (evt) evt.stopPropagation();
+      vm.showAccountMenu = !vm.showAccountMenu;
+    };
+
+    vm.logout = function () {
+      AuthService.logout();
+      vm.currentUser = null;
+      vm.isLoggedIn = false;
+      vm.showAccountMenu = false;
+      $window.location.reload();
+    };
+
+    $window.addEventListener('click', function () {
+      if (vm.showAccountMenu) {
+        $scope.$apply(function () {
+          vm.showAccountMenu = false;
+        });
+      }
+    });
+
+    $rootScope.$on('showAuthModal', function (evt, data) {
+      vm.authModalAction = data.action || 'access this feature';
+      vm.targetReturnUrl = data.returnUrl || 'dashboard.html';
+      vm.showAuthModal = true;
+      $scope.$applyAsync();
+    });
+
+    $rootScope.$on('toggleAccountMenu', function () {
+      vm.showAccountMenu = !vm.showAccountMenu;
+      $scope.$applyAsync();
+    });
 
     vm.searchTerm = '';
 
@@ -24,6 +132,10 @@
     ];
 
     vm.setActiveNav = function (selected) {
+      if (selected.label === 'Saved Catalog' && !AuthService.isLoggedIn()) {
+        vm.requireAuth('Saved Catalog', 'dashboard.html#my-cards');
+        return;
+      }
       vm.navItems.forEach(function (item) { item.active = false; });
       selected.active = true;
     };
@@ -72,6 +184,8 @@
     };
 
     vm.onCreateCard = function () {
+      if (!vm.requireAuth('Create Card', 'create-card.html')) return;
+
       var name = prompt('Enter Cardholder Name:', 'New Member');
       if (!name) return;
       var role = prompt('Enter Job Title:', 'Creator & Developer') || 'Member';
@@ -91,6 +205,7 @@
     };
 
     vm.onEditCard = function (card) {
+      if (!vm.requireAuth('Edit Card', 'dashboard.html#my-cards')) return;
       var name = prompt('Edit Cardholder Name:', card.fullName);
       if (name) {
         card.fullName = name;
@@ -99,6 +214,7 @@
     };
 
     vm.onDeleteCard = function (card) {
+      if (!vm.requireAuth('Delete Card', 'dashboard.html#my-cards')) return;
       if (confirm('Are you sure you want to remove ' + card.fullName + '?')) {
         var idx = vm.cards.indexOf(card);
         if (idx > -1) vm.cards.splice(idx, 1);
@@ -106,15 +222,88 @@
     };
 
     vm.selectTemplate = function (name) {
-      alert('Selected Template: "' + name + '". Create a card to use this template!');
+      if (!vm.requireAuth('Use Template', 'create-card.html')) return;
+      $window.location.href = 'create-card.html';
+    };
+
+    vm.onQrClick = function () {
+      vm.requireAuth('Save Contact via QR', 'dashboard.html#hero');
     };
   }]);
 
   /* --------------------------------------------------------------------------
      CreateCardController
      -------------------------------------------------------------------------- */
-  app.controller('CreateCardController', ['$scope', '$window', function ($scope, $window) {
+  app.controller('CreateCardController', ['$scope', '$window', '$rootScope', 'AuthService', function ($scope, $window, $rootScope, AuthService) {
     var vm = this;
+
+    vm.currentUser = AuthService.getUser();
+    vm.isLoggedIn = AuthService.isLoggedIn();
+
+    $rootScope.$on('authChange', function (evt, user) {
+      vm.currentUser = user;
+      vm.isLoggedIn = !!user;
+    });
+
+    vm.showAuthModal = false;
+    vm.authModalAction = '';
+    vm.targetReturnUrl = '';
+    vm.showAccountMenu = false;
+
+    vm.requireAuth = function (actionName, targetUrl) {
+      if (AuthService.isLoggedIn()) {
+        return true;
+      }
+      vm.authModalAction = actionName || 'access this feature';
+      vm.targetReturnUrl = targetUrl || 'create-card.html';
+      vm.showAuthModal = true;
+      return false;
+    };
+
+    vm.getLoginUrl = function () {
+      var ret = vm.targetReturnUrl || 'create-card.html';
+      $window.sessionStorage.setItem('returnUrl', ret);
+      return 'login.html?returnUrl=' + encodeURIComponent(ret);
+    };
+
+    vm.getSignupUrl = function () {
+      var ret = vm.targetReturnUrl || 'create-card.html';
+      $window.sessionStorage.setItem('returnUrl', ret);
+      return 'signup.html?returnUrl=' + encodeURIComponent(ret);
+    };
+
+    vm.closeAuthModal = function (evt) {
+      if (evt) evt.stopPropagation();
+      vm.showAuthModal = false;
+    };
+
+    vm.toggleAccountMenu = function (evt) {
+      if (evt) evt.stopPropagation();
+      vm.showAccountMenu = !vm.showAccountMenu;
+    };
+
+    vm.logout = function () {
+      AuthService.logout();
+      vm.currentUser = null;
+      vm.isLoggedIn = false;
+      vm.showAccountMenu = false;
+      $window.location.reload();
+    };
+
+    $window.addEventListener('click', function () {
+      if (vm.showAccountMenu) {
+        $scope.$apply(function () {
+          vm.showAccountMenu = false;
+        });
+      }
+    });
+
+    $rootScope.$on('showAuthModal', function (evt, data) {
+      vm.authModalAction = data.action || 'access this feature';
+      vm.targetReturnUrl = data.returnUrl || 'create-card.html';
+      vm.showAuthModal = true;
+      $scope.$applyAsync();
+    });
 
     vm.cardData = {
       fullName: 'Trupal Panchal',
@@ -178,6 +367,8 @@
     };
 
     vm.onSaveCard = function () {
+      if (!vm.requireAuth('Save Digital Card', 'create-card.html?action=save')) return;
+
       vm.saveSuccess = true;
       setTimeout(function () {
         $scope.$apply(function () {
@@ -187,6 +378,8 @@
     };
 
     vm.copyCardLink = function () {
+      if (!vm.requireAuth('Share Card Link', 'create-card.html')) return;
+
       if (navigator.clipboard) {
         navigator.clipboard.writeText($window.location.origin + '/create-card?card=' + encodeURIComponent(vm.cardData.fullName));
       }
@@ -197,10 +390,17 @@
   /* --------------------------------------------------------------------------
      DockController & Apple-Style Floating Dock Directive (macOS Proximity Magnification)
      -------------------------------------------------------------------------- */
-  app.controller('DockController', ['$scope', '$window', '$document', function ($scope, $window, $document) {
+  app.controller('DockController', ['$scope', '$window', '$document', '$rootScope', 'AuthService', function ($scope, $window, $document, $rootScope, AuthService) {
     var dock = this;
 
     dock.currentTheme = localStorage.getItem('inoviq_theme') || 'light';
+    dock.currentUser = AuthService.getUser();
+    dock.isLoggedIn = AuthService.isLoggedIn();
+
+    $rootScope.$on('authChange', function (evt, user) {
+      dock.currentUser = user;
+      dock.isLoggedIn = !!user;
+    });
 
     /* Navigation items — 'divider' type creates a visual separator */
     dock.items = [
@@ -282,37 +482,45 @@
 
     /* Calculate approximate center X of each item in the dock */
     dock._getItemCenterX = function (index) {
-      /* Account for padding (16px) + gap (6px between items) + dividers (12px wide) */
-      var x = 16; /* left padding */
+      var x = 16;
       var navItems = dock.items;
       for (var i = 0; i < index; i++) {
         if (navItems[i].type === 'divider') {
-          x += 12 + 6; /* divider width + gap */
+          x += 12 + 6;
         } else {
-          x += BASE_SIZE + 6; /* item width + gap */
+          x += BASE_SIZE + 6;
         }
       }
       if (navItems[index] && navItems[index].type === 'divider') {
-        x += 6; /* half of divider */
+        x += 6;
       } else {
-        x += BASE_SIZE / 2; /* center of item */
+        x += BASE_SIZE / 2;
       }
       return x;
     };
 
     dock.onItemClick = function (item, $event) {
-      if (item.action === 'create') {
+      if (item.action === 'create' || item.id === 'create') {
         $event.preventDefault();
-        var bodyEl = angular.element(document.body);
-        var vm = bodyEl.scope() ? bodyEl.scope().vm : null;
-        if (vm && typeof vm.onCreateCard === 'function') {
-          vm.onCreateCard();
+        if (!dock.isLoggedIn) {
+          $rootScope.$broadcast('showAuthModal', { action: 'Create Card', returnUrl: 'create-card.html' });
         } else {
-          var name = prompt('Create Card — Enter Name:');
-          if (name) {
-            alert('Card created for ' + name + '! Redirecting to collection...');
-          }
+          $window.location.href = 'create-card.html';
+        }
+      } else if (item.id === 'cards') {
+        if (!dock.isLoggedIn) {
+          $event.preventDefault();
+          $rootScope.$broadcast('showAuthModal', { action: 'View Saved Catalog', returnUrl: 'dashboard.html#my-cards' });
+        } else {
+          dock.activeId = 'cards';
           $window.location.href = 'dashboard.html#my-cards';
+        }
+      } else if (item.id === 'account') {
+        $event.preventDefault();
+        if (dock.isLoggedIn) {
+          $rootScope.$broadcast('toggleAccountMenu');
+        } else {
+          $rootScope.$broadcast('showAuthModal', { action: 'Account Options', returnUrl: $window.location.pathname });
         }
       } else if (item.action === 'theme') {
         $event.preventDefault();
@@ -372,9 +580,9 @@
             '</a>' +
 
             /* ---- Saved Catalog ---- */
-            '<a href="dashboard.html#my-cards" class="apple-dock-item" ' +
+            '<a href="javascript:void(0);" class="apple-dock-item" ' +
                'ng-class="{ active: dock.activeId === \'cards\' }" ' +
-               'ng-click="dock.activeId = \'cards\'" ' +
+               'ng-click="dock.onItemClick({id: \'cards\'}, $event)" ' +
                'ng-style="{ transform: \'translateY(\' + dock.getItemTranslateY(2) + \'px) scale(\' + dock.getItemScale(2) + \')\' }">' +
               '<span class="apple-dock-tooltip">Saved Catalog</span>' +
               '<div class="apple-dock-icon">' +
@@ -425,10 +633,11 @@
             '</button>' +
 
             /* ---- Account ---- */
-            '<a href="login.html" class="apple-dock-item" ' +
+            '<a href="javascript:void(0);" class="apple-dock-item" ' +
                'ng-class="{ active: dock.activeId === \'account\' }" ' +
+               'ng-click="dock.onItemClick({id: \'account\'}, $event)" ' +
                'ng-style="{ transform: \'translateY(\' + dock.getItemTranslateY(7) + \'px) scale(\' + dock.getItemScale(7) + \')\' }">' +
-              '<span class="apple-dock-tooltip">Account</span>' +
+              '<span class="apple-dock-tooltip">{{ dock.isLoggedIn ? dock.currentUser.name + \' (Account)\' : \'Log In / Sign Up\' }}</span>' +
               '<div class="apple-dock-icon">' +
                 '<svg viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>' +
               '</div>' +
@@ -440,3 +649,4 @@
   });
 
 })();
+

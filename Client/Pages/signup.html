@@ -202,6 +202,9 @@
       var pass = document.getElementById('signupPassword').value;
       var confirm = document.getElementById('signupConfirm');
       var btn = document.getElementById('signupBtn');
+      var firstName = (document.getElementById('signupFirstName').value || '').trim();
+      var lastName = (document.getElementById('signupLastName').value || '').trim();
+      var email = (document.getElementById('signupEmail').value || '').trim();
 
       if (pass !== confirm.value) {
         confirm.style.borderColor = 'var(--stamp-red)';
@@ -213,13 +216,37 @@
       btn.textContent = 'Creating account\u2026';
       btn.disabled = true;
 
+      var params = new URLSearchParams(window.location.search);
+      var returnUrl = params.get('returnUrl') || sessionStorage.getItem('returnUrl') || 'dashboard.html';
+
+      var fullName = (firstName + ' ' + lastName).trim() || 'New Member';
+      var initials = ((firstName[0] || 'N') + (lastName[0] || 'M')).toUpperCase();
+
+      var user = {
+        name: fullName,
+        email: email || 'member@inoviq.io',
+        initials: initials,
+        isLoggedIn: true,
+        loginTime: Date.now()
+      };
+
+      localStorage.setItem('inoviq_user', JSON.stringify(user));
+
       setTimeout(function () {
-        window.location.href = 'login.html?registered=1';
-      }, 1200);
+        sessionStorage.removeItem('returnUrl');
+        window.location.href = returnUrl;
+      }, 900);
     }
 
     /* ── Theme Toggle & Event Handlers ── */
     document.addEventListener('DOMContentLoaded', function () {
+      var params = new URLSearchParams(window.location.search);
+      var returnUrl = params.get('returnUrl') || sessionStorage.getItem('returnUrl');
+      if (returnUrl) {
+        var loginLink = document.querySelector('.card-foot a');
+        if (loginLink) loginLink.href = 'login.html?returnUrl=' + encodeURIComponent(returnUrl);
+      }
+
       var confirm = document.getElementById('signupConfirm');
       if (confirm) {
         confirm.addEventListener('input', function () {
