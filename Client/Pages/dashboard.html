@@ -33,18 +33,22 @@
             <circle cx="11" cy="11" r="8" />
             <path d="m21 21-4.35-4.35" />
           </svg>
-          <input type="text" placeholder="Search cards, contacts or companies..." ng-model="vm.searchTerm" id="nav-search-input">
+          <input type="text" placeholder="Search cards, contacts or companies..." ng-model="vm.searchTerm"
+            id="nav-search-input">
         </div>
 
         <div class="nav-actions">
-          <a href="javascript:void(0)" ng-click="vm.requireAuth('Create Card', 'create-card.html')" class="btn-primary" id="btn-create-top">+ Create Card</a>
+          <a href="javascript:void(0)" ng-click="vm.requireAuth('Create Card', 'create-card.html')" class="btn-primary"
+            id="btn-create-top">➕ Create Card</a>
 
           <!-- Logged-in Account Dropdown -->
           <div class="account-menu-container" ng-if="vm.isLoggedIn">
             <button class="user-pill" ng-click="vm.toggleAccountMenu($event)" id="btn-account-user">
               <div class="avatar-circle" title="{{ vm.currentUser.name }}">{{ vm.currentUser.initials }}</div>
               <span>{{ vm.currentUser.name }}</span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
             </button>
 
             <div class="account-dropdown-menu" ng-if="vm.showAccountMenu" ng-click="$event.stopPropagation()">
@@ -58,16 +62,25 @@
               <a href="dashboard.html#my-cards" class="account-dropdown-item">📇 Saved Catalog</a>
               <div class="account-dropdown-divider"></div>
               <button class="account-dropdown-item btn-logout-item" ng-click="vm.logout()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                  <polyline points="16 17 21 12 16 7" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
                 Log Out
               </button>
             </div>
           </div>
 
           <!-- Guest State Account Button -->
-          <a href="javascript:void(0)" ng-if="!vm.isLoggedIn" ng-click="vm.requireAuth('Account Options', 'dashboard.html')" class="user-pill guest-pill" id="btn-account-guest">
+          <a href="javascript:void(0)" ng-if="!vm.isLoggedIn"
+            ng-click="vm.requireAuth('Account Options', 'dashboard.html')" class="user-pill guest-pill"
+            id="btn-account-guest">
             <div class="avatar-circle guest-avatar">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+              </svg>
             </div>
             <span>Log In / Sign Up</span>
           </a>
@@ -78,12 +91,13 @@
     <!-- ===== HERO SECTION ===== -->
     <section class="hero" id="hero">
       <div class="hero-copy">
-        <div class="eyebrow">No. {{ vm.totalCards() }} cards filed — issued digitally</div>
+        <div class="eyebrow">PUBLIC DEMO PREVIEW · DIGITAL CARDS IN ACTION</div>
         <h1>Hand someone<br>your card, <em>without</em><br>the paper.</h1>
         <p class="sub">Build a card, generate its QR, and swap details the moment you meet someone — every detail filed
           straight into their contacts.</p>
         <div class="cta-row">
-          <a href="javascript:void(0)" ng-click="vm.requireAuth('Create Card', 'create-card.html')" class="btn-primary btn-lg" id="btn-hero-create">Create your card</a>
+          <a href="javascript:void(0)" ng-click="vm.requireAuth('Create Card', 'create-card.html')"
+            class="btn-primary btn-lg" id="btn-hero-create">Create your card</a>
           <a href="#templates" class="btn-ghost btn-lg" id="btn-browse">Browse templates</a>
         </div>
       </div>
@@ -97,26 +111,42 @@
           <div class="card-flip" id="heroCard">
             <div class="face front">
               <div class="card-header">
-                <div class="card-id">CARD · NO. 001{{ vm.heroCard.id }}</div>
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                  <div class="card-id">CARD · SAMPLE {{ vm.heroCard.id }}</div>
+                  <span class="sample-tag-badge">SAMPLE CARD</span>
+                </div>
                 <div class="card-name">{{ vm.heroCard.fullName }}</div>
                 <div class="card-role">{{ vm.heroCard.jobTitle }} — {{ vm.heroCard.company }}</div>
               </div>
               <div class="card-foot">
-                <span class="card-url">{{ vm.heroCard.company | lowercase }}.io</span>
+                <span class="card-url">{{ vm.heroCard.website }}</span>
                 <div class="card-mark">{{ vm.heroCard.initials }}</div>
               </div>
             </div>
             <div class="face back">
-              <div class="qr-block" id="qrBlock" ng-click="vm.onQrClick()" style="cursor:pointer;" title="Scan to Save Contact">
-                <svg width="68" height="68" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <div class="qr-block" id="qrBlock" ng-click="vm.onQrClick()" style="cursor:pointer;"
+                title="Click or Scan to Save Contact">
+                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                   <rect x="3" y="3" width="7" height="7" />
                   <rect x="14" y="3" width="7" height="7" />
                   <rect x="3" y="14" width="7" height="7" />
                   <path d="M14 14h3v3h-3zM18 18h3v3h-3zM14 18h3v3h-3zM18 14h3v3h-3z" />
                 </svg>
               </div>
-              <div class="enc-ticker" id="encTicker">SCAN TO SAVE · NFC · 256-BIT</div>
-              <small class="back-label">SCAN TO SAVE CONTACT</small>
+
+              <!-- Realistic Demo Contact Details -->
+              <div class="demo-contact-details">
+                <div>✉️ {{ vm.heroCard.email }}</div>
+                <div>📞 {{ vm.heroCard.phone }}</div>
+                <div>🌐 {{ vm.heroCard.website }}</div>
+              </div>
+
+              <button type="button" class="btn-primary btn-save-contact" ng-click="vm.onQrClick()"
+                style="padding: 5px 14px; font-size: 11px; border-radius: 6px; margin-top: 2px;">
+                💾 Save Contact
+              </button>
+
+              <small class="back-label" style="font-size: 9px; opacity: 0.8;">SCAN OR CLICK TO SAVE DEMO CONTACT</small>
             </div>
           </div>
 
@@ -297,8 +327,6 @@
       </div>
     </div>
   </div>
-
-  </div><!-- /wrap -->
 
   <!-- Apple-Style Floating Dock Navigation (macOS Proximity Magnification) -->
   <liquid-dock></liquid-dock>

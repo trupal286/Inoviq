@@ -140,6 +140,13 @@
       selected.active = true;
     };
 
+    vm.heroCards = [
+      { id: '0011', fullName: 'Alex Morgan', jobTitle: 'Product Designer', company: 'Studio North', email: 'alex@studionorth.io', phone: '+1 (555) 234-5678', website: 'studionorth.io', initials: 'AM', color: '#2F5233' },
+      { id: '0012', fullName: 'Aarav Mehta', jobTitle: 'Senior UX Designer', company: 'Studio Craft', email: 'aarav@studiocraft.design', phone: '+1 (555) 876-5432', website: 'studiocraft.design', initials: 'AM', color: '#1B2740' },
+      { id: '0013', fullName: 'Riddhi Gandhi', jobTitle: 'Lead Software Engineer', company: 'Inoviq Tech', email: 'riddhi@inoviq.tech', phone: '+1 (555) 345-6789', website: 'inoviq.tech', initials: 'RG', color: '#B08D57' },
+      { id: '0014', fullName: 'Sofia Chen', jobTitle: 'Brand Designer', company: 'Aura Studio', email: 'sofia@aurastudio.co', phone: '+1 (555) 901-2345', website: 'aurastudio.co', initials: 'SC', color: '#9C3D3D' }
+    ];
+
     vm.cards = [
       { id: 1, fullName: 'Trupal Panchal', jobTitle: 'Product Lead & Architect', company: 'Inoviq Studio', templateLabel: 'Ledger', initials: 'TP', color: '#2F5233' },
       { id: 2, fullName: 'Aarav Mehta', jobTitle: 'Senior UX Designer', company: 'Studio Craft', templateLabel: 'Midnight Desk', initials: 'AM', color: '#1B2740' },
@@ -148,18 +155,18 @@
     ];
 
     vm.heroIndex = 0;
-    vm.heroCard = vm.cards[0];
+    vm.heroCard = vm.heroCards[0];
 
     vm.shuffleHeroCard = function () {
       if ($window._pixelShuffle) {
         $window._pixelShuffle(function () {
-          vm.heroIndex = (vm.heroIndex + 1) % vm.cards.length;
-          vm.heroCard = vm.cards[vm.heroIndex];
+          vm.heroIndex = (vm.heroIndex + 1) % vm.heroCards.length;
+          vm.heroCard = vm.heroCards[vm.heroIndex];
           $scope.$applyAsync();
         });
       } else {
-        vm.heroIndex = (vm.heroIndex + 1) % vm.cards.length;
-        vm.heroCard = vm.cards[vm.heroIndex];
+        vm.heroIndex = (vm.heroIndex + 1) % vm.heroCards.length;
+        vm.heroCard = vm.heroCards[vm.heroIndex];
       }
     };
 

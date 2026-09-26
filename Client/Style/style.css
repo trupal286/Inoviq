@@ -2363,11 +2363,33 @@ body {
   background: rgba(105, 124, 112, 0.12);
 }
 
-.btn-logout-item {
-  color: var(--stamp-red);
-}
 .btn-logout-item:hover {
   background: rgba(156, 61, 61, 0.1);
 }
+
+.sample-tag-badge {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(177, 212, 208, 0.22);
+  color: var(--baby-blue);
+  border: 1px solid rgba(177, 212, 208, 0.35);
+  text-transform: uppercase;
+}
+
+.demo-contact-details {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--plaster);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 
 
