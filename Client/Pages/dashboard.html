@@ -165,7 +165,34 @@
     </section>
 
     <!-- ===== STATS STRIP ===== -->
-    <div class="stats-strip">
+    <div class="stats-strip" ng-if="!vm.isLoggedIn">
+      <div class="stat-item">
+        <div class="stat-num">01</div>
+        <div class="stat-lbl">Digital Card</div>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-item">
+        <div class="stat-num">04</div>
+        <div class="stat-lbl">Card Styles</div>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-item">
+        <div class="stat-num">01</div>
+        <div class="stat-lbl">QR Profile</div>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-item">
+        <div class="stat-num">0</div>
+        <div class="stat-lbl">Paper Required</div>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-item">
+        <div class="stat-num">&#8734;</div>
+        <div class="stat-lbl">Connections</div>
+      </div>
+    </div>
+
+    <div class="stats-strip" ng-if="vm.isLoggedIn">
       <div class="stat-item">
         <div class="stat-num">{{ vm.totalCards() }}</div>
         <div class="stat-lbl">Cards on file</div>
@@ -224,45 +251,97 @@
       </div>
     </section>
 
-    <!-- ===== MY CARDS ===== -->
+    <!-- ===== CARDS SECTION ===== -->
     <section class="my-cards-section" id="my-cards">
-      <div class="catalog-head">
-        <div>
-          <div class="eyebrow-small">Your collection</div>
-          <div class="catalog-title">My Cards</div>
+      <!-- GUEST MODE: EXPLORE INOVIQ CARDS -->
+      <div ng-if="!vm.isLoggedIn">
+        <div class="catalog-head">
+          <div>
+            <div class="eyebrow-small">Sample Showcase</div>
+            <div class="catalog-title">Explore Inoviq Cards</div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="nav-search-wrap">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+              </svg>
+              <input type="text" placeholder="Filter sample cards…" ng-model="vm.searchTerm" id="search-demo-cards">
+            </div>
+            <button class="btn-ghost" ng-click="vm.toggleShowAllDemoCards()" id="btn-toggle-demo-cards" style="white-space: nowrap;">
+              {{ vm.showAllDemoCards ? 'Show initial 4' : 'View all cards →' }}
+            </button>
+          </div>
         </div>
-        <div class="nav-search-wrap">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <circle cx="11" cy="11" r="8" />
-            <path d="m21 21-4.35-4.35" />
-          </svg>
-          <input type="text" placeholder="Filter cards…" ng-model="vm.searchTerm" id="search-my-cards">
+
+        <div class="cards-list">
+          <div class="card-row" ng-repeat="card in vm.filteredDemoCards() track by card.id" id="card-{{ card.id }}">
+            <div class="row-chip" ng-style="{background: card.color}">{{ card.initials }}</div>
+            <div class="row-info">
+              <div class="row-name">{{ card.fullName }}</div>
+              <div class="row-role">{{ card.jobTitle }} &middot; {{ card.company }}</div>
+            </div>
+            <div class="row-badge">{{ card.templateLabel }}</div>
+            <div class="row-actions">
+              <button class="btn-icon" ng-click="vm.onEditCard(card)" title="Edit card (Demo)">&#9998;</button>
+              <button class="btn-icon btn-del" ng-click="vm.onDeleteCard(card)" title="Delete card (Demo)">&#10005;</button>
+            </div>
+          </div>
+
+          <p class="empty-state" ng-if="vm.filteredDemoCards().length === 0 && vm.searchTerm">
+            No sample cards match &ldquo;{{ vm.searchTerm }}&rdquo;.
+          </p>
+
+          <div class="card-row row-add" ng-click="vm.onCreateCard()" id="btn-add-row-guest">
+            <div class="row-chip add-chip">+</div>
+            <div class="row-info">
+              <div class="row-name">Create your custom card</div>
+              <div class="row-role">Start blank or choose a template</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="cards-list">
-        <div class="card-row" ng-repeat="card in vm.filteredCards() track by card.id" id="card-{{ card.id }}">
-          <div class="row-chip" ng-style="{background: card.color}">{{ card.initials }}</div>
-          <div class="row-info">
-            <div class="row-name">{{ card.fullName }}</div>
-            <div class="row-role">{{ card.jobTitle }} &middot; {{ card.company }}</div>
+      <!-- LOGGED-IN MODE: MY CARDS -->
+      <div ng-if="vm.isLoggedIn">
+        <div class="catalog-head">
+          <div>
+            <div class="eyebrow-small">Your collection</div>
+            <div class="catalog-title">My Cards</div>
           </div>
-          <div class="row-badge">{{ card.templateLabel }}</div>
-          <div class="row-actions">
-            <button class="btn-icon" ng-click="vm.onEditCard(card)" title="Edit card">&#9998;</button>
-            <button class="btn-icon btn-del" ng-click="vm.onDeleteCard(card)" title="Delete card">&#10005;</button>
+          <div class="nav-search-wrap">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+            <input type="text" placeholder="Filter cards…" ng-model="vm.searchTerm" id="search-my-cards">
           </div>
         </div>
 
-        <p class="empty-state" ng-if="vm.filteredCards().length === 0 && vm.searchTerm">
-          No cards match &ldquo;{{ vm.searchTerm }}&rdquo;.
-        </p>
+        <div class="cards-list">
+          <div class="card-row" ng-repeat="card in vm.filteredCards() track by card.id" id="card-{{ card.id }}">
+            <div class="row-chip" ng-style="{background: card.color}">{{ card.initials }}</div>
+            <div class="row-info">
+              <div class="row-name">{{ card.fullName }}</div>
+              <div class="row-role">{{ card.jobTitle }} &middot; {{ card.company }}</div>
+            </div>
+            <div class="row-badge">{{ card.templateLabel }}</div>
+            <div class="row-actions">
+              <button class="btn-icon" ng-click="vm.onEditCard(card)" title="Edit card">&#9998;</button>
+              <button class="btn-icon btn-del" ng-click="vm.onDeleteCard(card)" title="Delete card">&#10005;</button>
+            </div>
+          </div>
 
-        <div class="card-row row-add" ng-click="vm.onCreateCard()" id="btn-add-row">
-          <div class="row-chip add-chip">+</div>
-          <div class="row-info">
-            <div class="row-name">Add a new card</div>
-            <div class="row-role">Start blank or choose a template</div>
+          <p class="empty-state" ng-if="vm.filteredCards().length === 0 && vm.searchTerm">
+            No cards match &ldquo;{{ vm.searchTerm }}&rdquo;.
+          </p>
+
+          <div class="card-row row-add" ng-click="vm.onCreateCard()" id="btn-add-row">
+            <div class="row-chip add-chip">+</div>
+            <div class="row-info">
+              <div class="row-name">Add a new card</div>
+              <div class="row-role">Start blank or choose a template</div>
+            </div>
           </div>
         </div>
       </div>

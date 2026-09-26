@@ -147,6 +147,37 @@
       { id: '0014', fullName: 'Sofia Chen', jobTitle: 'Brand Designer', company: 'Aura Studio', email: 'sofia@aurastudio.co', phone: '+1 (555) 901-2345', website: 'aurastudio.co', initials: 'SC', color: '#9C3D3D' }
     ];
 
+    vm.showAllDemoCards = false;
+
+    vm.demoCards = [
+      { id: 'demo-1', fullName: 'Alex Morgan', jobTitle: 'Product Designer', company: 'Studio North', templateLabel: 'Ledger', initials: 'AM', color: '#2F5233' },
+      { id: 'demo-2', fullName: 'Riddhi Gandhi', jobTitle: 'Lead Software Engineer', company: 'Inoviq Tech', templateLabel: 'Brass Rule', initials: 'RG', color: '#B08D57' },
+      { id: 'demo-3', fullName: 'Sofia Chen', jobTitle: 'Creative Director', company: 'Aura Studio', templateLabel: 'Stamped', initials: 'SC', color: '#9C3D3D' },
+      { id: 'demo-4', fullName: 'Trupal Panchal', jobTitle: 'Founder & Architect', company: 'Loop Studio', templateLabel: 'Midnight Desk', initials: 'TP', color: '#1B2740' },
+      { id: 'demo-5', fullName: 'Elena Rostova', jobTitle: 'Principal Photographer', company: 'Lumina Lens', templateLabel: 'Midnight Desk', initials: 'ER', color: '#52352D' },
+      { id: 'demo-6', fullName: 'Marcus Vance', jobTitle: 'Growth & Marketing Lead', company: 'Vanguard Media', templateLabel: 'Ledger', initials: 'MV', color: '#697C70' }
+    ];
+
+    vm.toggleShowAllDemoCards = function () {
+      vm.showAllDemoCards = !vm.showAllDemoCards;
+    };
+
+    vm.filteredDemoCards = function () {
+      var list = vm.demoCards;
+      if (vm.searchTerm) {
+        var term = vm.searchTerm.toLowerCase();
+        list = vm.demoCards.filter(function (card) {
+          return card.fullName.toLowerCase().includes(term) ||
+            card.jobTitle.toLowerCase().includes(term) ||
+            card.company.toLowerCase().includes(term);
+        });
+      }
+      if (!vm.showAllDemoCards && !vm.searchTerm) {
+        return list.slice(0, 4);
+      }
+      return list;
+    };
+
     vm.cards = [
       { id: 1, fullName: 'Trupal Panchal', jobTitle: 'Product Lead & Architect', company: 'Inoviq Studio', templateLabel: 'Ledger', initials: 'TP', color: '#2F5233' },
       { id: 2, fullName: 'Aarav Mehta', jobTitle: 'Senior UX Designer', company: 'Studio Craft', templateLabel: 'Midnight Desk', initials: 'AM', color: '#1B2740' },
