@@ -139,9 +139,15 @@
 
             <!-- SUBMIT BUTTON -->
             <div class="form-submit-row">
-              <button type="submit" class="btn-save-card" id="btn-save-card">
-                Save &amp; Issue Digital Card
+              <button type="submit" class="btn-save-card" id="btn-save-card" ng-disabled="vm.saving">
+                <span ng-if="!vm.saving">Save &amp; Issue Digital Card</span>
+                <span ng-if="vm.saving">Saving…</span>
               </button>
+            </div>
+
+            <!-- ERROR MESSAGE -->
+            <div ng-if="vm.saveError" style="color: #C0392B; font-family: var(--font-mono); font-size: 11px; text-align: center; margin-top: 10px;">
+              {{ vm.saveError }}
             </div>
 
             <!-- TOAST BANNER -->

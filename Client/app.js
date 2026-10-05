@@ -1,6 +1,7 @@
 /* ==========================================================================
    INOVIQ — AngularJS Master Application & Liquid Glass Dock Directive
    Pure AngularJS Architecture with Synchronized Circle + Icon Elevation
+   + AuthService, CardService, and API Integration
    ========================================================================== */
 
 (function () {
@@ -9,10 +10,259 @@
   var app = angular.module('digiCardApp', []);
 
   /* --------------------------------------------------------------------------
+     AuthService — JWT token management & API calls
+     -------------------------------------------------------------------------- */
+  app.factory('AuthService', ['$http', '$window', function ($http, $window) {
+    var API = '/api/auth';
+    var TOKEN_KEY = 'inoviq_token';
+    var USER_KEY = 'inoviq_user';
+
+    function saveAuth(token, user) {
+      $window.localStorage.setItem(TOKEN_KEY, token);
+      $window.localStorage.setItem(USER_KEY, JSON.stringify(user));
+    }
+
+    function clearAuth() {
+      $window.localStorage.removeItem(TOKEN_KEY);
+      $window.localStorage.removeItem(USER_KEY);
+    }
+
+    return {
+      signup: function (data) {
+        return $http.post(API + '/signup', data).then(function (res) {
+          if (res.data.success) {
+            saveAuth(res.data.token, res.data.user);
+          }
+          return res.data;
+        });
+      },
+
+      login: function (identifier, password) {
+        return $http.post(API + '/login', {
+          identifier: identifier,
+          password: password
+        }).then(function (res) {
+          if (res.data.success) {
+            saveAuth(res.data.token, res.data.user);
+          }
+          return res.data;
+        });
+      },
+
+      logout: function () {
+        clearAuth();
+        $window.location.href = 'login.html';
+      },
+
+      getToken: function () {
+        return $window.localStorage.getItem(TOKEN_KEY);
+      },
+
+      isLoggedIn: function () {
+        var token = $window.localStorage.getItem(TOKEN_KEY);
+        if (!token) return false;
+        // Simple expiry check (JWT is base64-encoded JSON)
+        try {
+          var payload = JSON.parse(atob(token.split('.')[1]));
+          return payload.exp * 1000 > Date.now();
+        } catch (e) {
+          return false;
+        }
+      },
+
+      getCurrentUser: function () {
+        try {
+          var data = $window.localStorage.getItem(USER_KEY);
+          return data ? JSON.parse(data) : null;
+        } catch (e) {
+          return null;
+        }
+      },
+
+      fetchProfile: function () {
+        return $http.get(API + '/me', {
+          headers: { 'Authorization': 'Bearer ' + $window.localStorage.getItem(TOKEN_KEY) }
+        }).then(function (res) {
+          if (res.data.success) {
+            $window.localStorage.setItem(USER_KEY, JSON.stringify(res.data.user));
+          }
+          return res.data;
+        });
+      }
+    };
+  }]);
+
+  /* --------------------------------------------------------------------------
+     CardService — CRUD API calls for cards
+     -------------------------------------------------------------------------- */
+  app.factory('CardService', ['$http', 'AuthService', function ($http, AuthService) {
+    var API = '/api/cards';
+
+    function authHeaders() {
+      return { headers: { 'Authorization': 'Bearer ' + AuthService.getToken() } };
+    }
+
+    return {
+      list: function () {
+        return $http.get(API, authHeaders()).then(function (res) {
+          return res.data;
+        });
+      },
+
+      create: function (cardData) {
+        return $http.post(API, cardData, authHeaders()).then(function (res) {
+          return res.data;
+        });
+      },
+
+      update: function (cardId, cardData) {
+        return $http.put(API + '/' + cardId, cardData, authHeaders()).then(function (res) {
+          return res.data;
+        });
+      },
+
+      remove: function (cardId) {
+        return $http.delete(API + '/' + cardId, authHeaders()).then(function (res) {
+          return res.data;
+        });
+      }
+    };
+  }]);
+
+  /* --------------------------------------------------------------------------
+     HTTP Interceptor — auto-attach JWT token to all API requests
+     -------------------------------------------------------------------------- */
+  app.factory('AuthInterceptor', ['$window', '$q', function ($window, $q) {
+    return {
+      request: function (config) {
+        var token = $window.localStorage.getItem('inoviq_token');
+        if (token && config.url.indexOf('/api/') !== -1) {
+          config.headers = config.headers || {};
+          config.headers['Authorization'] = 'Bearer ' + token;
+        }
+        return config;
+      },
+      responseError: function (response) {
+        if (response.status === 401) {
+          $window.localStorage.removeItem('inoviq_token');
+          $window.localStorage.removeItem('inoviq_user');
+          // Only redirect if not already on login/signup page
+          if ($window.location.pathname.indexOf('login') === -1 &&
+              $window.location.pathname.indexOf('signup') === -1) {
+            $window.location.href = 'login.html';
+          }
+        }
+        return $q.reject(response);
+      }
+    };
+  }]);
+
+  app.config(['$httpProvider', function ($httpProvider) {
+    $httpProvider.interceptors.push('AuthInterceptor');
+  }]);
+
+  /* --------------------------------------------------------------------------
+     AuthController — handles login & signup forms
+     -------------------------------------------------------------------------- */
+  app.controller('AuthController', ['$scope', '$window', 'AuthService', function ($scope, $window, AuthService) {
+    var auth = this;
+
+    auth.identifier = '';
+    auth.password = '';
+    auth.firstName = '';
+    auth.lastName = '';
+    auth.email = '';
+    auth.phone = '';
+    auth.signupPassword = '';
+    auth.confirmPassword = '';
+    auth.agreeTerms = false;
+
+    auth.loading = false;
+    auth.errorMsg = '';
+    auth.successMsg = '';
+
+    /* ── Login ── */
+    auth.login = function () {
+      auth.errorMsg = '';
+      auth.loading = true;
+
+      AuthService.login(auth.identifier, auth.password)
+        .then(function (data) {
+          auth.loading = false;
+          if (data.success) {
+            auth.successMsg = 'Login successful! Redirecting...';
+            setTimeout(function () {
+              $window.location.href = 'dashboard.html';
+            }, 600);
+          }
+        })
+        .catch(function (err) {
+          auth.loading = false;
+          auth.errorMsg = (err.data && err.data.message) || 'Login failed. Please try again.';
+          $scope.$applyAsync();
+        });
+    };
+
+    /* ── Signup ── */
+    auth.signup = function () {
+      auth.errorMsg = '';
+
+      if (!auth.firstName || !auth.lastName || !auth.email || !auth.signupPassword) {
+        auth.errorMsg = 'Please fill in all required fields.';
+        return;
+      }
+
+      if (auth.signupPassword.length < 8) {
+        auth.errorMsg = 'Password must be at least 8 characters.';
+        return;
+      }
+
+      if (auth.signupPassword !== auth.confirmPassword) {
+        auth.errorMsg = 'Passwords do not match.';
+        return;
+      }
+
+      auth.loading = true;
+
+      AuthService.signup({
+        firstName: auth.firstName,
+        lastName: auth.lastName,
+        email: auth.email,
+        phone: auth.phone,
+        password: auth.signupPassword,
+        confirmPassword: auth.confirmPassword
+      })
+        .then(function (data) {
+          auth.loading = false;
+          if (data.success) {
+            auth.successMsg = 'Account created! Redirecting...';
+            setTimeout(function () {
+              $window.location.href = 'dashboard.html';
+            }, 800);
+          }
+        })
+        .catch(function (err) {
+          auth.loading = false;
+          auth.errorMsg = (err.data && err.data.message) || 'Signup failed. Please try again.';
+          $scope.$applyAsync();
+        });
+    };
+  }]);
+
+  /* --------------------------------------------------------------------------
      DashboardController
      -------------------------------------------------------------------------- */
-  app.controller('DashboardController', ['$scope', '$window', function ($scope, $window) {
+  app.controller('DashboardController', ['$scope', '$window', 'AuthService', 'CardService', function ($scope, $window, AuthService, CardService) {
     var vm = this;
+
+    /* ── Auth guard ── */
+    vm.isLoggedIn = AuthService.isLoggedIn();
+    vm.currentUser = AuthService.getCurrentUser();
+
+    if (!vm.isLoggedIn) {
+      $window.location.href = 'login.html';
+      return;
+    }
 
     vm.searchTerm = '';
 
@@ -28,17 +278,55 @@
       selected.active = true;
     };
 
-    vm.cards = [
-      { id: 1, fullName: 'Trupal Panchal', jobTitle: 'Product Lead & Architect', company: 'Inoviq Studio', templateLabel: 'Ledger', initials: 'TP', color: '#2F5233' },
-      { id: 2, fullName: 'Aarav Mehta', jobTitle: 'Senior UX Designer', company: 'Studio Craft', templateLabel: 'Midnight Desk', initials: 'AM', color: '#1B2740' },
-      { id: 3, fullName: 'Riddhi Gandhi', jobTitle: 'Lead Software Engineer', company: 'Inoviq Tech', templateLabel: 'Brass Rule', initials: 'RG', color: '#B08D57' },
-      { id: 4, fullName: 'Sofia Chen', jobTitle: 'Brand Designer', company: 'Aura Studio', templateLabel: 'Stamped', initials: 'SC', color: '#9C3D3D' }
-    ];
+    vm.cards = [];
+    vm.cardsLoading = true;
+
+    /* ── Load cards from API ── */
+    function loadCards() {
+      vm.cardsLoading = true;
+      CardService.list()
+        .then(function (data) {
+          vm.cards = data.cards || [];
+          vm.cardsLoading = false;
+          // Set hero card
+          if (vm.cards.length > 0) {
+            vm.heroCard = vm.cards[0];
+            vm.heroIndex = 0;
+          } else {
+            vm.heroCard = {
+              id: 0,
+              fullName: vm.currentUser ? (vm.currentUser.firstName + ' ' + vm.currentUser.lastName) : 'Your Name',
+              jobTitle: 'Your Title',
+              company: 'Your Company',
+              templateLabel: 'Ledger',
+              initials: vm.currentUser ? (vm.currentUser.firstName[0] + vm.currentUser.lastName[0]).toUpperCase() : 'YN',
+              color: '#2F5233'
+            };
+          }
+        })
+        .catch(function (err) {
+          console.error('Failed to load cards:', err);
+          vm.cardsLoading = false;
+          vm.cards = [];
+          vm.heroCard = {
+            id: 0,
+            fullName: 'Your Name',
+            jobTitle: 'Your Title',
+            company: 'Your Company',
+            templateLabel: 'Ledger',
+            initials: 'YN',
+            color: '#2F5233'
+          };
+        });
+    }
+
+    loadCards();
 
     vm.heroIndex = 0;
-    vm.heroCard = vm.cards[0];
+    vm.heroCard = {};
 
     vm.shuffleHeroCard = function () {
+      if (vm.cards.length === 0) return;
       if ($window._pixelShuffle) {
         $window._pixelShuffle(function () {
           vm.heroIndex = (vm.heroIndex + 1) % vm.cards.length;
@@ -77,50 +365,95 @@
       var role = prompt('Enter Job Title:', 'Creator & Developer') || 'Member';
       var company = prompt('Enter Company:', 'Inoviq') || 'Inoviq';
 
-      var initials = name.split(' ').map(function (n) { return n[0]; }).join('').substring(0, 2).toUpperCase();
-
-      vm.cards.push({
-        id: Date.now(),
+      CardService.create({
         fullName: name,
         jobTitle: role,
         company: company,
         templateLabel: 'Ledger',
-        initials: initials || 'IN',
         color: '#2F5233'
+      }).then(function (data) {
+        if (data.success) {
+          vm.cards.unshift(data.card);
+          if (vm.cards.length === 1) {
+            vm.heroCard = vm.cards[0];
+            vm.heroIndex = 0;
+          }
+        }
+      }).catch(function (err) {
+        alert('Failed to create card: ' + ((err.data && err.data.message) || 'Unknown error'));
       });
     };
 
     vm.onEditCard = function (card) {
       var name = prompt('Edit Cardholder Name:', card.fullName);
-      if (name) {
-        card.fullName = name;
-        card.initials = name.split(' ').map(function (n) { return n[0]; }).join('').substring(0, 2).toUpperCase();
+      if (name && name !== card.fullName) {
+        CardService.update(card._id || card.id, { fullName: name })
+          .then(function (data) {
+            if (data.success) {
+              card.fullName = data.card.fullName;
+              card.initials = data.card.initials;
+            }
+          })
+          .catch(function (err) {
+            alert('Failed to update card: ' + ((err.data && err.data.message) || 'Unknown error'));
+          });
       }
     };
 
     vm.onDeleteCard = function (card) {
       if (confirm('Are you sure you want to remove ' + card.fullName + '?')) {
-        var idx = vm.cards.indexOf(card);
-        if (idx > -1) vm.cards.splice(idx, 1);
+        CardService.remove(card._id || card.id)
+          .then(function (data) {
+            if (data.success) {
+              var idx = vm.cards.indexOf(card);
+              if (idx > -1) vm.cards.splice(idx, 1);
+            }
+          })
+          .catch(function (err) {
+            alert('Failed to delete card: ' + ((err.data && err.data.message) || 'Unknown error'));
+          });
       }
     };
 
     vm.selectTemplate = function (name) {
       alert('Selected Template: "' + name + '". Create a card to use this template!');
     };
+
+    /* ── User info for nav ── */
+    vm.getUserInitials = function () {
+      if (!vm.currentUser) return 'YN';
+      return ((vm.currentUser.firstName || '')[0] + (vm.currentUser.lastName || '')[0]).toUpperCase();
+    };
+
+    vm.getUserName = function () {
+      if (!vm.currentUser) return 'Account';
+      return vm.currentUser.firstName;
+    };
+
+    vm.logout = function () {
+      AuthService.logout();
+    };
   }]);
 
   /* --------------------------------------------------------------------------
      CreateCardController
      -------------------------------------------------------------------------- */
-  app.controller('CreateCardController', ['$scope', '$window', function ($scope, $window) {
+  app.controller('CreateCardController', ['$scope', '$window', 'AuthService', 'CardService', function ($scope, $window, AuthService, CardService) {
     var vm = this;
 
+    /* ── Auth guard ── */
+    if (!AuthService.isLoggedIn()) {
+      $window.location.href = 'login.html';
+      return;
+    }
+
+    vm.currentUser = AuthService.getCurrentUser();
+
     vm.cardData = {
-      fullName: 'Trupal Panchal',
+      fullName: vm.currentUser ? (vm.currentUser.firstName + ' ' + vm.currentUser.lastName) : 'Your Name',
       jobTitle: 'Product Manager & Founder',
       company: 'Loop Studio',
-      email: 'you@company.com',
+      email: vm.currentUser ? vm.currentUser.email : 'you@company.com',
       phone: '+1 (555) 000-0000',
       website: 'https://company.io',
       bio: 'Crafting digital products with tactile aesthetics and human-centered design.',
@@ -132,6 +465,8 @@
 
     vm.isFlipped = false;
     vm.saveSuccess = false;
+    vm.saveError = '';
+    vm.saving = false;
 
     vm.colorSwatches = [
       { name: 'Dark Charcoal', color: '#2D3536', accent: '#B1D4D0', gradient: 'linear-gradient(135deg, #2D3536 0%, #1A2223 100%)' },
@@ -178,12 +513,29 @@
     };
 
     vm.onSaveCard = function () {
-      vm.saveSuccess = true;
-      setTimeout(function () {
-        $scope.$apply(function () {
-          vm.saveSuccess = false;
+      vm.saveError = '';
+      vm.saving = true;
+
+      var payload = angular.copy(vm.cardData);
+      payload.templateLabel = vm.selectedTemplate.name;
+
+      CardService.create(payload)
+        .then(function (data) {
+          vm.saving = false;
+          if (data.success) {
+            vm.saveSuccess = true;
+            setTimeout(function () {
+              $scope.$apply(function () {
+                vm.saveSuccess = false;
+              });
+            }, 4000);
+          }
+        })
+        .catch(function (err) {
+          vm.saving = false;
+          vm.saveError = (err.data && err.data.message) || 'Failed to save card. Please try again.';
+          $scope.$applyAsync();
         });
-      }, 4000);
     };
 
     vm.copyCardLink = function () {
@@ -197,10 +549,11 @@
   /* --------------------------------------------------------------------------
      DockController & Apple-Style Floating Dock Directive (macOS Proximity Magnification)
      -------------------------------------------------------------------------- */
-  app.controller('DockController', ['$scope', '$window', '$document', function ($scope, $window, $document) {
+  app.controller('DockController', ['$scope', '$window', '$document', 'AuthService', function ($scope, $window, $document, AuthService) {
     var dock = this;
 
     dock.currentTheme = localStorage.getItem('inoviq_theme') || 'light';
+    dock.isLoggedIn = AuthService.isLoggedIn();
 
     /* Navigation items — 'divider' type creates a visual separator */
     dock.items = [
@@ -211,7 +564,7 @@
       { type: 'divider' },
       { id: 'create', title: 'Create Card', href: 'create-card.html' },
       { id: 'theme', title: 'Toggle Theme', action: 'theme', isThemeBtn: true },
-      { id: 'account', title: 'Account', href: 'login.html' }
+      { id: 'account', title: dock.isLoggedIn ? 'Logout' : 'Account', href: dock.isLoggedIn ? 'javascript:void(0)' : 'login.html', action: dock.isLoggedIn ? 'logout' : null }
     ];
 
     dock.activeId = 'home';
@@ -303,20 +656,13 @@
     dock.onItemClick = function (item, $event) {
       if (item.action === 'create') {
         $event.preventDefault();
-        var bodyEl = angular.element(document.body);
-        var vm = bodyEl.scope() ? bodyEl.scope().vm : null;
-        if (vm && typeof vm.onCreateCard === 'function') {
-          vm.onCreateCard();
-        } else {
-          var name = prompt('Create Card — Enter Name:');
-          if (name) {
-            alert('Card created for ' + name + '! Redirecting to collection...');
-          }
-          $window.location.href = 'dashboard.html#my-cards';
-        }
+        $window.location.href = 'create-card.html';
       } else if (item.action === 'theme') {
         $event.preventDefault();
         dock.toggleTheme();
+      } else if (item.action === 'logout') {
+        $event.preventDefault();
+        AuthService.logout();
       } else {
         dock.activeId = item.id;
       }
@@ -397,8 +743,7 @@
         '<div class="apple-dock-divider"></div>' +
 
         /* ---- Create Card ---- */
-        '<a href="javascript:void(0);" class="apple-dock-item" ' +
-        'ng-click="dock.onItemClick({action: \'create\'}, $event)" ' +
+        '<a href="create-card.html" class="apple-dock-item" ' +
         'ng-style="{ transform: \'translateY(\' + dock.getItemTranslateY(5) + \'px) scale(\' + dock.getItemScale(5) + \')\' }">' +
         '<span class="apple-dock-tooltip">Create Card</span>' +
         '<div class="apple-dock-icon">' +
@@ -424,11 +769,12 @@
         '</div>' +
         '</button>' +
 
-        /* ---- Account ---- */
-        '<a href="login.html" class="apple-dock-item" ' +
+        /* ---- Account / Logout ---- */
+        '<a ng-href="{{ dock.isLoggedIn ? \'\' : \'login.html\' }}" class="apple-dock-item" ' +
         'ng-class="{ active: dock.activeId === \'account\' }" ' +
+        'ng-click="dock.isLoggedIn && dock.onItemClick({action: \'logout\'}, $event)" ' +
         'ng-style="{ transform: \'translateY(\' + dock.getItemTranslateY(7) + \'px) scale(\' + dock.getItemScale(7) + \')\' }">' +
-        '<span class="apple-dock-tooltip">Account</span>' +
+        '<span class="apple-dock-tooltip">{{ dock.isLoggedIn ? "Logout" : "Account" }}</span>' +
         '<div class="apple-dock-icon">' +
         '<svg viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>' +
         '</div>' +

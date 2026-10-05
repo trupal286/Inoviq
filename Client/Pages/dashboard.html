@@ -40,10 +40,10 @@
         <div class="nav-actions">
           <a href="create-card.html" class="btn-primary" id="btn-create-top">+ Create Card</a>
 
-          <a href="login.html" class="user-pill">
-            <div class="avatar-circle" title="Trupal Panchal">TP</div>
-            <span>Account</span>
-          </a>
+          <div class="user-pill" style="cursor: pointer;" ng-click="vm.logout()">
+            <div class="avatar-circle" ng-attr-title="{{ vm.getUserName() }}">{{ vm.getUserInitials() }}</div>
+            <span>Logout</span>
+          </div>
         </div>
       </div>
     </header>
@@ -183,8 +183,13 @@
         </div>
       </div>
 
-      <div class="cards-list">
-        <div class="card-row" ng-repeat="card in vm.filteredCards() track by card.id" id="card-{{ card.id }}">
+      <!-- Loading state -->
+      <div ng-if="vm.cardsLoading" style="text-align: center; padding: 40px; font-family: var(--font-mono); font-size: 12px; color: var(--ink-light);">
+        Loading your cards…
+      </div>
+
+      <div class="cards-list" ng-if="!vm.cardsLoading">
+        <div class="card-row" ng-repeat="card in vm.filteredCards() track by (card._id || card.id)" ng-attr-id="card-{{ card._id || card.id }}">
           <div class="row-chip" ng-style="{background: card.color}">{{ card.initials }}</div>
           <div class="row-info">
             <div class="row-name">{{ card.fullName }}</div>
@@ -199,6 +204,10 @@
 
         <p class="empty-state" ng-if="vm.filteredCards().length === 0 && vm.searchTerm">
           No cards match &ldquo;{{ vm.searchTerm }}&rdquo;.
+        </p>
+
+        <p class="empty-state" ng-if="vm.cards.length === 0 && !vm.searchTerm && !vm.cardsLoading">
+          No cards yet. Create your first digital card!
         </p>
 
         <div class="card-row row-add" ng-click="vm.onCreateCard()" id="btn-add-row">
@@ -245,7 +254,7 @@
         <a href="#templates">Templates</a>
         <a href="#how-it-works">Scan &amp; Save</a>
         <a href="#my-cards">Contacts</a>
-        <a href="login.html">Sign In</a>
+        <a href="javascript:void(0)" ng-click="vm.logout()">Logout</a>
       </div>
     </footer>
 

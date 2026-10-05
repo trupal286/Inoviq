@@ -21,7 +21,7 @@
   </script>
 </head>
 
-<body>
+<body ng-controller="AuthController as auth">
 
   <div class="login-shell">
 
@@ -47,10 +47,15 @@
 
     <!-- ===== RIGHT: LOGIN CARD ===== -->
     <div class="login-stage">
-      <form class="login-card" id="loginForm" novalidate>
+      <form class="login-card" id="loginForm" ng-submit="auth.login()" novalidate>
         <div class="card-id">AUTHENTICATION · CARD 001</div>
         <div class="card-title">Log in</div>
         <div class="card-tag">Enter your details to open your account.</div>
+
+        <!-- Success message (e.g. after signup) -->
+        <p class="success-msg" ng-if="auth.successMsg" style="color: #27AE60; font-family: var(--font-mono); font-size: 11px; text-align: center; margin-bottom: 10px;">
+          {{ auth.successMsg }}
+        </p>
 
         <!-- Email / Username switcher -->
         <div class="field">
@@ -77,7 +82,7 @@
               <circle cx="12" cy="8" r="4" />
               <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
             </svg>
-            <input type="text" id="identifier" placeholder="you@company.com" autocomplete="email" required>
+            <input type="text" id="identifier" ng-model="auth.identifier" placeholder="you@company.com" autocomplete="email" required>
           </div>
         </div>
 
@@ -88,12 +93,12 @@
               <rect x="5" y="11" width="14" height="9" rx="1.5" />
               <path d="M8 11V7a4 4 0 0 1 8 0v4" />
             </svg>
-            <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" required>
+            <input type="password" id="password" ng-model="auth.password" placeholder="••••••••" autocomplete="current-password" required>
             <button type="button" class="field-toggle" id="togglePw">Show</button>
           </div>
         </div>
 
-        <p class="error-msg" id="errorMsg">Check your email and password, then try again.</p>
+        <p class="error-msg" id="errorMsg" ng-class="{'show': auth.errorMsg}">{{ auth.errorMsg || 'Check your email and password, then try again.' }}</p>
 
         <div class="field-row">
           <label class="remember">
@@ -103,8 +108,9 @@
           <a href="#" class="link-quiet">Forgot password?</a>
         </div>
 
-        <button type="submit" class="btn-stamp" id="submitBtn">
-          Sign in
+        <button type="submit" class="btn-stamp" id="submitBtn" ng-disabled="auth.loading">
+          <span ng-if="!auth.loading">Sign in</span>
+          <span ng-if="auth.loading">Signing in…</span>
           <span class="stamp-mark">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <path d="M20 6 9 17l-5-5" />
@@ -123,7 +129,7 @@
 
   </div><!-- /login-shell -->
 
-  <script src="login.js?v=1"></script>
+  <script src="../app.js"></script>
   <script>
     (function () {
       'use strict';
@@ -148,6 +154,21 @@
         themeBtn.addEventListener('click', function () {
           currentTheme = (currentTheme === 'light') ? 'dark' : 'light';
           applyTheme(currentTheme);
+        });
+      }
+
+      /* ── Password toggle ── */
+      var togglePwBtn = document.getElementById('togglePw');
+      var pwInput = document.getElementById('password');
+      if (togglePwBtn && pwInput) {
+        togglePwBtn.addEventListener('click', function () {
+          if (pwInput.type === 'password') {
+            pwInput.type = 'text';
+            togglePwBtn.textContent = 'Hide';
+          } else {
+            pwInput.type = 'password';
+            togglePwBtn.textContent = 'Show';
+          }
         });
       }
 
