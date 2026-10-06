@@ -1,349 +1,1165 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="digiCardApp">
+<html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description"
-    content="Inoviq Card Builder : Create your custom digital business card with live interactive preview and dynamic QR generation.">
-  <title>Inoviq — Create Custom Card</title>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+    content="Inoviq Card Studio — Interactive React 3D Card Studio with physical perspective tilt, specular lighting physics, drag-and-transform elements, and tactile editorial templates.">
+  <title>Card Studio — Inoviq</title>
+
+  <!-- Typography matching Inoviq Design System: Fraunces Serif, Work Sans, IBM Plex Mono, Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Work+Sans:wght@400;500;600;700;800&display=swap"
     rel="stylesheet">
+
+  <!-- Core Inoviq Stylesheet (Master Design System) + Studio CSS -->
   <link rel="stylesheet" href="../Style/style.css">
+  <link rel="stylesheet" href="../Style/studio.css">
+
+  <!-- React 18, Babel & Utility Engines -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 
-<body ng-controller="CreateCardController as vm">
+<body class="studio-layout">
+  <!-- React Root Mount Container -->
+  <div id="react-card-studio-root"></div>
 
-  <div class="wrap">
+  <!-- React Application Logic -->
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useCallback } = React;
 
-    <!-- ===== NAV HEADER ===== -->
-    <header class="nav-header">
-      <div class="nav-topbar">
-        <a href="dashboard.html" class="brand-logo">
-          i<span>noviq</span>
-          <span class="brand-badge card-builder-badge">CARD BUILDER</span>
-        </a>
+    /* Curated Project Palettes harmonized with style.css */
+    const PROJECT_PALETTES = [
+      {
+        name: 'Inoviq Soot & Mist',
+        desc: 'Tactile charcoal soot with mist blue accents',
+        bg: '#2D3536',
+        bgGrad: 'linear-gradient(135deg, #2D3536 0%, #1A2223 100%)',
+        text: '#F2EFE2',
+        accent: '#B3C9D6',
+        muted: '#98AA9D',
+        chip: '#D4AF37'
+      },
+      {
+        name: 'Plaster Paper Light',
+        desc: 'Warm textured plaster with deep espresso ink',
+        bg: '#F2EFE2',
+        bgGrad: 'linear-gradient(135deg, #FFFDF8 0%, #F2EFE2 100%)',
+        text: '#2D3536',
+        accent: '#52352D',
+        muted: '#697C70',
+        chip: '#B89230'
+      },
+      {
+        name: 'Eucalyptus & Moss',
+        desc: 'Organic forest sage with warm ivory contrast',
+        bg: '#37473D',
+        bgGrad: 'linear-gradient(135deg, #37473D 0%, #233028 100%)',
+        text: '#F2EFE2',
+        accent: '#98AA9D',
+        muted: '#B1D4D0',
+        chip: '#E2C068'
+      },
+      {
+        name: 'Espresso Heritage',
+        desc: 'Deep warm espresso leather with gold foil accents',
+        bg: '#3B231C',
+        bgGrad: 'linear-gradient(135deg, #52352D 0%, #291712 100%)',
+        text: '#FFFDF8',
+        accent: '#F5D166',
+        muted: '#B3C9D6',
+        chip: '#F5D166'
+      },
+      {
+        name: 'Baby Blue Aurora',
+        desc: 'Soft ethereal sky blue with sharp slate typography',
+        bg: '#B1D4D0',
+        bgGrad: 'linear-gradient(135deg, #D5ECE9 0%, #B1D4D0 100%)',
+        text: '#1A2223',
+        accent: '#2D3536',
+        muted: '#52352D',
+        chip: '#785A14'
+      },
+      {
+        name: 'Royal Monolith',
+        desc: 'Matte titanium obsidian with emerald stamp',
+        bg: '#0F172A',
+        bgGrad: 'linear-gradient(135deg, #0F172A 0%, #050810 100%)',
+        text: '#F8FAFC',
+        accent: '#38BDF8',
+        muted: '#94A3B8',
+        chip: '#FBBF24'
+      }
+    ];
 
-        <div class="nav-actions">
-          <button class="theme-toggle-btn" id="themeToggle" title="Toggle Theme">🌙</button>
+    function InoviqStudioApp() {
+      // Theme State (Inherits or sets document theme)
+      const [theme, setTheme] = useState(() => localStorage.getItem('inoviq_theme') || 'light');
+      
+      useEffect(() => {
+        document.body.setAttribute('data-theme', theme);
+        localStorage.setItem('inoviq_theme', theme);
+      }, [theme]);
 
-          <!-- Logged-in Account Dropdown -->
-          <div class="account-menu-container" ng-if="vm.isLoggedIn">
-            <button class="user-pill" ng-click="vm.toggleAccountMenu($event)" id="btn-account-user">
-              <div class="avatar-circle" title="{{ vm.currentUser.name }}">{{ vm.currentUser.initials }}</div>
-              <span>{{ vm.currentUser.name }}</span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-            </button>
+      const toggleTheme = () => {
+        setTheme(prev => prev === 'light' ? 'dark' : 'light');
+      };
 
-            <div class="account-dropdown-menu" ng-if="vm.showAccountMenu" ng-click="$event.stopPropagation()">
-              <div class="account-dropdown-header">
-                <div class="user-name">{{ vm.currentUser.name }}</div>
-                <div class="user-email">{{ vm.currentUser.email }}</div>
+      // Card Format (business, event, social, mobile, editorial, cyber)
+      const [cardFormat, setCardFormat] = useState('business');
+      const [activeTab, setActiveTab] = useState('info'); // 'info', 'design', 'transform', 'templates'
+
+      // Card Information Model
+      const [cardData, setCardData] = useState({
+        fullName: 'Alex Morgan',
+        jobTitle: 'Principal Product Architect',
+        company: 'Inoviq Global Studios',
+        email: 'alex.morgan@inoviq.io',
+        phone: '+1 (555) 019-2834',
+        website: 'https://inoviq.io',
+        location: 'San Francisco, CA',
+        bio: 'Crafting tactile spatial systems and physical digital identity.',
+        badgeText: 'VERIFIED ID',
+        handle: '@alexmorgan',
+        orgTag: 'INOVIQ // PROTOCOL'
+      });
+
+      // Visual Styles
+      const [cardProps, setCardProps] = useState({
+        paletteName: 'Inoviq Soot & Mist',
+        bgColor: '#2D3536',
+        bgGrad: 'linear-gradient(135deg, #2D3536 0%, #1A2223 100%)',
+        textColor: '#F2EFE2',
+        accentColor: '#B3C9D6',
+        mutedColor: '#98AA9D',
+        fontFamily: "'Fraunces', Georgia, serif",
+        radius: 18,
+        pattern: 'dots', // 'dots', 'grid', 'mesh', 'none'
+        showChip: true,
+        showNfc: true,
+        showBarcode: false
+      });
+
+      // Drag & Transform States for QR and Image
+      const [selectedObject, setSelectedObject] = useState(null); // 'qr' | 'image' | null
+      const [uploadedImage, setUploadedImage] = useState(null);
+
+      const [qrTransform, setQrTransform] = useState({
+        x: 74,
+        y: 56,
+        size: 80,
+        rotation: 0,
+        borderRadius: 10
+      });
+
+      const [imageTransform, setImageTransform] = useState({
+        x: 74,
+        y: 12,
+        size: 64,
+        rotation: 0,
+        shape: 'rounded', // 'circle', 'rounded', 'square'
+        borderRadius: 12
+      });
+
+      const [qrMode, setQrMode] = useState('vcard');
+      const [toastMsg, setToastMsg] = useState('');
+      const [isSaving, setIsSaving] = useState(false);
+
+      const triggerToast = (msg) => {
+        setToastMsg(msg);
+        setTimeout(() => setToastMsg(''), 3500);
+      };
+
+      /* ======================================================================
+         DRIBBBLE-INSPIRED 3D PERSPECTIVE TILT & SPECULAR GLARE ENGINE
+         ====================================================================== */
+      const cardRef = useRef(null);
+      const stageRef = useRef(null);
+      const [tiltStyle, setTiltStyle] = useState({});
+      const [glarePos, setGlarePos] = useState({ x: 50, y: 50, opacity: 0 });
+      const [isHovered, setIsHovered] = useState(false);
+
+      const handleStageMouseMove = (e) => {
+        if (!cardRef.current) return;
+        const rect = cardRef.current.getBoundingClientRect();
+        
+        const cardX = e.clientX - rect.left;
+        const cardY = e.clientY - rect.top;
+        
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        // Tilt rotation limits (-14 to +14 deg)
+        const rotX = ((cardY - centerY) / centerY) * -13;
+        const rotY = ((cardX - centerX) / centerX) * 13;
+
+        // Glare coordinates (0 to 100%)
+        const gX = Math.round((cardX / rect.width) * 100);
+        const gY = Math.round((cardY / rect.height) * 100);
+
+        setTiltStyle({
+          transform: `perspective(1200px) rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) scale3d(1.025, 1.025, 1.025)`,
+          boxShadow: `${(-rotY * 1.6).toFixed(1)}px ${(rotX * 1.6 + 28).toFixed(1)}px 55px rgba(45, 53, 54, 0.28), 0 8px 24px rgba(45, 53, 54, 0.12)`,
+          transition: 'transform 0.08s ease-out, box-shadow 0.08s ease-out'
+        });
+
+        setGlarePos({ x: gX, y: gY, opacity: 0.45 });
+        setIsHovered(true);
+      };
+
+      const handleStageMouseLeave = () => {
+        setTiltStyle({
+          transform: 'perspective(1200px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
+          boxShadow: '0 24px 50px -14px rgba(45, 53, 54, 0.22), 0 4px 14px rgba(45, 53, 54, 0.08)',
+          transition: 'transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.6s ease'
+        });
+        setGlarePos(prev => ({ ...prev, opacity: 0 }));
+        setIsHovered(false);
+      };
+
+      /* ======================================================================
+         CANVAS DRAG & RESIZE ENGINE
+         ====================================================================== */
+      const dragRef = useRef({
+        isDragging: false,
+        isResizing: false,
+        corner: null,
+        target: null,
+        startX: 0,
+        startY: 0,
+        initialX: 0,
+        initialY: 0,
+        initialSize: 0,
+        cardRect: null
+      });
+
+      const startDrag = (target, e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setSelectedObject(target);
+        setActiveTab('transform');
+
+        if (!cardRef.current) return;
+        const rect = cardRef.current.getBoundingClientRect();
+        const currentTransform = target === 'qr' ? qrTransform : imageTransform;
+
+        dragRef.current = {
+          isDragging: true,
+          isResizing: false,
+          target,
+          startX: e.clientX,
+          startY: e.clientY,
+          initialX: currentTransform.x,
+          initialY: currentTransform.y,
+          cardRect: rect
+        };
+
+        window.addEventListener('mousemove', onDragMove);
+        window.addEventListener('mouseup', onDragEnd);
+      };
+
+      const startResize = (target, corner, e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!cardRef.current) return;
+        const rect = cardRef.current.getBoundingClientRect();
+        const currentTransform = target === 'qr' ? qrTransform : imageTransform;
+
+        dragRef.current = {
+          isDragging: false,
+          isResizing: true,
+          corner,
+          target,
+          startX: e.clientX,
+          startY: e.clientY,
+          initialSize: currentTransform.size,
+          cardRect: rect
+        };
+
+        window.addEventListener('mousemove', onDragMove);
+        window.addEventListener('mouseup', onDragEnd);
+      };
+
+      const onDragMove = (e) => {
+        const { isDragging, isResizing, target, corner, startX, startY, initialX, initialY, initialSize, cardRect } = dragRef.current;
+        if (!cardRect) return;
+
+        if (isDragging) {
+          const deltaXPx = e.clientX - startX;
+          const deltaYPx = e.clientY - startY;
+
+          const deltaXPct = (deltaXPx / cardRect.width) * 100;
+          const deltaYPct = (deltaYPx / cardRect.height) * 100;
+
+          const newX = Math.max(0, Math.min(88, Math.round(initialX + deltaXPct)));
+          const newY = Math.max(0, Math.min(88, Math.round(initialY + deltaYPct)));
+
+          if (target === 'qr') {
+            setQrTransform(prev => ({ ...prev, x: newX, y: newY }));
+          } else {
+            setImageTransform(prev => ({ ...prev, x: newX, y: newY }));
+          }
+        } else if (isResizing) {
+          let delta = 0;
+          if (corner === 'se' || corner === 'ne') {
+            delta = e.clientX - startX;
+          } else {
+            delta = startX - e.clientX;
+          }
+
+          const newSize = Math.max(36, Math.min(220, Math.round(initialSize + delta)));
+          if (target === 'qr') {
+            setQrTransform(prev => ({ ...prev, size: newSize }));
+          } else {
+            setImageTransform(prev => ({ ...prev, size: newSize }));
+          }
+        }
+      };
+
+      const onDragEnd = () => {
+        dragRef.current.isDragging = false;
+        dragRef.current.isResizing = false;
+        window.removeEventListener('mousemove', onDragMove);
+        window.removeEventListener('mouseup', onDragEnd);
+      };
+
+      // Corner Snapping
+      const snapObject = (target, pos) => {
+        const updater = target === 'qr' ? setQrTransform : setImageTransform;
+        let coords = { x: 74, y: 56 };
+        if (pos === 'top-left') coords = { x: 6, y: 8 };
+        if (pos === 'top-right') coords = { x: 74, y: 8 };
+        if (pos === 'bottom-left') coords = { x: 6, y: 60 };
+        if (pos === 'bottom-right') coords = { x: 74, y: 56 };
+        if (pos === 'center') coords = { x: 40, y: 40 };
+
+        updater(prev => ({ ...prev, ...coords }));
+      };
+
+      // Image Upload
+      const fileInputRef = useRef(null);
+      const handleImageUpload = (e) => {
+        if (e.target.files && e.target.files[0]) {
+          const file = e.target.files[0];
+          const reader = new FileReader();
+          reader.onload = (evt) => {
+            setUploadedImage(evt.target.result);
+            setSelectedObject('image');
+            setActiveTab('transform');
+            triggerToast('Photo / Logo imported! Drag anywhere on the card surface.');
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+
+      // QR Code Render Effect
+      const qrHolderRef = useRef(null);
+      useEffect(() => {
+        if (!qrHolderRef.current) return;
+        qrHolderRef.current.innerHTML = '';
+
+        let qrData = cardData.website || 'https://inoviq.io';
+        if (qrMode === 'vcard') {
+          qrData = [
+            'BEGIN:VCARD',
+            'VERSION:3.0',
+            `FN:${cardData.fullName || 'Member'}`,
+            `ORG:${cardData.company || 'Inoviq'}`,
+            `TITLE:${cardData.jobTitle || ''}`,
+            cardData.phone ? `TEL;TYPE=CELL:${cardData.phone}` : '',
+            cardData.email ? `EMAIL:${cardData.email}` : '',
+            cardData.website ? `URL:${cardData.website}` : '',
+            `NOTE:${cardData.bio || 'Inoviq Tactile Pass'}`,
+            'END:VCARD'
+          ].filter(Boolean).join('\n');
+        } else if (qrMode === 'email') {
+          qrData = `mailto:${cardData.email}`;
+        } else if (qrMode === 'phone') {
+          qrData = `tel:${cardData.phone}`;
+        }
+
+        if (window.QRCode) {
+          new window.QRCode(qrHolderRef.current, {
+            text: qrData,
+            width: qrTransform.size,
+            height: qrTransform.size,
+            colorDark: '#2D3536',
+            colorLight: '#FFFFFF',
+            correctLevel: window.QRCode.CorrectLevel.M
+          });
+        }
+      }, [cardData, qrTransform.size, qrMode]);
+
+      // Format Switcher
+      const applyFormat = (fmt) => {
+        setCardFormat(fmt);
+        if (fmt === 'event') {
+          setCardProps(prev => ({ ...prev, showBarcode: true, showChip: false }));
+          setQrTransform(prev => ({ ...prev, x: 28, y: 65, size: 105 }));
+          setImageTransform(prev => ({ ...prev, x: 34, y: 14, size: 90 }));
+        } else if (fmt === 'social') {
+          setCardProps(prev => ({ ...prev, showBarcode: false, showChip: false }));
+          setQrTransform(prev => ({ ...prev, x: 65, y: 65, size: 95 }));
+          setImageTransform(prev => ({ ...prev, x: 8, y: 8, size: 75 }));
+        } else if (fmt === 'mobile') {
+          setCardProps(prev => ({ ...prev, showBarcode: false, showChip: true }));
+          setQrTransform(prev => ({ ...prev, x: 32, y: 70, size: 100 }));
+          setImageTransform(prev => ({ ...prev, x: 36, y: 14, size: 85 }));
+        } else if (fmt === 'editorial') {
+          setCardProps(prev => ({
+            ...prev,
+            paletteName: 'Plaster Paper Light',
+            bgColor: '#F2EFE2',
+            bgGrad: 'linear-gradient(135deg, #FFFDF8 0%, #F2EFE2 100%)',
+            textColor: '#2D3536',
+            accentColor: '#52352D',
+            fontFamily: "'Fraunces', Georgia, serif",
+            radius: 12
+          }));
+          setQrTransform(prev => ({ ...prev, x: 74, y: 56, size: 80 }));
+        } else {
+          // Default Business
+          setQrTransform(prev => ({ ...prev, x: 74, y: 56, size: 80 }));
+          setImageTransform(prev => ({ ...prev, x: 74, y: 12, size: 64 }));
+        }
+      };
+
+      // Export PNG
+      const exportPNG = () => {
+        if (!cardRef.current || !window.html2canvas) {
+          alert('Rendering engine initializing. Please retry in a moment.');
+          return;
+        }
+        setSelectedObject(null);
+        triggerToast('Exporting high-resolution PNG…');
+
+        setTimeout(() => {
+          window.html2canvas(cardRef.current, {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: null
+          }).then(canvas => {
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = `${(cardData.fullName || 'inoviq').toLowerCase().replace(/\s+/g, '_')}_card.png`;
+            link.click();
+            triggerToast('PNG Card exported successfully!');
+          });
+        }, 120);
+      };
+
+      // Save to Mongo API
+      const saveCard = () => {
+        const token = localStorage.getItem('inoviq_token');
+        if (!token) {
+          if (confirm('An Inoviq account is required to save cards to your permanent catalog. Go to Login?')) {
+            window.location.href = 'login.html';
+          }
+          return;
+        }
+
+        setIsSaving(true);
+        fetch('/api/cards', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            fullName: cardData.fullName || 'Alex Morgan',
+            jobTitle: cardData.jobTitle || 'Product Architect',
+            company: cardData.company || 'Inoviq',
+            phone: cardData.phone || '',
+            email: cardData.email || '',
+            website: cardData.website || '',
+            bio: cardData.bio || '',
+            color: cardProps.bgColor,
+            accentColor: cardProps.accentColor,
+            templateLabel: `${cardFormat.toUpperCase()} (${cardProps.paletteName})`,
+            avatar: uploadedImage || ''
+          })
+        })
+        .then(res => res.json())
+        .then(data => {
+          setIsSaving(false);
+          if (data.success) {
+            triggerToast('Card published to your Inoviq Catalog!');
+          } else {
+            alert(data.message || 'Failed to save card.');
+          }
+        })
+        .catch(() => {
+          setIsSaving(false);
+          alert('Could not connect to server.');
+        });
+      };
+
+      return (
+        <div className="studio-react-shell" onClick={() => setSelectedObject(null)}>
+          
+          {/* ================================================================
+               TOP BAR: Single-Tier Navigation, Presets & Actions
+               ================================================================ */}
+          <header className="studio-topbar">
+            <div className="topbar-left">
+              <a href="dashboard.html" className="btn-topbar-nav" id="btn-back-dashboard">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                <span>Dashboard</span>
+              </a>
+
+              <div className="brand-badge">
+                <span className="pulse-indicator"></span>
+                <span className="brand-text">Inoviq Studio</span>
+                <span className="version-tag">REACT</span>
               </div>
-              <div class="account-dropdown-divider"></div>
-              <a href="dashboard.html" class="account-dropdown-item">📊 Dashboard</a>
-              <a href="create-card.html" class="account-dropdown-item">✨ Create Card</a>
-              <a href="dashboard.html#my-cards" class="account-dropdown-item">📇 Saved Catalog</a>
-              <div class="account-dropdown-divider"></div>
-              <button class="account-dropdown-item btn-logout-item" ng-click="vm.logout()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                Log Out
+            </div>
+
+            {/* Quick Format Switcher */}
+            <div className="topbar-format-pills">
+              <button type="button" className={`format-pill-btn ${cardFormat === 'business' ? 'active' : ''}`} onClick={() => applyFormat('business')}>
+                💼 Business Card
+              </button>
+              <button type="button" className={`format-pill-btn ${cardFormat === 'event' ? 'active' : ''}`} onClick={() => applyFormat('event')}>
+                🎫 Event Pass
+              </button>
+              <button type="button" className={`format-pill-btn ${cardFormat === 'social' ? 'active' : ''}`} onClick={() => applyFormat('social')}>
+                📱 Social (1:1)
+              </button>
+              <button type="button" className={`format-pill-btn ${cardFormat === 'mobile' ? 'active' : ''}`} onClick={() => applyFormat('mobile')}>
+                🔗 Mobile Bio
+              </button>
+              <button type="button" className={`format-pill-btn ${cardFormat === 'editorial' ? 'active' : ''}`} onClick={() => applyFormat('editorial')}>
+                📜 Editorial
               </button>
             </div>
-          </div>
 
-          <!-- Guest State Account Button -->
-          <a href="javascript:void(0)" ng-if="!vm.isLoggedIn" ng-click="vm.requireAuth('Account Options', 'create-card.html')" class="user-pill guest-pill" id="btn-account-guest">
-            <div class="avatar-circle guest-avatar">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-            </div>
-            <span>Log In / Sign Up</span>
-          </a>
+            {/* Topbar Actions */}
+            <div className="topbar-actions">
+              <button type="button" className="btn-theme-switcher" onClick={toggleTheme} title="Toggle Theme">
+                {theme === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode'}
+              </button>
 
-          <a href="dashboard.html" class="btn-secondary" id="btn-back-dashboard">← Back to Dashboard</a>
-        </div>
-      </div>
+              <button type="button" className="btn-secondary-action" onClick={exportPNG}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Export PNG</span>
+              </button>
 
-      <!-- Tactical File Folder Navigation Tabs -->
-      <nav class="folder-tabs-bar">
-        <a href="dashboard.html" class="folder-tab" id="tab-dashboard">
-          Dashboard
-        </a>
-        <a href="create-card.html" class="folder-tab active" id="tab-create-card">
-          Create Card
-        </a>
-        <a href="dashboard.html#templates" class="folder-tab" id="tab-templates-gallery">
-          Templates Gallery
-        </a>
-        <a href="javascript:void(0)" ng-click="vm.requireAuth('Saved Catalog', 'dashboard.html#my-cards')" class="folder-tab" id="tab-saved-catalog">
-          Saved Catalog
-        </a>
-      </nav>
-    </header>
-
-    <!-- ===== CARD BUILDER MAIN STAGE ===== -->
-    <main class="builder-stage">
-
-      <!-- LEFT COLUMN: CREATION FORM -->
-      <div class="builder-form-panel">
-        <div class="builder-form-card">
-          <div class="form-header-group">
-            <span class="form-eyebrow">DIGITAL IDENTIFIER CREATION</span>
-            <h1 class="form-title">Build Your Custom Card</h1>
-          </div>
-
-          <form ng-submit="vm.onSaveCard()" novalidate class="builder-form">
-            <!-- FULL NAME -->
-            <div class="form-field-group">
-              <label class="form-label" for="card-fullname">FULL NAME *</label>
-              <input type="text" id="card-fullname" class="form-input-text" ng-model="vm.cardData.fullName"
-                placeholder="e.g. Trupal Panchal" required>
-            </div>
-
-            <!-- JOB TITLE & ROLE -->
-            <div class="form-field-group">
-              <label class="form-label" for="card-jobtitle">JOB TITLE &amp; ROLE</label>
-              <input type="text" id="card-jobtitle" class="form-input-text" ng-model="vm.cardData.jobTitle"
-                placeholder="e.g. Product Manager &amp; Founder">
-            </div>
-
-            <!-- COMPANY / STUDIO -->
-            <div class="form-field-group">
-              <label class="form-label" for="card-company">COMPANY / STUDIO *</label>
-              <input type="text" id="card-company" class="form-input-text" ng-model="vm.cardData.company"
-                placeholder="e.g. Loop Studio" required>
-            </div>
-
-            <!-- EMAIL ADDRESS -->
-            <div class="form-field-group">
-              <label class="form-label" for="card-email">EMAIL ADDRESS</label>
-              <input type="email" id="card-email" class="form-input-text" ng-model="vm.cardData.email"
-                placeholder="you@company.com">
-            </div>
-
-            <!-- PHONE NUMBER -->
-            <div class="form-field-group">
-              <label class="form-label" for="card-phone">PHONE NUMBER</label>
-              <input type="text" id="card-phone" class="form-input-text" ng-model="vm.cardData.phone"
-                placeholder="+1 (555) 000-0000">
-            </div>
-
-            <!-- WEBSITE URL -->
-            <div class="form-field-group">
-              <label class="form-label" for="card-website">WEBSITE URL</label>
-              <input type="url" id="card-website" class="form-input-text" ng-model="vm.cardData.website"
-                placeholder="https://company.io">
-            </div>
-
-            <!-- WORK INFO & BIO -->
-            <div class="form-field-group">
-              <label class="form-label" for="card-bio">WORK INFO &amp; BIO</label>
-              <textarea id="card-bio" class="form-textarea" rows="3" ng-model="vm.cardData.bio"
-                placeholder="Brief tagline or description..."></textarea>
-            </div>
-
-            <!-- COLOR PALETTE REFERENCE -->
-            <div class="form-field-group">
-              <label class="form-label">COLOR PALETTE REFERENCE</label>
-              <div class="swatches-row">
-                <button type="button" class="swatch-btn" ng-repeat="swatch in vm.colorSwatches"
-                  ng-class="{active: vm.cardData.templateStyle === swatch.name}"
-                  ng-style="{'background-color': swatch.color}" ng-click="vm.selectSwatch(swatch)"
-                  title="{{ swatch.name }}">
-                </button>
-              </div>
-              <span class="swatch-selected-name">Active Theme: <strong>{{ vm.cardData.templateStyle }}</strong></span>
-            </div>
-
-            <!-- TEMPLATE PRESETS -->
-            <div class="form-field-group">
-              <label class="form-label">TEMPLATE STYLE PRESET</label>
-              <div class="template-selector-row">
-                <button type="button" class="template-pill-btn" ng-repeat="tpl in vm.templates"
-                  ng-class="{active: vm.selectedTemplate.id === tpl.id}" ng-click="vm.selectTemplate(tpl)">
-                  <span>{{ tpl.name }}</span>
-                  <small>{{ tpl.tag }}</small>
-                </button>
-              </div>
-            </div>
-
-            <!-- SUBMIT BUTTON -->
-            <div class="form-submit-row">
-              <button type="submit" class="btn-save-card" id="btn-save-card" ng-disabled="vm.saving">
-                <span ng-if="!vm.saving">Save &amp; Issue Digital Card</span>
-                <span ng-if="vm.saving">Saving…</span>
+              <button type="button" className="btn-primary-action" onClick={saveCard} disabled={isSaving}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>{isSaving ? 'Saving…' : 'Save to Catalog'}</span>
               </button>
             </div>
+          </header>
 
-            <!-- ERROR MESSAGE -->
-            <div ng-if="vm.saveError" style="color: #C0392B; font-family: var(--font-mono); font-size: 11px; text-align: center; margin-top: 10px;">
-              {{ vm.saveError }}
-            </div>
+          {/* ================================================================
+               MAIN WORKSPACE: Canvas (Left) + Tactile Inspector (Right)
+               ================================================================ */}
+          <main className="studio-workspace">
 
-            <!-- TOAST BANNER -->
-            <div class="save-toast-banner" ng-if="vm.saveSuccess">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            {/* CANVAS VIEWPORT */}
+            <section className="studio-canvas" ref={stageRef} onMouseMove={handleStageMouseMove} onMouseLeave={handleStageMouseLeave}>
+              <div className="canvas-viewport">
+
+                {/* THE 3D LIVING CARD */}
+                <div
+                  className={`card-render-frame format-${cardFormat} pattern-${cardProps.pattern}`}
+                  ref={cardRef}
+                  style={{
+                    background: cardProps.bgGrad,
+                    color: cardProps.textColor,
+                    borderRadius: `${cardProps.radius}px`,
+                    fontFamily: cardProps.fontFamily,
+                    ...tiltStyle,
+                    '--accent': cardProps.accentColor,
+                    '--chip-gold': cardProps.accentColor
+                  }}
+                >
+                  {/* Dynamic Specular Lighting Glare (Follows Cursor) */}
+                  <div
+                    className="card-specular-glare"
+                    style={{
+                      background: `radial-gradient(circle at ${glarePos.x}% ${glarePos.y}%, rgba(255, 255, 255, ${glarePos.opacity}) 0%, rgba(255,255,255,0.04) 45%, transparent 70%)`
+                    }}
+                  />
+
+                  {/* Pattern Overlay */}
+                  <div className={`card-texture-layer texture-${cardProps.pattern}`} />
+
+                  {/* Lanyard punch hole for event pass */}
+                  {cardFormat === 'event' && <div className="lanyard-hole-slot" />}
+
+                  {/* CARD HEADER */}
+                  <div className="card-zone-header">
+                    <div className="header-branding-group">
+                      {cardProps.showChip && (
+                        <div className="smart-emv-chip">
+                          <span className="chip-line horizontal"></span>
+                          <span className="chip-line vertical"></span>
+                        </div>
+                      )}
+
+                      {cardProps.showNfc && (
+                        <div className="nfc-wave-icon">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                            <path d="M2 8.5C6.5 4.5 17.5 4.5 22 8.5" opacity="0.3"></path>
+                            <path d="M5 12C8 9 16 9 19 12" opacity="0.6"></path>
+                            <path d="M8.5 15.5C10.5 13.5 13.5 13.5 15.5 15.5"></path>
+                          </svg>
+                        </div>
+                      )}
+
+                      <span className="card-org-title">{cardData.orgTag || 'INOVIQ PROTOCOL'}</span>
+                    </div>
+
+                    {cardData.badgeText && (
+                      <div className="card-status-badge">
+                        <span>{cardData.badgeText}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* CARD IDENTITY */}
+                  <div className="card-zone-identity">
+                    <h1 className="card-identity-name">{cardData.fullName || 'Alex Morgan'}</h1>
+                    <h2 className="card-identity-title">{cardData.jobTitle || 'Principal Architect'}</h2>
+                    <h3 className="card-identity-company">{cardData.company || 'Inoviq Global Studios'}</h3>
+
+                    {cardData.bio && (
+                      <p className="card-identity-bio">"{cardData.bio}"</p>
+                    )}
+
+                    {cardData.handle && (cardFormat === 'social' || cardFormat === 'mobile') && (
+                      <div className="card-handle-pill">
+                        <span>{cardData.handle}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* CARD FOOTER */}
+                  <div className="card-zone-footer">
+                    <div className="card-contact-strip">
+                      {cardData.email && (
+                        <div className="contact-pill-item">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                          </svg>
+                          <span>{cardData.email}</span>
+                        </div>
+                      )}
+
+                      {cardData.phone && (
+                        <div className="contact-pill-item">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                          </svg>
+                          <span>{cardData.phone}</span>
+                        </div>
+                      )}
+
+                      {cardData.website && (
+                        <div className="contact-pill-item">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                          </svg>
+                          <span>{cardData.website}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {(cardProps.showBarcode || cardFormat === 'event') && (
+                      <div className="event-barcode-strip">
+                        <div className="barcode-bars"></div>
+                        <span className="barcode-number">INV-EVENT-9021</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* DRAGGABLE & RESIZABLE QR CODE NODE */}
+                  <div
+                    className={`canvas-interactive-node object-qr ${selectedObject === 'qr' ? 'is-active-selected' : ''}`}
+                    style={{
+                      left: `${qrTransform.x}%`,
+                      top: `${qrTransform.y}%`,
+                      width: `${qrTransform.size}px`,
+                      height: `${qrTransform.size}px`,
+                      transform: `rotate(${qrTransform.rotation}deg)`
+                    }}
+                    onMouseDown={(e) => startDrag('qr', e)}
+                    onClick={(e) => { e.stopPropagation(); setSelectedObject('qr'); setActiveTab('transform'); }}
+                  >
+                    {selectedObject === 'qr' && (
+                      <div className="selection-bounding-box">
+                        <span className="bounding-tag">QR Code (Drag / Resize)</span>
+                        <span className="resize-handle nw" onMouseDown={(e) => startResize('qr', 'nw', e)}></span>
+                        <span className="resize-handle ne" onMouseDown={(e) => startResize('qr', 'ne', e)}></span>
+                        <span className="resize-handle se" onMouseDown={(e) => startResize('qr', 'se', e)}></span>
+                        <span className="resize-handle sw" onMouseDown={(e) => startResize('qr', 'sw', e)}></span>
+                      </div>
+                    )}
+
+                    <div className="qr-code-render-box" style={{ borderRadius: `${qrTransform.borderRadius}px` }}>
+                      <div ref={qrHolderRef} style={{ width: '100%', height: '100%' }}></div>
+                    </div>
+                  </div>
+
+                  {/* DRAGGABLE & RESIZABLE CUSTOM IMAGE NODE */}
+                  {uploadedImage && (
+                    <div
+                      className={`canvas-interactive-node object-image ${selectedObject === 'image' ? 'is-active-selected' : ''}`}
+                      style={{
+                        left: `${imageTransform.x}%`,
+                        top: `${imageTransform.y}%`,
+                        width: `${imageTransform.size}px`,
+                        height: `${imageTransform.size}px`,
+                        transform: `rotate(${imageTransform.rotation}deg)`
+                      }}
+                      onMouseDown={(e) => startDrag('image', e)}
+                      onClick={(e) => { e.stopPropagation(); setSelectedObject('image'); setActiveTab('transform'); }}
+                    >
+                      {selectedObject === 'image' && (
+                        <div className="selection-bounding-box">
+                          <span className="bounding-tag">Image (Drag / Resize)</span>
+                          <span className="resize-handle nw" onMouseDown={(e) => startResize('image', 'nw', e)}></span>
+                          <span className="resize-handle ne" onMouseDown={(e) => startResize('image', 'ne', e)}></span>
+                          <span className="resize-handle se" onMouseDown={(e) => startResize('image', 'se', e)}></span>
+                          <span className="resize-handle sw" onMouseDown={(e) => startResize('image', 'sw', e)}></span>
+                        </div>
+                      )}
+
+                      <div
+                        className="custom-image-wrapper"
+                        style={{
+                          borderRadius: imageTransform.shape === 'circle' ? '50%' : (imageTransform.shape === 'square' ? '4px' : `${imageTransform.borderRadius}px`)
+                        }}
+                      >
+                        <img src={uploadedImage} alt="Uploaded Element" />
+                      </div>
+                    </div>
+                  )}
+
+                </div>
+              </div>
+
+              {/* Canvas Physics Info Bar */}
+              <div className="canvas-dock-controls">
+                <span style={{ fontSize: '11.5px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                  ✨ Dynamic 3D Perspective Physics Active (Move cursor over card)
+                </span>
+              </div>
+            </section>
+
+            {/* RIGHT INSPECTOR PANEL */}
+            <aside className="studio-inspector" onClick={(e) => e.stopPropagation()}>
+              
+              {/* Header Navigation */}
+              <nav className="inspector-tabs-header">
+                <button type="button" className={`inspector-tab-btn ${activeTab === 'info' ? 'active' : ''}`} onClick={() => setActiveTab('info')}>
+                  <span>Information</span>
+                </button>
+                <button type="button" className={`inspector-tab-btn ${activeTab === 'design' ? 'active' : ''}`} onClick={() => setActiveTab('design')}>
+                  <span>Design &amp; Theme</span>
+                </button>
+                <button type="button" className={`inspector-tab-btn ${activeTab === 'transform' ? 'active' : ''}`} onClick={() => setActiveTab('transform')}>
+                  <span>Position &amp; QR</span>
+                </button>
+                <button type="button" className={`inspector-tab-btn ${activeTab === 'templates' ? 'active' : ''}`} onClick={() => setActiveTab('templates')}>
+                  <span>Templates</span>
+                </button>
+              </nav>
+
+              {/* TAB 1: INFORMATION */}
+              {activeTab === 'info' && (
+                <div className="inspector-panel-body">
+                  <div className="panel-section-title">IDENTITY CREDENTIALS</div>
+
+                  <div className="form-field-group">
+                    <label className="form-label">Full Name *</label>
+                    <input
+                      type="text"
+                      className="form-text-input"
+                      value={cardData.fullName}
+                      onChange={(e) => setCardData({ ...cardData, fullName: e.target.value })}
+                      placeholder="e.g. Alex Morgan"
+                    />
+                  </div>
+
+                  <div className="form-field-group">
+                    <label className="form-label">Job Title &amp; Role</label>
+                    <input
+                      type="text"
+                      className="form-text-input"
+                      value={cardData.jobTitle}
+                      onChange={(e) => setCardData({ ...cardData, jobTitle: e.target.value })}
+                      placeholder="e.g. Principal Product Architect"
+                    />
+                  </div>
+
+                  <div className="form-field-group">
+                    <label className="form-label">Company / Organization</label>
+                    <input
+                      type="text"
+                      className="form-text-input"
+                      value={cardData.company}
+                      onChange={(e) => setCardData({ ...cardData, company: e.target.value })}
+                      placeholder="e.g. Inoviq Global Studios"
+                    />
+                  </div>
+
+                  <div className="panel-section-title" style={{ marginTop: '18px' }}>CONTACT &amp; REACH</div>
+
+                  <div className="form-field-group">
+                    <label className="form-label">Email Address</label>
+                    <input
+                      type="email"
+                      className="form-text-input"
+                      value={cardData.email}
+                      onChange={(e) => setCardData({ ...cardData, email: e.target.value })}
+                      placeholder="alex@inoviq.io"
+                    />
+                  </div>
+
+                  <div className="form-field-group">
+                    <label className="form-label">Phone Number</label>
+                    <input
+                      type="text"
+                      className="form-text-input"
+                      value={cardData.phone}
+                      onChange={(e) => setCardData({ ...cardData, phone: e.target.value })}
+                      placeholder="+1 (555) 019-2834"
+                    />
+                  </div>
+
+                  <div className="form-field-group">
+                    <label className="form-label">Website URL</label>
+                    <input
+                      type="url"
+                      className="form-text-input"
+                      value={cardData.website}
+                      onChange={(e) => setCardData({ ...cardData, website: e.target.value })}
+                      placeholder="https://inoviq.io"
+                    />
+                  </div>
+
+                  <div className="form-field-group">
+                    <label className="form-label">Social Handle (@)</label>
+                    <input
+                      type="text"
+                      className="form-text-input"
+                      value={cardData.handle}
+                      onChange={(e) => setCardData({ ...cardData, handle: e.target.value })}
+                      placeholder="@alexmorgan"
+                    />
+                  </div>
+
+                  <div className="form-field-group">
+                    <label className="form-label">Short Tagline / Mission</label>
+                    <textarea
+                      rows="2"
+                      className="form-text-input"
+                      value={cardData.bio}
+                      onChange={(e) => setCardData({ ...cardData, bio: e.target.value })}
+                      placeholder="Short memorable phrase…"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 2: DESIGN */}
+              {activeTab === 'design' && (
+                <div className="inspector-panel-body">
+                  <div className="panel-section-title">PROJECT TACTILE PALETTES</div>
+                  <p className="section-subtext">Harmonized with Inoviq's tactile design system tokens.</p>
+
+                  <div className="palettes-selection-grid">
+                    {PROJECT_PALETTES.map((pal) => (
+                      <div
+                        key={pal.name}
+                        className={`palette-swatch-card ${cardProps.paletteName === pal.name ? 'active' : ''}`}
+                        onClick={() => {
+                          setCardProps(prev => ({
+                            ...prev,
+                            paletteName: pal.name,
+                            bgColor: pal.bg,
+                            bgGrad: pal.bgGrad,
+                            textColor: pal.text,
+                            accentColor: pal.accent,
+                            mutedColor: pal.muted
+                          }));
+                        }}
+                      >
+                        <div className="palette-color-strip">
+                          <span className="strip-segment" style={{ flex: 3, backgroundColor: pal.bg }}></span>
+                          <span className="strip-segment" style={{ flex: 1.5, backgroundColor: pal.accent }}></span>
+                          <span className="strip-segment" style={{ flex: 1, backgroundColor: pal.text }}></span>
+                        </div>
+                        <div className="palette-meta">
+                          <span className="pal-name">{pal.name}</span>
+                          <span className="pal-desc">{pal.desc}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="panel-section-title" style={{ marginTop: '20px' }}>TYPOGRAPHY SYSTEM</div>
+                  <div className="form-field-group">
+                    <select
+                      className="form-select-input"
+                      value={cardProps.fontFamily}
+                      onChange={(e) => setCardProps({ ...cardProps, fontFamily: e.target.value })}
+                    >
+                      <option value="'Fraunces', Georgia, serif">Fraunces — High-Fashion Serif (Master Theme)</option>
+                      <option value="'Work Sans', sans-serif">Work Sans — Crisp Editorial Sans</option>
+                      <option value="'Plus Jakarta Sans', sans-serif">Plus Jakarta Sans — Geometric Modern</option>
+                      <option value="'IBM Plex Mono', monospace">IBM Plex Mono — Developer Monospace</option>
+                    </select>
+                  </div>
+
+                  <div className="panel-section-title" style={{ marginTop: '20px' }}>SURFACE TEXTURE</div>
+                  <div className="pill-options-grid">
+                    {['none', 'dots', 'grid', 'mesh'].map((pat) => (
+                      <button
+                        key={pat}
+                        type="button"
+                        className={`btn-option-pill ${cardProps.pattern === pat ? 'active' : ''}`}
+                        onClick={() => setCardProps({ ...cardProps, pattern: pat })}
+                      >
+                        {pat.toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="panel-section-title" style={{ marginTop: '20px' }}>HARDWARE EMBLEMS</div>
+                  <div className="toggle-checkbox-row">
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={cardProps.showChip}
+                        onChange={(e) => setCardProps({ ...cardProps, showChip: e.target.checked })}
+                      />
+                      Smart EMV Chip
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={cardProps.showNfc}
+                        onChange={(e) => setCardProps({ ...cardProps, showNfc: e.target.checked })}
+                      />
+                      NFC Wave
+                    </label>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 3: TRANSFORM */}
+              {activeTab === 'transform' && (
+                <div className="inspector-panel-body">
+                  
+                  {/* Image Upload */}
+                  <div className="inspector-module-card">
+                    <div className="module-title">🖼️ Custom Photo / Logo</div>
+                    <div className="upload-action-row" style={{ marginTop: '10px' }}>
+                      <button type="button" className="btn-upload-file" onClick={() => fileInputRef.current.click()}>
+                        {uploadedImage ? 'Replace Image' : 'Upload Photo / Logo'}
+                      </button>
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={handleImageUpload}
+                      />
+
+                      {uploadedImage && (
+                        <button type="button" className="btn-delete-element" onClick={() => setUploadedImage(null)}>
+                          ✕ Remove
+                        </button>
+                      )}
+                    </div>
+
+                    {uploadedImage && (
+                      <div className="element-transform-controls" style={{ marginTop: '12px' }}>
+                        <div className="slider-control-row">
+                          <span className="control-label">Size: {imageTransform.size}px</span>
+                          <input
+                            type="range"
+                            min="36"
+                            max="180"
+                            className="range-slider"
+                            value={imageTransform.size}
+                            onChange={(e) => setImageTransform({ ...imageTransform, size: Number(e.target.value) })}
+                          />
+                        </div>
+
+                        <div className="slider-control-row">
+                          <span className="control-label">Rotation: {imageTransform.rotation}°</span>
+                          <input
+                            type="range"
+                            min="-180"
+                            max="180"
+                            className="range-slider"
+                            value={imageTransform.rotation}
+                            onChange={(e) => setImageTransform({ ...imageTransform, rotation: Number(e.target.value) })}
+                          />
+                        </div>
+
+                        <div className="control-label" style={{ marginTop: '10px' }}>SHAPE</div>
+                        <div className="pill-options-grid">
+                          {['circle', 'rounded', 'square'].map((sh) => (
+                            <button
+                              key={sh}
+                              type="button"
+                              className={`btn-option-pill ${imageTransform.shape === sh ? 'active' : ''}`}
+                              onClick={() => setImageTransform({ ...imageTransform, shape: sh })}
+                            >
+                              {sh.toUpperCase()}
+                            </button>
+                          ))}
+                        </div>
+
+                        <div className="control-label" style={{ marginTop: '10px' }}>SNAP TO CORNER</div>
+                        <div className="corner-snaps-grid">
+                          <button type="button" className="btn-corner-snap" onClick={() => snapObject('image', 'top-left')}>Top Left</button>
+                          <button type="button" className="btn-corner-snap" onClick={() => snapObject('image', 'top-right')}>Top Right</button>
+                          <button type="button" className="btn-corner-snap" onClick={() => snapObject('image', 'bottom-left')}>Bot Left</button>
+                          <button type="button" className="btn-corner-snap" onClick={() => snapObject('image', 'center')}>Center</button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* QR Code Module */}
+                  <div className="inspector-module-card" style={{ marginTop: '16px' }}>
+                    <div className="module-title">🏁 Dynamic QR Code Engine</div>
+
+                    <div className="form-field-group" style={{ marginTop: '10px' }}>
+                      <label className="form-label">QR Encode Data</label>
+                      <select className="form-select-input" value={qrMode} onChange={(e) => setQrMode(e.target.value)}>
+                        <option value="vcard">Full Smartphone vCard (Contact Import)</option>
+                        <option value="website">Direct Website Link</option>
+                        <option value="email">Direct Email Link</option>
+                        <option value="phone">Direct Phone Call</option>
+                      </select>
+                    </div>
+
+                    <div className="slider-control-row">
+                      <span className="control-label">Size: {qrTransform.size}px</span>
+                      <input
+                        type="range"
+                        min="48"
+                        max="140"
+                        className="range-slider"
+                        value={qrTransform.size}
+                        onChange={(e) => setQrTransform({ ...qrTransform, size: Number(e.target.value) })}
+                      />
+                    </div>
+
+                    <div className="control-label" style={{ marginTop: '10px' }}>SNAP QR TO CORNER</div>
+                    <div className="corner-snaps-grid">
+                      <button type="button" className="btn-corner-snap" onClick={() => snapObject('qr', 'top-left')}>Top Left</button>
+                      <button type="button" className="btn-corner-snap" onClick={() => snapObject('qr', 'top-right')}>Top Right</button>
+                      <button type="button" className="btn-corner-snap" onClick={() => snapObject('qr', 'bottom-left')}>Bot Left</button>
+                      <button type="button" className="btn-corner-snap" onClick={() => snapObject('qr', 'bottom-right')}>Bot Right</button>
+                    </div>
+                  </div>
+
+                </div>
+              )}
+
+              {/* TAB 4: TEMPLATES */}
+              {activeTab === 'templates' && (
+                <div className="inspector-panel-body">
+                  <div className="panel-section-title">PURPOSE &amp; FORMAT PRESETS</div>
+
+                  <div className="templates-list-stack">
+                    <div className={`template-choice-card ${cardFormat === 'business' ? 'active' : ''}`} onClick={() => applyFormat('business')}>
+                      <div className="template-icon">💼</div>
+                      <div className="template-info">
+                        <span className="template-title">Executive Business Card</span>
+                        <span className="template-ratio">Landscape 3.5 : 2 (560 × 320)</span>
+                        <span className="template-desc">Standard pocket proportion with EMV chip and vCard QR.</span>
+                      </div>
+                    </div>
+
+                    <div className={`template-choice-card ${cardFormat === 'event' ? 'active' : ''}`} onClick={() => applyFormat('event')}>
+                      <div className="template-icon">🎫</div>
+                      <div className="template-info">
+                        <span className="template-title">Conference &amp; VIP Event Pass</span>
+                        <span className="template-ratio">Portrait 2 : 3 (340 × 510)</span>
+                        <span className="template-desc">Lanyard punch slot, attendee badge and barcode strip.</span>
+                      </div>
+                    </div>
+
+                    <div className={`template-choice-card ${cardFormat === 'social' ? 'active' : ''}`} onClick={() => applyFormat('social')}>
+                      <div className="template-icon">📱</div>
+                      <div className="template-info">
+                        <span className="template-title">Social Media Feed Showcase</span>
+                        <span className="template-ratio">Square 1 : 1 (420 × 420)</span>
+                        <span className="template-desc">Optimized for Instagram, X, and LinkedIn feeds.</span>
+                      </div>
+                    </div>
+
+                    <div className={`template-choice-card ${cardFormat === 'mobile' ? 'active' : ''}`} onClick={() => applyFormat('mobile')}>
+                      <div className="template-icon">🔗</div>
+                      <div className="template-info">
+                        <span className="template-title">Mobile Screen Bio Pass</span>
+                        <span className="template-ratio">Tall 9 : 16 (320 × 570)</span>
+                        <span className="template-desc">Smartphone screen pass with instant QR contact sharing.</span>
+                      </div>
+                    </div>
+
+                    <div className={`template-choice-card ${cardFormat === 'editorial' ? 'active' : ''}`} onClick={() => applyFormat('editorial')}>
+                      <div className="template-icon">📜</div>
+                      <div className="template-info">
+                        <span className="template-title">Tactile Editorial Plaster</span>
+                        <span className="template-ratio">Inoviq Signature Theme</span>
+                        <span className="template-desc">Fraunces serif typography on textured warm plaster.</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+            </aside>
+
+          </main>
+
+          {/* Toast Notification */}
+          {toastMsg && (
+            <div className="studio-toast-banner">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>
-              Card issued successfully! Saved to your Digital Catalog.
+              <span>{toastMsg}</span>
             </div>
-          </form>
+          )}
+
         </div>
-      </div>
+      );
+    }
 
-      <!-- RIGHT COLUMN: REAL-TIME LIVE PREVIEW -->
-      <div class="builder-preview-panel">
-        <div class="preview-sticky-wrap">
-          <div class="preview-header">
-            <span class="preview-eyebrow">REAL-TIME PREVIEW</span>
-            <button type="button" class="btn-flip-toggle" ng-click="vm.toggleFlip()" title="Flip Card View">
-              🔄 {{ vm.isFlipped ? 'View Front Side' : 'View Back Side' }}
-            </button>
-          </div>
-
-          <!-- 3D LIVE CARD PREVIEW CONTAINER -->
-          <div class="live-card-stage" ng-class="{'is-flipped': vm.isFlipped}">
-
-            <!-- CARD FRONT -->
-            <div class="live-card-front" ng-style="{'background': vm.cardData.bgGradient}">
-              <div class="card-top-sub">
-                <span class="card-brand-tag">INOVIQ · {{ vm.cardData.templateStyle | uppercase }} LIVE PREVIEW</span>
-                <span class="card-template-tag">{{ vm.selectedTemplate.name }}</span>
-              </div>
-
-              <div class="card-main-content">
-                <h2 class="card-holder-name">{{ vm.cardData.fullName || 'Your Name' }}</h2>
-                <p class="card-holder-role">
-                  {{ vm.cardData.jobTitle || 'Designation' }} · {{ vm.cardData.company || 'Company Name' }}
-                </p>
-
-                <div class="card-meta-details" ng-if="vm.cardData.email || vm.cardData.phone || vm.cardData.website">
-                  <p ng-if="vm.cardData.email">✉️ {{ vm.cardData.email }}</p>
-                  <p ng-if="vm.cardData.phone">📞 {{ vm.cardData.phone }}</p>
-                  <p ng-if="vm.cardData.website">🌐 {{ vm.cardData.website }}</p>
-                </div>
-
-                <p class="card-bio-snippet" ng-if="vm.cardData.bio">
-                  "{{ vm.cardData.bio }}"
-                </p>
-              </div>
-
-              <!-- CARD BOTTOM ROW: DYNAMIC QR & INITIALS BADGE -->
-              <div class="card-bottom-row">
-                <div class="qr-code-box" title="Scan to Save Contact">
-                  <svg viewBox="0 0 100 100" width="46" height="46" fill="currentColor">
-                    <!-- Stylized Vector QR Code -->
-                    <rect x="0" y="0" width="30" height="30" rx="4" />
-                    <rect x="5" y="5" width="20" height="20" fill="#fff" />
-                    <rect x="10" y="10" width="10" height="10" />
-
-                    <rect x="70" y="0" width="30" height="30" rx="4" />
-                    <rect x="75" y="5" width="20" height="20" fill="#fff" />
-                    <rect x="80" y="10" width="10" height="10" />
-
-                    <rect x="0" y="70" width="30" height="30" rx="4" />
-                    <rect x="5" y="75" width="20" height="20" fill="#fff" />
-                    <rect x="10" y="80" width="10" height="10" />
-
-                    <rect x="40" y="10" width="15" height="15" rx="2" />
-                    <rect x="40" y="35" width="20" height="10" rx="2" />
-                    <rect x="70" y="40" width="15" height="15" rx="2" />
-                    <rect x="35" y="70" width="25" height="25" rx="2" />
-                    <rect x="70" y="70" width="10" height="25" rx="2" />
-                    <rect x="85" y="85" width="15" height="15" rx="2" />
-                  </svg>
-                </div>
-
-                <div class="card-initials-pill" ng-style="{'color': vm.cardData.accentColor}">
-                  {{ vm.getInitials() }}
-                </div>
-              </div>
-            </div>
-
-            <!-- CARD BACK -->
-            <div class="live-card-back" ng-style="{'background': vm.cardData.bgGradient}">
-              <div class="card-back-brand">i<span>noviq</span></div>
-              <div class="card-back-emblem">{{ vm.getInitials() }}</div>
-              <p class="card-back-holder">{{ vm.cardData.fullName || 'Your Name' }}</p>
-              <div class="card-back-qr-large">
-                <svg viewBox="0 0 100 100" width="90" height="90" fill="currentColor">
-                  <rect x="0" y="0" width="30" height="30" rx="4" />
-                  <rect x="5" y="5" width="20" height="20" fill="#fff" />
-                  <rect x="10" y="10" width="10" height="10" />
-
-                  <rect x="70" y="0" width="30" height="30" rx="4" />
-                  <rect x="75" y="5" width="20" height="20" fill="#fff" />
-                  <rect x="80" y="10" width="10" height="10" />
-
-                  <rect x="0" y="70" width="30" height="30" rx="4" />
-                  <rect x="5" y="75" width="20" height="20" fill="#fff" />
-                  <rect x="10" y="80" width="10" height="10" />
-
-                  <rect x="40" y="10" width="15" height="15" rx="2" />
-                  <rect x="40" y="35" width="20" height="10" rx="2" />
-                  <rect x="70" y="40" width="15" height="15" rx="2" />
-                  <rect x="35" y="70" width="25" height="25" rx="2" />
-                  <rect x="70" y="70" width="10" height="25" rx="2" />
-                  <rect x="85" y="85" width="15" height="15" rx="2" />
-                </svg>
-              </div>
-              <p class="card-back-hint">SCAN TO ADD DIRECT TO CONTACTS</p>
-            </div>
-
-          </div>
-
-          <!-- SPECIFICATIONS TAG BADGE -->
-          <div class="spec-tag-container">
-            <span class="spec-tag-badge">785 × 1120 spec</span>
-          </div>
-
-          <p class="preview-caption">
-            This card automatically generates a unique QR code upon saving for instant contact swapping.
-          </p>
-
-          <!-- PREVIEW ACTIONS ROW -->
-          <div class="preview-actions-row">
-            <button type="button" class="btn-preview-action" ng-click="vm.copyCardLink()">
-              🔗 Copy Public Link
-            </button>
-            <button type="button" class="btn-preview-action" ng-click="vm.toggleFlip()">
-              🎴 Flip Card
-            </button>
-          </div>
-        </div>
-      </div>
-
-    </main>
-
-    <!-- Auth Prompt Modal Component -->
-    <div class="auth-modal-backdrop" ng-class="{'is-open': vm.showAuthModal}" ng-click="vm.closeAuthModal($event)">
-      <div class="auth-modal-card" ng-click="$event.stopPropagation()">
-        <button class="auth-modal-close" ng-click="vm.closeAuthModal($event)">&times;</button>
-        <div class="card-id">AUTHENTICATION REQUIRED</div>
-        <h3 class="auth-modal-title">Sign in to continue</h3>
-        <p class="auth-modal-desc">
-          You need an Inoviq account to <span class="auth-action-name">{{ vm.authModalAction }}</span>.
-        </p>
-        <div class="auth-modal-buttons">
-          <a ng-href="{{ vm.getSignupUrl() }}" class="btn-primary btn-auth-modal">Create Account</a>
-          <a ng-href="{{ vm.getLoginUrl() }}" class="btn-secondary btn-auth-modal">Log In</a>
-        </div>
-        <div class="auth-modal-foot">
-          <span>🔒 256-bit encrypted · Free forever</span>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- ===== FLOATING LIQUID GLASS DOCK ===== -->
-  <liquid-dock></liquid-dock>
-
-  <script src="../app.js"></script>
+    // Mount React App
+    const root = ReactDOM.createRoot(document.getElementById('react-card-studio-root'));
+    root.render(<InoviqStudioApp />);
+  </script>
 </body>
 
 </html>

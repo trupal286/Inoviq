@@ -74,9 +74,9 @@ const cardSchema = new mongoose.Schema({
 });
 
 /* ── Auto-generate initials from fullName before saving ── */
-cardSchema.pre('save', function (next) {
+cardSchema.pre('save', function () {
   if (this.isModified('fullName') || !this.initials) {
-    var parts = this.fullName.trim().split(/\s+/);
+    var parts = (this.fullName || '').trim().split(/\s+/);
     if (parts.length >= 2) {
       this.initials = (parts[0][0] + parts[1][0]).toUpperCase();
     } else if (parts[0] && parts[0].length > 0) {
@@ -85,7 +85,6 @@ cardSchema.pre('save', function (next) {
       this.initials = 'IN';
     }
   }
-  next();
 });
 
 /* ── Clean JSON output ── */

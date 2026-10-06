@@ -436,114 +436,682 @@
   }]);
 
   /* --------------------------------------------------------------------------
-     CreateCardController
+     CreateCardController — Inoviq Studio Bespoke Architecture
+     Freeform Drag & Resize Engine, Multi-Format Templates, Legible High-Contrast UI
      -------------------------------------------------------------------------- */
-  app.controller('CreateCardController', ['$scope', '$window', 'AuthService', 'CardService', function ($scope, $window, AuthService, CardService) {
+  app.controller('CreateCardController', ['$scope', '$window', '$timeout', 'AuthService', 'CardService', function ($scope, $window, $timeout, AuthService, CardService) {
     var vm = this;
 
-    /* ── Auth guard ── */
-    if (!AuthService.isLoggedIn()) {
-      $window.location.href = 'login.html';
-      return;
-    }
-
+    /* ── Auth & Current User ── */
+    vm.isLoggedIn = AuthService.isLoggedIn();
     vm.currentUser = AuthService.getCurrentUser();
 
+    /* ── Theme Mode (Light by default for clear legibility, toggleable to dark) ── */
+    vm.themeMode = $window.localStorage.getItem('inoviq_studio_theme') || 'light';
+    document.body.setAttribute('data-theme', vm.themeMode);
+
+    vm.toggleTheme = function () {
+      vm.themeMode = vm.themeMode === 'light' ? 'dark' : 'light';
+      $window.localStorage.setItem('inoviq_studio_theme', vm.themeMode);
+      document.body.setAttribute('data-theme', vm.themeMode);
+    };
+
+    /* ── Card Template Formats ── */
+    // 'business' (Landscape 3.5:2), 'event' (Portrait 2:3), 'social' (Square 1:1), 'mobile' (Phone 9:16), 'minimal' (Swiss), 'cyber' (Tech Terminal)
+    vm.cardFormat = 'business';
+
+    /* ── Active Inspector Navigation Tab ── */
+    vm.activeTab = 'content'; // 'content', 'design', 'elements', 'templates'
+    vm.switchTab = function (tab) {
+      vm.activeTab = tab;
+    };
+
+    /* ── Card Content Data ── */
     vm.cardData = {
-      fullName: vm.currentUser ? (vm.currentUser.firstName + ' ' + vm.currentUser.lastName) : 'Your Name',
-      jobTitle: 'Product Manager & Founder',
-      company: 'Loop Studio',
-      email: vm.currentUser ? vm.currentUser.email : 'you@company.com',
-      phone: '+1 (555) 000-0000',
-      website: 'https://company.io',
-      bio: 'Crafting digital products with tactile aesthetics and human-centered design.',
-      templateStyle: 'Dark Charcoal',
-      color: '#2D3536',
-      accentColor: '#B1D4D0',
-      bgGradient: 'linear-gradient(135deg, #2D3536 0%, #1A2223 100%)'
+      fullName: vm.currentUser ? (vm.currentUser.firstName + ' ' + (vm.currentUser.lastName || '')).trim() : 'Alex Morgan',
+      jobTitle: 'Principal Product Architect',
+      company: 'Inoviq Global Studios',
+      email: vm.currentUser ? vm.currentUser.email : 'alex.morgan@inoviq.io',
+      phone: '+1 (555) 019-2834',
+      website: 'https://inoviq.io',
+      location: 'San Francisco, CA',
+      bio: 'Crafting high-precision spatial tools and digital identity systems.',
+      badgeText: 'VERIFIED ID',
+      handle: '@alexmorgan'
     };
 
-    vm.isFlipped = false;
-    vm.saveSuccess = false;
-    vm.saveError = '';
-    vm.saving = false;
-
-    vm.colorSwatches = [
-      { name: 'Dark Charcoal', color: '#2D3536', accent: '#B1D4D0', gradient: 'linear-gradient(135deg, #2D3536 0%, #1A2223 100%)' },
-      { name: 'Deep Espresso', color: '#52352D', accent: '#F2EFE2', gradient: 'linear-gradient(135deg, #52352D 0%, #36221C 100%)' },
-      { name: 'Midnight Navy', color: '#1B2740', accent: '#67C3F3', gradient: 'linear-gradient(135deg, #1B2740 0%, #0F1726 100%)' },
-      { name: 'Forest Moss', color: '#697C70', accent: '#F2EFE2', gradient: 'linear-gradient(135deg, #697C70 0%, #46554D 100%)' },
-      { name: 'Eucalyptus', color: '#98AA9D', accent: '#2D3536', gradient: 'linear-gradient(135deg, #98AA9D 0%, #76897B 100%)' },
-      { name: 'Warm Cream', color: '#F2EFE2', accent: '#52352D', gradient: 'linear-gradient(135deg, #F2EFE2 0%, #E2DDD0 100%)' },
-      { name: 'Cyber Teal', color: '#104F55', accent: '#B1D4D0', gradient: 'linear-gradient(135deg, #104F55 0%, #082F33 100%)' }
-    ];
-
-    vm.templates = [
-      { id: 'ledger', name: 'Ledger Pro', tag: 'Minimal Tactile' },
-      { id: 'midnight', name: 'Midnight Desk', tag: 'Executive Dark' },
-      { id: 'brass', name: 'Brass Rule', tag: 'Classic Serif' },
-      { id: 'stamped', name: 'Stamped Gold', tag: 'Premium Foil' }
-    ];
-    vm.selectedTemplate = vm.templates[0];
-
-    vm.selectSwatch = function (swatch) {
-      vm.cardData.templateStyle = swatch.name;
-      vm.cardData.color = swatch.color;
-      vm.cardData.accentColor = swatch.accent;
-      vm.cardData.bgGradient = swatch.gradient;
+    /* ── Card Visual Design Properties ── */
+    vm.cardProps = {
+      paletteName: 'Obsidian Noir',
+      bgColor: '#0F172A',
+      cardBgType: 'gradient', // 'solid', 'gradient', 'glass'
+      bgGradient: 'linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #090D16 100%)',
+      textColor: '#FFFFFF',
+      accentColor: '#38BDF8',
+      mutedTextColor: '#94A3B8',
+      fontFamily: "'Plus Jakarta Sans', sans-serif",
+      radius: 20,
+      pattern: 'dots', // 'none', 'dots', 'grid', 'mesh', 'lines'
+      showChip: true,
+      showNfc: true,
+      showBarcode: false,
+      orgTag: 'INOVIQ // PROTOCOL',
+      borderStyle: 'subtle', // 'none', 'subtle', 'glow', 'gold'
+      shadowStrength: 'medium' // 'none', 'subtle', 'medium', 'deep'
     };
 
-    vm.selectTemplate = function (tpl) {
-      vm.selectedTemplate = tpl;
-    };
-
-    vm.getInitials = function () {
-      if (!vm.cardData.fullName) return 'YN';
-      var parts = vm.cardData.fullName.trim().split(/\s+/);
-      if (parts.length >= 2) {
-        return (parts[0][0] + parts[1][0]).toUpperCase();
-      } else if (parts[0].length > 0) {
-        return parts[0].substring(0, 2).toUpperCase();
+    /* ── Curated Professional Palettes (Human-crafted, high legibility) ── */
+    vm.curatedPalettes = [
+      {
+        name: 'Obsidian Noir',
+        desc: 'Deep titanium slate with electric cyan accent',
+        bg: '#0F172A',
+        bgGrad: 'linear-gradient(135deg, #0F172A 0%, #1E293B 60%, #090D16 100%)',
+        text: '#F8FAFC',
+        accent: '#38BDF8',
+        muted: '#94A3B8'
+      },
+      {
+        name: 'Pure Editorial Light',
+        desc: 'Crisp gallery white with deep carbon contrast',
+        bg: '#FFFFFF',
+        bgGrad: 'linear-gradient(135deg, #FFFFFF 0%, #F1F5F9 100%)',
+        text: '#0F172A',
+        accent: '#2563EB',
+        muted: '#64748B'
+      },
+      {
+        name: 'Royal Indigo',
+        desc: 'Rich deep violet with vibrant electric blue',
+        bg: '#1E1B4B',
+        bgGrad: 'linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #0F172A 100%)',
+        text: '#FFFFFF',
+        accent: '#818CF8',
+        muted: '#C7D2FE'
+      },
+      {
+        name: 'Swiss Bauhaus Red',
+        desc: 'Minimal stark cream with signature crimson',
+        bg: '#FAFAF9',
+        bgGrad: 'linear-gradient(135deg, #FAFAF9 0%, #F5F5F4 100%)',
+        text: '#1C1917',
+        accent: '#DC2626',
+        muted: '#78716C'
+      },
+      {
+        name: 'Emerald Executive',
+        desc: 'Deep forest green with warm champagne gold',
+        bg: '#064E3B',
+        bgGrad: 'linear-gradient(135deg, #064E3B 0%, #022C22 100%)',
+        text: '#ECFDF5',
+        accent: '#FBBF24',
+        muted: '#A7F3D0'
+      },
+      {
+        name: 'Cyberpunk Monolith',
+        desc: 'Matte black with radiant neon lime matrix',
+        bg: '#050505',
+        bgGrad: 'linear-gradient(135deg, #000000 0%, #111111 60%, #050505 100%)',
+        text: '#FFFFFF',
+        accent: '#10B981',
+        muted: '#6EE7B7'
+      },
+      {
+        name: 'Warm Cashmere',
+        desc: 'Warm beige aesthetic with espresso typography',
+        bg: '#F5F2EB',
+        bgGrad: 'linear-gradient(135deg, #FBF9F5 0%, #EDE8DC 100%)',
+        text: '#292524',
+        accent: '#9A3412',
+        muted: '#78716C'
+      },
+      {
+        name: 'Midnight Hologram',
+        desc: 'Dark iridescent glass with prismatic reflections',
+        bg: '#0B0F19',
+        bgGrad: 'linear-gradient(135deg, #0B0F19 0%, #1E1B4B 40%, #064E3B 100%)',
+        text: '#F8FAFC',
+        accent: '#C084FC',
+        muted: '#94A3B8'
       }
-      return 'YN';
+    ];
+
+    vm.applyPalette = function (pal) {
+      vm.cardProps.paletteName = pal.name;
+      vm.cardProps.bgColor = pal.bg;
+      vm.cardProps.bgGradient = pal.bgGrad;
+      vm.cardProps.textColor = pal.text;
+      vm.cardProps.accentColor = pal.accent;
+      vm.cardProps.mutedTextColor = pal.muted;
+      vm.recordChange();
     };
 
-    vm.toggleFlip = function () {
-      vm.isFlipped = !vm.isFlipped;
+    /* ── Template Presets Switcher ── */
+    vm.setFormat = function (format) {
+      vm.cardFormat = format;
+      if (format === 'event') {
+        vm.cardProps.showBarcode = true;
+        vm.cardProps.showChip = false;
+        vm.qrTransform.x = 28;
+        vm.qrTransform.y = 65;
+        vm.qrTransform.size = 110;
+        if (vm.imageTransform) {
+          vm.imageTransform.x = 35;
+          vm.imageTransform.y = 12;
+          vm.imageTransform.size = 90;
+        }
+      } else if (format === 'social') {
+        vm.cardProps.showBarcode = false;
+        vm.cardProps.showChip = false;
+        vm.qrTransform.x = 65;
+        vm.qrTransform.y = 65;
+        vm.qrTransform.size = 95;
+        if (vm.imageTransform) {
+          vm.imageTransform.x = 8;
+          vm.imageTransform.y = 8;
+          vm.imageTransform.size = 75;
+        }
+      } else if (format === 'mobile') {
+        vm.cardProps.showBarcode = false;
+        vm.cardProps.showChip = true;
+        vm.qrTransform.x = 32;
+        vm.qrTransform.y = 70;
+        vm.qrTransform.size = 105;
+        if (vm.imageTransform) {
+          vm.imageTransform.x = 36;
+          vm.imageTransform.y = 14;
+          vm.imageTransform.size = 85;
+        }
+      } else if (format === 'minimal') {
+        vm.applyPalette(vm.curatedPalettes[1]); // Pure Editorial Light
+        vm.cardProps.fontFamily = "'Inter', sans-serif";
+        vm.cardProps.showChip = false;
+        vm.cardProps.radius = 8;
+        vm.qrTransform.x = 72;
+        vm.qrTransform.y = 62;
+        vm.qrTransform.size = 80;
+      } else if (format === 'cyber') {
+        vm.applyPalette(vm.curatedPalettes[5]); // Cyberpunk Monolith
+        vm.cardProps.fontFamily = "'IBM Plex Mono', monospace";
+        vm.cardProps.showBarcode = true;
+        vm.cardProps.radius = 12;
+      } else {
+        // Business default
+        vm.qrTransform.x = 72;
+        vm.qrTransform.y = 56;
+        vm.qrTransform.size = 84;
+        if (vm.imageTransform) {
+          vm.imageTransform.x = 72;
+          vm.imageTransform.y = 12;
+          vm.imageTransform.size = 60;
+        }
+      }
+      vm.recordChange();
+      vm.renderQR();
     };
 
-    vm.onSaveCard = function () {
-      vm.saveError = '';
-      vm.saving = true;
+    /* ── Freeform Interactive Transform Engine (Direct Canvas Drag + Handles) ── */
+    vm.selectedObject = null; // 'qr', 'image', 'avatar', 'logo'
 
-      var payload = angular.copy(vm.cardData);
-      payload.templateLabel = vm.selectedTemplate.name;
+    vm.qrTransform = {
+      x: 72,       // percentage from left
+      y: 56,       // percentage from top
+      size: 84,    // width/height in px
+      rotation: 0,
+      opacity: 100,
+      borderRadius: 12,
+      shadow: true,
+      invertColor: false
+    };
+
+    vm.imageTransform = {
+      x: 72,
+      y: 12,
+      size: 65,
+      rotation: 0,
+      opacity: 100,
+      borderRadius: 14,
+      shape: 'rounded', // 'square', 'rounded', 'circle'
+      shadow: true,
+      border: true
+    };
+
+    vm.uploadedImageUrl = null;
+    vm.uploadedLogoUrl = null;
+
+    vm.selectObject = function (type, event) {
+      if (event) event.stopPropagation();
+      vm.selectedObject = type;
+      vm.activeTab = 'elements';
+    };
+
+    vm.deselectObjects = function (event) {
+      // If clicking directly on the canvas background, deselect
+      if (event && (event.target.id === 'canvasContainer' || event.target.id === 'canvasViewport')) {
+        vm.selectedObject = null;
+      }
+    };
+
+    /* ── Direct Drag & Resize Physics ── */
+    var dragState = {
+      isDragging: false,
+      isResizing: false,
+      resizeCorner: null,
+      target: null,
+      startX: 0,
+      startY: 0,
+      initialLeftPct: 0,
+      initialTopPct: 0,
+      initialSize: 0,
+      cardRect: null
+    };
+
+    vm.startDrag = function (target, event) {
+      event.preventDefault();
+      event.stopPropagation();
+      vm.selectedObject = target;
+
+      var cardElem = document.getElementById('cardRenderFrame');
+      if (!cardElem) return;
+      var cardRect = cardElem.getBoundingClientRect();
+
+      var transform = target === 'qr' ? vm.qrTransform : vm.imageTransform;
+
+      dragState.isDragging = true;
+      dragState.isResizing = false;
+      dragState.target = target;
+      dragState.startX = event.clientX;
+      dragState.startY = event.clientY;
+      dragState.initialLeftPct = transform.x;
+      dragState.initialTopPct = transform.y;
+      dragState.cardRect = cardRect;
+
+      $window.addEventListener('mousemove', onMouseMove);
+      $window.addEventListener('mouseup', onMouseUp);
+    };
+
+    vm.startResize = function (target, corner, event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      var cardElem = document.getElementById('cardRenderFrame');
+      if (!cardElem) return;
+      var cardRect = cardElem.getBoundingClientRect();
+
+      var transform = target === 'qr' ? vm.qrTransform : vm.imageTransform;
+
+      dragState.isDragging = false;
+      dragState.isResizing = true;
+      dragState.resizeCorner = corner;
+      dragState.target = target;
+      dragState.startX = event.clientX;
+      dragState.startY = event.clientY;
+      dragState.initialSize = transform.size;
+      dragState.cardRect = cardRect;
+
+      $window.addEventListener('mousemove', onMouseMove);
+      $window.addEventListener('mouseup', onMouseUp);
+    };
+
+    function onMouseMove(e) {
+      if (!dragState.cardRect) return;
+
+      $scope.$apply(function () {
+        var transform = dragState.target === 'qr' ? vm.qrTransform : vm.imageTransform;
+
+        if (dragState.isDragging) {
+          var deltaXPx = e.clientX - dragState.startX;
+          var deltaYPx = e.clientY - dragState.startY;
+
+          var deltaXPct = (deltaXPx / dragState.cardRect.width) * 100;
+          var deltaYPct = (deltaYPx / dragState.cardRect.height) * 100;
+
+          var newX = Math.round(dragState.initialLeftPct + deltaXPct);
+          var newY = Math.round(dragState.initialTopPct + deltaYPct);
+
+          // Boundary clamping (0% to 88%)
+          transform.x = Math.max(0, Math.min(88, newX));
+          transform.y = Math.max(0, Math.min(88, newY));
+        } else if (dragState.isResizing) {
+          var deltaSize = 0;
+          if (dragState.resizeCorner === 'se' || dragState.resizeCorner === 'ne') {
+            deltaSize = (e.clientX - dragState.startX);
+          } else {
+            deltaSize = (dragState.startX - e.clientX);
+          }
+
+          var newSize = Math.round(dragState.initialSize + deltaSize);
+          transform.size = Math.max(36, Math.min(220, newSize));
+
+          if (dragState.target === 'qr') {
+            vm.renderQR();
+          }
+        }
+      });
+    }
+
+    function onMouseUp() {
+      if (dragState.isDragging || dragState.isResizing) {
+        dragState.isDragging = false;
+        dragState.isResizing = false;
+        dragState.target = null;
+        vm.recordChange();
+      }
+      $window.removeEventListener('mousemove', onMouseMove);
+      $window.removeEventListener('mouseup', onMouseUp);
+    }
+
+    /* ── Snap Object to Card Corners ── */
+    vm.snapObject = function (target, position) {
+      var transform = target === 'qr' ? vm.qrTransform : vm.imageTransform;
+      if (position === 'top-left') {
+        transform.x = 6;
+        transform.y = 8;
+      } else if (position === 'top-right') {
+        transform.x = 74;
+        transform.y = 8;
+      } else if (position === 'bottom-left') {
+        transform.x = 6;
+        transform.y = 60;
+      } else if (position === 'bottom-right') {
+        transform.x = 72;
+        transform.y = 56;
+      } else if (position === 'center') {
+        transform.x = 40;
+        transform.y = 40;
+      }
+      vm.recordChange();
+      if (target === 'qr') vm.renderQR();
+    };
+
+    /* ── Image Upload & Handling ── */
+    vm.triggerUpload = function () {
+      var input = document.getElementById('imageInputHidden');
+      if (input) input.click();
+    };
+
+    vm.onImagePicked = function (inputElem) {
+      if (inputElem.files && inputElem.files[0]) {
+        var file = inputElem.files[0];
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          $scope.$apply(function () {
+            vm.uploadedImageUrl = e.target.result;
+            vm.selectedObject = 'image';
+            vm.activeTab = 'elements';
+            vm.triggerToast('Image imported! Drag or resize directly on the card.');
+            vm.recordChange();
+          });
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+
+    vm.removeImage = function () {
+      vm.uploadedImageUrl = null;
+      if (vm.selectedObject === 'image') vm.selectedObject = null;
+      vm.recordChange();
+      vm.triggerToast('Uploaded image removed.');
+    };
+
+    /* ── QR Target & Dynamic Encoding Engine ── */
+    vm.qrTarget = 'vcard'; // 'vcard', 'website', 'email', 'phone', 'social'
+
+    function buildQRData() {
+      var d = vm.cardData;
+      if (vm.qrTarget === 'website' && d.website) return d.website;
+      if (vm.qrTarget === 'email' && d.email) return 'mailto:' + d.email;
+      if (vm.qrTarget === 'phone' && d.phone) return 'tel:' + d.phone;
+      if (vm.qrTarget === 'social' && d.handle) return 'https://instagram.com/' + d.handle.replace('@', '');
+
+      // Default high-compatibility vCard 3.0
+      return [
+        'BEGIN:VCARD',
+        'VERSION:3.0',
+        'N:' + (d.fullName || 'Member') + ';;;;',
+        'FN:' + (d.fullName || 'Member'),
+        'ORG:' + (d.company || 'Inoviq'),
+        'TITLE:' + (d.jobTitle || ''),
+        d.phone ? ('TEL;TYPE=CELL,VOICE:' + d.phone) : '',
+        d.email ? ('EMAIL;TYPE=PREF,INTERNET:' + d.email) : '',
+        d.website ? ('URL:' + d.website) : '',
+        d.location ? ('ADR:;;;' + d.location + ';;;') : '',
+        'NOTE:' + (d.bio || 'Inoviq Digital Pass'),
+        'END:VCARD'
+      ].filter(Boolean).join('\n');
+    }
+
+    vm.renderQR = function () {
+      $timeout(function () {
+        var container = document.getElementById('liveQRHolder');
+        if (!container) return;
+        container.innerHTML = '';
+
+        var qrData = buildQRData();
+        var size = Math.max(48, vm.qrTransform.size);
+
+        if ($window.QRCode) {
+          new $window.QRCode(container, {
+            text: qrData,
+            width: size,
+            height: size,
+            colorDark: vm.qrTransform.invertColor ? '#FFFFFF' : '#0F172A',
+            colorLight: vm.qrTransform.invertColor ? '#0F172A' : '#FFFFFF',
+            correctLevel: $window.QRCode.CorrectLevel.M
+          });
+        }
+      }, 50);
+    };
+
+    $timeout(function () {
+      vm.renderQR();
+    }, 150);
+
+    /* ── 3D Interactive Perspective Tilt ── */
+    vm.enable3DTilt = false;
+    vm.tiltStyle = {};
+
+    vm.onCanvasMouseMove = function (e) {
+      if (!vm.enable3DTilt) return;
+      var frame = document.getElementById('cardRenderFrame');
+      if (!frame) return;
+      var rect = frame.getBoundingClientRect();
+      var x = e.clientX - rect.left;
+      var y = e.clientY - rect.top;
+      var cx = rect.width / 2;
+      var cy = rect.height / 2;
+
+      var rotX = ((y - cy) / cy) * -12;
+      var rotY = ((x - cx) / cx) * 12;
+
+      vm.tiltStyle = {
+        transform: 'perspective(1000px) rotateX(' + rotX.toFixed(2) + 'deg) rotateY(' + rotY.toFixed(2) + 'deg) scale3d(1.02, 1.02, 1.02)',
+        transition: 'transform 0.08s ease-out'
+      };
+    };
+
+    vm.onCanvasMouseLeave = function () {
+      if (!vm.enable3DTilt) return;
+      vm.tiltStyle = {
+        transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
+        transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
+      };
+    };
+
+    /* ── Canvas Zoom Controls ── */
+    vm.zoom = 100;
+    vm.zoomIn = function () { if (vm.zoom < 160) vm.zoom += 10; };
+    vm.zoomOut = function () { if (vm.zoom > 50) vm.zoom -= 10; };
+    vm.resetZoom = function () { vm.zoom = 100; };
+
+    /* ── Undo / Redo History Stack ── */
+    var historyStack = [];
+    var historyIndex = -1;
+    var maxHistory = 40;
+
+    vm.recordChange = function () {
+      var snapshot = {
+        cardData: angular.copy(vm.cardData),
+        cardProps: angular.copy(vm.cardProps),
+        cardFormat: vm.cardFormat,
+        qrTransform: angular.copy(vm.qrTransform),
+        imageTransform: angular.copy(vm.imageTransform),
+        uploadedImageUrl: vm.uploadedImageUrl
+      };
+
+      if (historyIndex < historyStack.length - 1) {
+        historyStack = historyStack.slice(0, historyIndex + 1);
+      }
+      historyStack.push(JSON.stringify(snapshot));
+      if (historyStack.length > maxHistory) {
+        historyStack.shift();
+      } else {
+        historyIndex++;
+      }
+    };
+
+    vm.canUndo = function () { return historyIndex > 0; };
+    vm.canRedo = function () { return historyIndex < historyStack.length - 1; };
+
+    vm.undo = function () {
+      if (vm.canUndo()) {
+        historyIndex--;
+        applyHistory(historyStack[historyIndex]);
+      }
+    };
+
+    vm.redo = function () {
+      if (vm.canRedo()) {
+        historyIndex++;
+        applyHistory(historyStack[historyIndex]);
+      }
+    };
+
+    function applyHistory(serializedState) {
+      var st = JSON.parse(serializedState);
+      vm.cardData = st.cardData;
+      vm.cardProps = st.cardProps;
+      vm.cardFormat = st.cardFormat;
+      vm.qrTransform = st.qrTransform;
+      vm.imageTransform = st.imageTransform;
+      vm.uploadedImageUrl = st.uploadedImageUrl;
+      vm.renderQR();
+    }
+
+    vm.recordChange(); // Initial baseline
+
+    // Keyboard Shortcuts
+    $window.addEventListener('keydown', function (e) {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+        e.preventDefault();
+        $scope.$apply(function () {
+          if (e.shiftKey) vm.redo();
+          else vm.undo();
+        });
+      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
+        e.preventDefault();
+        $scope.$apply(function () { vm.redo(); });
+      } else if (e.key === 'Escape') {
+        $scope.$apply(function () { vm.selectedObject = null; });
+      }
+    });
+
+    /* ── High-Resolution PNG Card Export ── */
+    vm.downloadPNG = function () {
+      var frame = document.getElementById('cardRenderFrame');
+      if (!frame || !$window.html2canvas) {
+        alert('Rendering engine initializing. Please try again.');
+        return;
+      }
+
+      vm.selectedObject = null; // Hide selection border for clean capture
+      vm.triggerToast('Exporting high-resolution PNG…');
+
+      $timeout(function () {
+        $window.html2canvas(frame, {
+          scale: 3,
+          useCORS: true,
+          backgroundColor: null,
+          logging: false
+        }).then(function (canvas) {
+          var link = document.createElement('a');
+          var fileName = (vm.cardData.fullName ? vm.cardData.fullName.toLowerCase().replace(/[^a-z0-9]/g, '_') : 'inoviq') + '_card.png';
+          link.href = canvas.toDataURL('image/png');
+          link.download = fileName;
+          link.click();
+          vm.triggerToast('Card exported as PNG successfully!');
+        }).catch(function (err) {
+          console.error('Export failure:', err);
+          alert('Could not export image.');
+        });
+      }, 100);
+    };
+
+    /* ── Export QR Code Separately ── */
+    vm.downloadQROnly = function () {
+      var container = document.getElementById('liveQRHolder');
+      if (!container) return;
+      var canvas = container.querySelector('canvas');
+      var img = container.querySelector('img');
+      var url = canvas ? canvas.toDataURL('image/png') : (img ? img.src : null);
+
+      if (url) {
+        var link = document.createElement('a');
+        link.href = url;
+        link.download = (vm.cardData.fullName ? vm.cardData.fullName.replace(/\s+/g, '_') : 'card') + '_qr.png';
+        link.click();
+        vm.triggerToast('QR Code exported!');
+      }
+    };
+
+    /* ── MongoDB Save to Catalog API Integration ── */
+    vm.isSaving = false;
+    vm.toastNotice = '';
+
+    vm.triggerToast = function (msg) {
+      vm.toastNotice = msg;
+      $timeout(function () {
+        vm.toastNotice = '';
+      }, 3500);
+    };
+
+    vm.saveCardToCatalog = function () {
+      if (!AuthService.isLoggedIn()) {
+        if (confirm('An account is required to save cards to your permanent catalog. Go to Login?')) {
+          $window.location.href = 'login.html';
+        }
+        return;
+      }
+
+      vm.isSaving = true;
+
+      var payload = {
+        fullName: vm.cardData.fullName || 'Alex Morgan',
+        jobTitle: vm.cardData.jobTitle || 'Executive',
+        company: vm.cardData.company || 'Inoviq Studio',
+        phone: vm.cardData.phone || '',
+        email: vm.cardData.email || '',
+        website: vm.cardData.website || '',
+        bio: vm.cardData.bio || '',
+        color: vm.cardProps.bgColor || '#0F172A',
+        accentColor: vm.cardProps.accentColor || '#38BDF8',
+        templateLabel: vm.cardFormat.toUpperCase() + ' (' + vm.cardProps.paletteName + ')',
+        avatar: vm.uploadedImageUrl || ''
+      };
 
       CardService.create(payload)
-        .then(function (data) {
-          vm.saving = false;
-          if (data.success) {
-            vm.saveSuccess = true;
-            setTimeout(function () {
-              $scope.$apply(function () {
-                vm.saveSuccess = false;
-              });
-            }, 4000);
+        .then(function (res) {
+          vm.isSaving = false;
+          if (res.success) {
+            vm.triggerToast('Card saved and published to your Inoviq Catalog!');
           }
         })
         .catch(function (err) {
-          vm.saving = false;
-          vm.saveError = (err.data && err.data.message) || 'Failed to save card. Please try again.';
-          $scope.$applyAsync();
+          vm.isSaving = false;
+          alert('Failed to save card: ' + ((err.data && err.data.message) || 'Check network connection'));
         });
     };
 
-    vm.copyCardLink = function () {
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText($window.location.origin + '/create-card?card=' + encodeURIComponent(vm.cardData.fullName));
-      }
-      alert('Card Public Link copied to clipboard!');
-    };
   }]);
 
   /* --------------------------------------------------------------------------

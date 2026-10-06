@@ -18,10 +18,20 @@ const connectDB = async () => {
     console.log(`  ✔  MongoDB connected: ${conn.connection.host}/${conn.connection.name}`);
   } catch (err) {
     console.error(`\n  ✘  MongoDB connection error: ${err.message}`);
-    console.error(`\n  💡 Fix: Make sure MongoDB is running.`);
-    console.error(`     → Run "mongod" in a terminal, or`);
-    console.error(`     → Run "net start MongoDB" (if installed as service), or`);
-    console.error(`     → Update MONGO_URI in Server/.env to a MongoDB Atlas URI\n`);
+    
+    // Fallback to local MongoDB so the development server stays alive
+    try {
+      console.log(`  ➜  Attempting fallback to local MongoDB (127.0.0.1:27017)...`);
+      const fallbackConn = await mongoose.connect('mongodb://127.0.0.1:27017/inoviq', {
+        serverSelectionTimeoutMS: 3000
+      });
+      console.log(`  ✔  MongoDB fallback connected: ${fallbackConn.connection.host}/${fallbackConn.connection.name}`);
+      return;
+    } catch (fallbackErr) {
+      console.error(`  ✘  Local MongoDB also unavailable.`);
+    }
+
+    console.error(`\n  💡 Fix: Make sure MongoDB is running or your IP is whitelisted on Atlas.\n`);
     process.exit(1);
   }
 };

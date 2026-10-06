@@ -38,8 +38,7 @@
         </div>
 
         <div class="nav-actions">
-          <a href="javascript:void(0)" ng-click="vm.requireAuth('Create Card', 'create-card.html')" class="btn-primary"
-            id="btn-create-top">➕ Create Card</a>
+          <a href="create-card.html" class="btn-primary" id="btn-create-top">➕ Create Card</a>
 
           <!-- Logged-in Account Dropdown -->
           <div class="account-menu-container" ng-if="vm.isLoggedIn">
@@ -73,9 +72,7 @@
           </div>
 
           <!-- Guest State Account Button -->
-          <a href="javascript:void(0)" ng-if="!vm.isLoggedIn"
-            ng-click="vm.requireAuth('Account Options', 'dashboard.html')" class="user-pill guest-pill"
-            id="btn-account-guest">
+          <a href="login.html" ng-if="!vm.isLoggedIn" class="user-pill guest-pill" id="btn-account-guest">
             <div class="avatar-circle guest-avatar">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="8" r="4" />
@@ -96,8 +93,7 @@
         <p class="sub">Build a card, generate its QR, and swap details the moment you meet someone — every detail filed
           straight into their contacts.</p>
         <div class="cta-row">
-          <a href="javascript:void(0)" ng-click="vm.requireAuth('Create Card', 'create-card.html')"
-            class="btn-primary btn-lg" id="btn-hero-create">Create your card</a>
+          <a href="create-card.html" class="btn-primary btn-lg" id="btn-hero-create">Create your card</a>
           <a href="#templates" class="btn-ghost btn-lg" id="btn-browse">Browse templates</a>
         </div>
       </div>
@@ -292,13 +288,13 @@
             No sample cards match &ldquo;{{ vm.searchTerm }}&rdquo;.
           </p>
 
-          <div class="card-row row-add" ng-click="vm.onCreateCard()" id="btn-add-row-guest">
+          <a href="create-card.html" class="card-row row-add" id="btn-add-row-guest" style="text-decoration: none;">
             <div class="row-chip add-chip">+</div>
             <div class="row-info">
               <div class="row-name">Create your custom card</div>
               <div class="row-role">Start blank or choose a template</div>
             </div>
-          </div>
+          </a>
         </div>
       </div>
 
@@ -344,13 +340,13 @@
             No cards yet. Create your first digital card!
           </p>
 
-          <div class="card-row row-add" ng-click="vm.onCreateCard()" id="btn-add-row">
+          <a href="create-card.html" class="card-row row-add" id="btn-add-row" style="text-decoration: none;">
             <div class="row-chip add-chip">+</div>
             <div class="row-info">
               <div class="row-name">Add a new card</div>
               <div class="row-role">Start blank or choose a template</div>
             </div>
-          </div>
+          </a>
         </div>
       </div>
     </section>
@@ -414,9 +410,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Apple-Style Floating Dock Navigation (macOS Proximity Magnification) -->
-  <liquid-dock></liquid-dock>
 
   <script src="../app.js"></script>
   <script>
