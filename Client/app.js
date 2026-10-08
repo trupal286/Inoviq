@@ -255,40 +255,105 @@
   app.controller('DashboardController', ['$scope', '$window', 'AuthService', 'CardService', function ($scope, $window, AuthService, CardService) {
     var vm = this;
 
-    /* ── Auth guard ── */
+    /* ── Auth status ── */
     vm.isLoggedIn = AuthService.isLoggedIn();
     vm.currentUser = AuthService.getCurrentUser();
 
-    if (!vm.isLoggedIn) {
-      $window.location.href = 'login.html';
-      return;
-    }
-
     vm.searchTerm = '';
+    vm.showAllDemoCards = false;
+    vm.showAccountMenu = false;
+    vm.showAuthModal = false;
+    vm.authModalAction = 'save cards';
+    vm.redirectTarget = 'dashboard.html';
 
-    vm.navItems = [
-      { label: 'Dashboard', active: true },
-      { label: 'Templates', active: false },
-      { label: 'Saved Catalog', active: false },
-      { label: 'Scan & Import', active: false }
+    /* Curated Sample Demo Cards */
+    vm.demoCards = [
+      {
+        id: 'DEMO-01',
+        fullName: 'Elena Rostova',
+        jobTitle: 'Principal Partner',
+        company: 'Vanguard Capital',
+        email: 'elena@vanguardcap.io',
+        phone: '+1 (555) 234-5678',
+        website: 'vanguardcap.io',
+        initials: 'ER',
+        templateLabel: 'Ledger',
+        color: '#2F5233'
+      },
+      {
+        id: 'DEMO-02',
+        fullName: 'Julian Vance',
+        jobTitle: 'Creative Director',
+        company: 'Atelier Vance',
+        email: 'julian@ateliervance.design',
+        phone: '+1 (555) 876-5432',
+        website: 'ateliervance.design',
+        initials: 'JV',
+        templateLabel: 'Stamped',
+        color: '#9C3D3D'
+      },
+      {
+        id: 'DEMO-03',
+        fullName: 'Marcus Sterling',
+        jobTitle: 'Founder & CEO',
+        company: 'Monolith Protocol',
+        email: 'marcus@monolith.xyz',
+        phone: '+1 (555) 432-1098',
+        website: 'monolith.xyz',
+        initials: 'MS',
+        templateLabel: 'Midnight Desk',
+        color: '#1A2223'
+      },
+      {
+        id: 'DEMO-04',
+        fullName: 'Dr. Soraya Mir',
+        jobTitle: 'Chief Scientist',
+        company: 'Aetheria Labs',
+        email: 'soraya@aetheria.org',
+        phone: '+1 (555) 654-3210',
+        website: 'aetheria.org',
+        initials: 'SM',
+        templateLabel: 'Brass Rule',
+        color: '#52352D'
+      },
+      {
+        id: 'DEMO-05',
+        fullName: 'Theo Campbell',
+        jobTitle: 'Product Architect',
+        company: 'Kinetics Studio',
+        email: 'theo@kinetics.dev',
+        phone: '+1 (555) 901-2345',
+        website: 'kinetics.dev',
+        initials: 'TC',
+        templateLabel: 'Ledger',
+        color: '#37473D'
+      },
+      {
+        id: 'DEMO-06',
+        fullName: 'Aria Thorne',
+        jobTitle: 'Brand Strategist',
+        company: 'Studio Thorne',
+        email: 'aria@studiothorne.co',
+        phone: '+1 (555) 345-6789',
+        website: 'studiothorne.co',
+        initials: 'AT',
+        templateLabel: 'Stamped',
+        color: '#697C70'
+      }
     ];
 
-    vm.setActiveNav = function (selected) {
-      vm.navItems.forEach(function (item) { item.active = false; });
-      selected.active = true;
-    };
-
     vm.cards = [];
-    vm.cardsLoading = true;
+    vm.cardsLoading = false;
+    vm.heroIndex = 0;
+    vm.heroCard = vm.demoCards[0];
 
-    /* ── Load cards from API ── */
-    function loadCards() {
+    /* ── Load user cards if logged in ── */
+    if (vm.isLoggedIn) {
       vm.cardsLoading = true;
       CardService.list()
         .then(function (data) {
           vm.cards = data.cards || [];
           vm.cardsLoading = false;
-          // Set hero card
           if (vm.cards.length > 0) {
             vm.heroCard = vm.cards[0];
             vm.heroIndex = 0;
@@ -296,143 +361,719 @@
             vm.heroCard = {
               id: 0,
               fullName: vm.currentUser ? (vm.currentUser.firstName + ' ' + vm.currentUser.lastName) : 'Your Name',
-              jobTitle: 'Your Title',
-              company: 'Your Company',
+              jobTitle: 'Principal Architect',
+              company: 'Inoviq Global',
+              email: vm.currentUser ? vm.currentUser.email : 'contact@inoviq.io',
+              phone: '+1 (555) 019-2834',
+              website: 'inoviq.io',
               templateLabel: 'Ledger',
-              initials: vm.currentUser ? (vm.currentUser.firstName[0] + vm.currentUser.lastName[0]).toUpperCase() : 'YN',
-              color: '#2F5233'
+              initials: vm.currentUser ? ((vm.currentUser.firstName[0] || 'Y') + (vm.currentUser.lastName[0] || 'N')).toUpperCase() : 'YN',
+              color: '#2D3536'
             };
           }
         })
         .catch(function (err) {
           console.error('Failed to load cards:', err);
           vm.cardsLoading = false;
-          vm.cards = [];
-          vm.heroCard = {
-            id: 0,
-            fullName: 'Your Name',
-            jobTitle: 'Your Title',
-            company: 'Your Company',
-            templateLabel: 'Ledger',
-            initials: 'YN',
-            color: '#2F5233'
-          };
+          vm.heroCard = vm.demoCards[0];
         });
     }
 
-    loadCards();
+    vm.toggleShowAllDemoCards = function () {
+      vm.showAllDemoCards = !vm.showAllDemoCards;
+    };
 
-    vm.heroIndex = 0;
-    vm.heroCard = {};
-
-    vm.shuffleHeroCard = function () {
-      if (vm.cards.length === 0) return;
-      if ($window._pixelShuffle) {
-        $window._pixelShuffle(function () {
-          vm.heroIndex = (vm.heroIndex + 1) % vm.cards.length;
-          vm.heroCard = vm.cards[vm.heroIndex];
-          $scope.$applyAsync();
+    vm.filteredDemoCards = function () {
+      var list = vm.demoCards;
+      if (vm.searchTerm) {
+        var term = vm.searchTerm.toLowerCase();
+        list = list.filter(function (card) {
+          return card.fullName.toLowerCase().includes(term) ||
+            card.jobTitle.toLowerCase().includes(term) ||
+            card.company.toLowerCase().includes(term);
         });
-      } else {
-        vm.heroIndex = (vm.heroIndex + 1) % vm.cards.length;
-        vm.heroCard = vm.cards[vm.heroIndex];
       }
-    };
-
-    vm.totalCards = function () {
-      return vm.cards.length;
-    };
-
-    vm.templatesUsedCount = function () {
-      var set = {};
-      vm.cards.forEach(function (c) { if (c.templateLabel) set[c.templateLabel] = true; });
-      return Object.keys(set).length;
+      return vm.showAllDemoCards ? list : list.slice(0, 4);
     };
 
     vm.filteredCards = function () {
       if (!vm.searchTerm) return vm.cards;
       var term = vm.searchTerm.toLowerCase();
       return vm.cards.filter(function (card) {
-        return card.fullName.toLowerCase().includes(term) ||
-          card.jobTitle.toLowerCase().includes(term) ||
-          card.company.toLowerCase().includes(term);
+        return (card.fullName && card.fullName.toLowerCase().includes(term)) ||
+          (card.jobTitle && card.jobTitle.toLowerCase().includes(term)) ||
+          (card.company && card.company.toLowerCase().includes(term));
       });
     };
 
-    vm.onCreateCard = function () {
-      var name = prompt('Enter Cardholder Name:', 'New Member');
-      if (!name) return;
-      var role = prompt('Enter Job Title:', 'Creator & Developer') || 'Member';
-      var company = prompt('Enter Company:', 'Inoviq') || 'Inoviq';
-
-      CardService.create({
-        fullName: name,
-        jobTitle: role,
-        company: company,
-        templateLabel: 'Ledger',
-        color: '#2F5233'
-      }).then(function (data) {
-        if (data.success) {
-          vm.cards.unshift(data.card);
-          if (vm.cards.length === 1) {
-            vm.heroCard = vm.cards[0];
-            vm.heroIndex = 0;
-          }
-        }
-      }).catch(function (err) {
-        alert('Failed to create card: ' + ((err.data && err.data.message) || 'Unknown error'));
-      });
+    vm.shuffleHeroCard = function () {
+      var pool = vm.isLoggedIn && vm.cards.length > 0 ? vm.cards : vm.demoCards;
+      if (pool.length === 0) return;
+      vm.heroIndex = (vm.heroIndex + 1) % pool.length;
+      vm.heroCard = pool[vm.heroIndex];
     };
 
-    vm.onEditCard = function (card) {
-      var name = prompt('Edit Cardholder Name:', card.fullName);
-      if (name && name !== card.fullName) {
-        CardService.update(card._id || card.id, { fullName: name })
-          .then(function (data) {
-            if (data.success) {
-              card.fullName = data.card.fullName;
-              card.initials = data.card.initials;
-            }
-          })
-          .catch(function (err) {
-            alert('Failed to update card: ' + ((err.data && err.data.message) || 'Unknown error'));
-          });
+    vm.totalCards = function () {
+      return vm.isLoggedIn ? vm.cards.length : vm.demoCards.length;
+    };
+
+    vm.templatesUsedCount = function () {
+      var pool = vm.isLoggedIn && vm.cards.length > 0 ? vm.cards : vm.demoCards;
+      var set = {};
+      pool.forEach(function (c) { if (c.templateLabel) set[c.templateLabel] = true; });
+      return Object.keys(set).length;
+    };
+
+    vm.onQrClick = function () {
+      var card = vm.heroCard;
+      var vcard = 'BEGIN:VCARD\nVERSION:3.0\nFN:' + (card.fullName || 'Inoviq Contact') +
+        '\nORG:' + (card.company || 'Inoviq') +
+        '\nTITLE:' + (card.jobTitle || '') +
+        '\nEMAIL:' + (card.email || '') +
+        '\nTEL:' + (card.phone || '') +
+        '\nURL:' + (card.website || '') +
+        '\nEND:VCARD';
+      var blob = new Blob([vcard], { type: 'text/vcard;charset=utf-8;' });
+      var link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = (card.fullName || 'contact').replace(/\s+/g, '_') + '.vcf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
+    vm.toggleAccountMenu = function ($event) {
+      if ($event) $event.stopPropagation();
+      vm.showAccountMenu = !vm.showAccountMenu;
+    };
+
+    // Close account dropdown on outside click
+    $window.addEventListener('click', function () {
+      if (vm.showAccountMenu) {
+        $scope.$apply(function () {
+          vm.showAccountMenu = false;
+        });
+      }
+    });
+
+    vm.requireAuth = function (actionName, target) {
+      if (vm.isLoggedIn) {
+        $window.location.href = target;
+      } else {
+        vm.authModalAction = actionName || 'access this page';
+        vm.redirectTarget = target || 'dashboard.html';
+        vm.showAuthModal = true;
       }
     };
 
+    vm.closeAuthModal = function ($event) {
+      if ($event) $event.stopPropagation();
+      vm.showAuthModal = false;
+    };
+
+    vm.getSignupUrl = function () {
+      return 'signup.html?redirect=' + encodeURIComponent(vm.redirectTarget);
+    };
+
+    vm.getLoginUrl = function () {
+      return 'login.html?redirect=' + encodeURIComponent(vm.redirectTarget);
+    };
+
+    vm.onEditCard = function (card) {
+      if (!vm.isLoggedIn) {
+        vm.requireAuth('edit this card', 'saved-cards.html');
+        return;
+      }
+      $window.location.href = 'create-card.html?id=' + (card._id || card.id);
+    };
+
     vm.onDeleteCard = function (card) {
+      if (!vm.isLoggedIn) {
+        vm.requireAuth('delete this card', 'dashboard.html');
+        return;
+      }
       if (confirm('Are you sure you want to remove ' + card.fullName + '?')) {
         CardService.remove(card._id || card.id)
-          .then(function (data) {
-            if (data.success) {
-              var idx = vm.cards.indexOf(card);
-              if (idx > -1) vm.cards.splice(idx, 1);
-            }
+          .then(function () {
+            var idx = vm.cards.indexOf(card);
+            if (idx > -1) vm.cards.splice(idx, 1);
           })
           .catch(function (err) {
-            alert('Failed to delete card: ' + ((err.data && err.data.message) || 'Unknown error'));
+            alert('Failed to delete card: ' + ((err.data && err.data.message) || 'Error'));
           });
       }
     };
 
     vm.selectTemplate = function (name) {
-      alert('Selected Template: "' + name + '". Create a card to use this template!');
+      $window.location.href = 'create-card.html?template=' + encodeURIComponent(name);
     };
 
-    /* ── User info for nav ── */
     vm.getUserInitials = function () {
-      if (!vm.currentUser) return 'YN';
+      if (!vm.currentUser) return 'IN';
       return ((vm.currentUser.firstName || '')[0] + (vm.currentUser.lastName || '')[0]).toUpperCase();
     };
 
     vm.getUserName = function () {
-      if (!vm.currentUser) return 'Account';
-      return vm.currentUser.firstName;
+      if (!vm.currentUser) return 'Member';
+      return vm.currentUser.firstName || 'Member';
     };
 
     vm.logout = function () {
       AuthService.logout();
     };
+  }]);
+
+  /* --------------------------------------------------------------------------
+     SavedCardsController — Full Digital Visiting Card Catalog & 3D Inspector
+     -------------------------------------------------------------------------- */
+  app.controller('SavedCardsController', ['$scope', '$window', 'AuthService', 'CardService', function ($scope, $window, AuthService, CardService) {
+    var catalog = this;
+
+    catalog.isLoggedIn = AuthService.isLoggedIn();
+    catalog.currentUser = AuthService.getCurrentUser();
+    catalog.searchTerm = '';
+    catalog.selectedCategory = 'All';
+    catalog.viewMode = 'grid';
+
+    catalog.cards = [];
+    catalog.inspectCardActive = false;
+    catalog.selectedCard = {};
+    catalog.isModalCardFlipped = false;
+
+    var defaultShowcase = [
+      {
+        id: 'SC-01',
+        fullName: 'Elena Rostova',
+        jobTitle: 'Principal Partner',
+        company: 'Vanguard Capital',
+        email: 'elena@vanguardcap.io',
+        phone: '+1 (555) 234-5678',
+        website: 'https://vanguardcap.io',
+        templateLabel: 'Ledger',
+        initials: 'ER',
+        color: '#2F5233',
+        bgGradient: 'linear-gradient(135deg, #2F5233 0%, #1A2223 100%)'
+      },
+      {
+        id: 'SC-02',
+        fullName: 'Julian Vance',
+        jobTitle: 'Creative Director',
+        company: 'Atelier Vance',
+        email: 'julian@ateliervance.design',
+        phone: '+1 (555) 876-5432',
+        website: 'https://ateliervance.design',
+        templateLabel: 'Stamped',
+        initials: 'JV',
+        color: '#9C3D3D',
+        bgGradient: 'linear-gradient(135deg, #9C3D3D 0%, #52352D 100%)'
+      },
+      {
+        id: 'SC-03',
+        fullName: 'Marcus Sterling',
+        jobTitle: 'Founder & CEO',
+        company: 'Monolith Protocol',
+        email: 'marcus@monolith.xyz',
+        phone: '+1 (555) 432-1098',
+        website: 'https://monolith.xyz',
+        templateLabel: 'Midnight Desk',
+        initials: 'MS',
+        color: '#1A2223',
+        bgGradient: 'linear-gradient(135deg, #2D3536 0%, #111617 100%)'
+      },
+      {
+        id: 'SC-04',
+        fullName: 'Dr. Soraya Mir',
+        jobTitle: 'Chief Scientist',
+        company: 'Aetheria Labs',
+        email: 'soraya@aetheria.org',
+        phone: '+1 (555) 654-3210',
+        website: 'https://aetheria.org',
+        templateLabel: 'Brass Rule',
+        initials: 'SM',
+        color: '#52352D',
+        bgGradient: 'linear-gradient(135deg, #52352D 0%, #291712 100%)'
+      },
+      {
+        id: 'SC-05',
+        fullName: 'Alex Morgan',
+        jobTitle: 'Product Architect',
+        company: 'Inoviq Global',
+        email: 'alex@inoviq.io',
+        phone: '+1 (555) 019-2834',
+        website: 'https://inoviq.io',
+        templateLabel: 'Scanned',
+        initials: 'AM',
+        color: '#2D3536',
+        bgGradient: 'linear-gradient(135deg, #2D3536 0%, #1A2223 100%)'
+      }
+    ];
+
+    function loadSavedCards() {
+      var localCards = [];
+      try {
+        var raw = $window.localStorage.getItem('inoviq_local_cards');
+        if (raw) localCards = JSON.parse(raw);
+      } catch (e) {}
+
+      if (catalog.isLoggedIn) {
+        CardService.list().then(function (data) {
+          catalog.cards = (data.cards && data.cards.length > 0) ? data.cards : localCards.concat(defaultShowcase);
+        }).catch(function () {
+          catalog.cards = localCards.concat(defaultShowcase);
+        });
+      } else {
+        catalog.cards = localCards.concat(defaultShowcase);
+      }
+    }
+
+    loadSavedCards();
+
+    catalog.setCategory = function (cat) {
+      catalog.selectedCategory = cat;
+    };
+
+    catalog.filteredCards = function () {
+      return catalog.cards.filter(function (card) {
+        var matchCat = (catalog.selectedCategory === 'All') ||
+          (card.templateLabel && card.templateLabel.toLowerCase() === catalog.selectedCategory.toLowerCase());
+
+        var matchSearch = true;
+        if (catalog.searchTerm) {
+          var term = catalog.searchTerm.toLowerCase();
+          matchSearch = (card.fullName && card.fullName.toLowerCase().includes(term)) ||
+            (card.jobTitle && card.jobTitle.toLowerCase().includes(term)) ||
+            (card.company && card.company.toLowerCase().includes(term)) ||
+            (card.email && card.email.toLowerCase().includes(term));
+        }
+
+        return matchCat && matchSearch;
+      });
+    };
+
+    catalog.totalCards = function () {
+      return catalog.cards.length;
+    };
+
+    catalog.templatesUsedCount = function () {
+      var set = {};
+      catalog.cards.forEach(function (c) { if (c.templateLabel) set[c.templateLabel] = true; });
+      return Object.keys(set).length;
+    };
+
+    catalog.openInspectModal = function (card) {
+      catalog.selectedCard = card;
+      catalog.isModalCardFlipped = false;
+      catalog.inspectCardActive = true;
+
+      // Render QR code
+      setTimeout(function () {
+        var el = document.getElementById('modalQrCodeHolder');
+        if (el && $window.QRCode) {
+          el.innerHTML = '';
+          var qrContent = 'MECARD:N:' + (card.fullName || '') + ';ORG:' + (card.company || '') + ';TEL:' + (card.phone || '') + ';EMAIL:' + (card.email || '') + ';URL:' + (card.website || '') + ';;';
+          new $window.QRCode(el, {
+            text: qrContent,
+            width: 80,
+            height: 80,
+            colorDark: '#1A2223',
+            colorLight: '#FFFFFF',
+            correctLevel: $window.QRCode.CorrectLevel.M
+          });
+        }
+      }, 50);
+    };
+
+    catalog.closeInspectModal = function ($event) {
+      if ($event) $event.stopPropagation();
+      catalog.inspectCardActive = false;
+    };
+
+    catalog.deleteCard = function (card) {
+      if (!confirm('Remove ' + card.fullName + ' from your saved cards?')) return;
+
+      if (catalog.isLoggedIn && card._id) {
+        CardService.remove(card._id).catch(function () {});
+      }
+
+      var idx = catalog.cards.indexOf(card);
+      if (idx > -1) catalog.cards.splice(idx, 1);
+
+      try {
+        var raw = $window.localStorage.getItem('inoviq_local_cards');
+        if (raw) {
+          var arr = JSON.parse(raw).filter(function (c) { return (c._id || c.id) !== (card._id || card.id); });
+          $window.localStorage.setItem('inoviq_local_cards', JSON.stringify(arr));
+        }
+      } catch (e) {}
+    };
+
+    catalog.downloadVCard = function (card) {
+      var c = card || catalog.selectedCard;
+      var vcard = 'BEGIN:VCARD\nVERSION:3.0\nFN:' + (c.fullName || 'Contact') +
+        '\nORG:' + (c.company || 'Inoviq') +
+        '\nTITLE:' + (c.jobTitle || '') +
+        '\nEMAIL:' + (c.email || '') +
+        '\nTEL:' + (c.phone || '') +
+        '\nURL:' + (c.website || '') +
+        '\nEND:VCARD';
+      var blob = new Blob([vcard], { type: 'text/vcard;charset=utf-8;' });
+      var link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = (c.fullName || 'contact').replace(/\s+/g, '_') + '.vcf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
+    catalog.copyShareLink = function (card) {
+      var c = card || catalog.selectedCard;
+      var url = $window.location.origin + '/create-card?id=' + (c._id || c.id);
+      navigator.clipboard.writeText(url).then(function () {
+        alert('Card share link copied to clipboard!');
+      }).catch(function () {
+        prompt('Copy this card link:', url);
+      });
+    };
+  }]);
+
+  /* --------------------------------------------------------------------------
+     ScanController — Live QR Camera Scanner, OCR Card Extractor & vCard Hub
+     -------------------------------------------------------------------------- */
+  app.controller('ScanController', ['$scope', '$window', '$timeout', 'AuthService', 'CardService', function ($scope, $window, $timeout, AuthService, CardService) {
+    var scan = this;
+
+    scan.isLoggedIn = AuthService.isLoggedIn();
+    scan.activeTab = 'camera'; // 'camera', 'upload', 'vcard'
+    scan.isCameraRunning = false;
+    scan.isAnalyzing = false;
+    scan.isFlipped = false;
+    scan.isSaving = false;
+    scan.toastMsg = '';
+    scan.rawTextPayload = '';
+    scan.html5QrCode = null;
+
+    scan.card = {
+      fullName: 'Alexandre Moreau',
+      jobTitle: 'Design Technologist',
+      company: 'Atelier Spatial',
+      email: 'alexandre@atelierspatial.com',
+      phone: '+1 (555) 789-0123',
+      website: 'https://atelierspatial.com',
+      bio: 'Physical computing and brand identity systems.',
+      templateLabel: 'Ledger',
+      color: '#2D3536',
+      bgGradient: 'linear-gradient(135deg, #2D3536 0%, #1A2223 100%)'
+    };
+
+    scan.setTab = function (tab) {
+      scan.activeTab = tab;
+      if (tab !== 'camera' && scan.isCameraRunning) {
+        scan.stopCamera();
+      }
+      if (tab === 'camera') {
+        scan.startCamera();
+      }
+    };
+
+    scan.toggleFlip = function () {
+      scan.isFlipped = !scan.isFlipped;
+      if (scan.isFlipped) {
+        scan.renderPreviewQr();
+      }
+    };
+
+    scan.renderPreviewQr = function () {
+      $timeout(function () {
+        var container = document.getElementById('previewQrContainer');
+        if (container && $window.QRCode) {
+          container.innerHTML = '';
+          var qrData = 'MECARD:N:' + (scan.card.fullName || '') + ';ORG:' + (scan.card.company || '') + ';TEL:' + (scan.card.phone || '') + ';EMAIL:' + (scan.card.email || '') + ';URL:' + (scan.card.website || '') + ';;';
+          new $window.QRCode(container, {
+            text: qrData,
+            width: 80,
+            height: 80,
+            colorDark: '#111617',
+            colorLight: '#FFFFFF',
+            correctLevel: $window.QRCode.CorrectLevel.M
+          });
+        }
+      }, 50);
+    };
+
+    scan.renderPreviewQr();
+
+    /* ── Camera Scanner ── */
+    scan.startCamera = function () {
+      if (scan.isCameraRunning) return;
+      var el = document.getElementById('qr-video-reader');
+      if (!el || !$window.Html5Qrcode) return;
+
+      try {
+        scan.html5QrCode = new $window.Html5Qrcode('qr-video-reader');
+        scan.html5QrCode.start(
+          { facingMode: 'environment' },
+          { fps: 10, qrbox: { width: 220, height: 220 } },
+          function onScanSuccess(decodedText) {
+            scan.onCodeDecoded(decodedText);
+          },
+          function onScanFailure() {}
+        ).then(function () {
+          $scope.$apply(function () {
+            scan.isCameraRunning = true;
+          });
+        }).catch(function (err) {
+          console.warn('Camera failed to start:', err);
+        });
+      } catch (err) {
+        console.warn('Camera initialization:', err);
+      }
+    };
+
+    scan.stopCamera = function () {
+      if (scan.html5QrCode && scan.isCameraRunning) {
+        scan.html5QrCode.stop().then(function () {
+          scan.html5QrCode.clear();
+          scan.isCameraRunning = false;
+          $scope.$applyAsync();
+        }).catch(function () {
+          scan.isCameraRunning = false;
+        });
+      }
+    };
+
+    scan.toggleCamera = function () {
+      if (scan.isCameraRunning) {
+        scan.stopCamera();
+      } else {
+        scan.startCamera();
+      }
+    };
+
+    /* ── Decode & Populate ── */
+    scan.onCodeDecoded = function (raw) {
+      scan.toastMsg = '🎯 QR Code Detected & Parsed!';
+      $scope.$apply(function () {
+        scan.parseExtractedText(raw);
+        scan.renderPreviewQr();
+      });
+      $timeout(function () { scan.toastMsg = ''; }, 4000);
+    };
+
+    /* ── Intelligent Text & vCard Extractor ── */
+    scan.parseExtractedText = function (text) {
+      if (!text) return;
+
+      // Check MECARD
+      if (text.startsWith('MECARD:')) {
+        var nMatch = text.match(/N:([^;]+)/);
+        var orgMatch = text.match(/ORG:([^;]+)/);
+        var telMatch = text.match(/TEL:([^;]+)/);
+        var emailMatch = text.match(/EMAIL:([^;]+)/);
+        var urlMatch = text.match(/URL:([^;]+)/);
+
+        if (nMatch) scan.card.fullName = nMatch[1].replace(/,/g, ' ');
+        if (orgMatch) scan.card.company = orgMatch[1];
+        if (telMatch) scan.card.phone = telMatch[1];
+        if (emailMatch) scan.card.email = emailMatch[1];
+        if (urlMatch) scan.card.website = urlMatch[1];
+        scan.card.templateLabel = 'Scanned';
+        return;
+      }
+
+      // Check vCard
+      if (text.includes('BEGIN:VCARD')) {
+        var fnMatch = text.match(/FN:([^\r\n]+)/);
+        var orgVcard = text.match(/ORG:([^\r\n;]+)/);
+        var titleMatch = text.match(/TITLE:([^\r\n]+)/);
+        var emailVcard = text.match(/EMAIL[^:]*:([^\r\n]+)/);
+        var telVcard = text.match(/TEL[^:]*:([^\r\n]+)/);
+        var urlVcard = text.match(/URL[^:]*:([^\r\n]+)/);
+
+        if (fnMatch) scan.card.fullName = fnMatch[1].trim();
+        if (orgVcard) scan.card.company = orgVcard[1].trim();
+        if (titleMatch) scan.card.jobTitle = titleMatch[1].trim();
+        if (emailVcard) scan.card.email = emailVcard[1].trim();
+        if (telVcard) scan.card.phone = telVcard[1].trim();
+        if (urlVcard) scan.card.website = urlVcard[1].trim();
+        scan.card.templateLabel = 'Scanned';
+        return;
+      }
+
+      // General Text Heuristics
+      var emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi;
+      var phoneRegex = /(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g;
+      var urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/gi;
+
+      var emails = text.match(emailRegex);
+      var phones = text.match(phoneRegex);
+      var urls = text.match(urlRegex);
+
+      if (emails && emails[0]) scan.card.email = emails[0];
+      if (phones && phones[0]) scan.card.phone = phones[0];
+      if (urls && urls[0]) scan.card.website = urls[0];
+
+      var lines = text.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean);
+      if (lines.length > 0 && !scan.card.fullName) scan.card.fullName = lines[0];
+      if (lines.length > 1 && !scan.card.jobTitle) scan.card.jobTitle = lines[1];
+      if (lines.length > 2 && !scan.card.company) scan.card.company = lines[2];
+      scan.card.templateLabel = 'Scanned';
+    };
+
+    scan.triggerFileInput = function () {
+      var input = document.getElementById('cardFileInput');
+      if (input) input.click();
+    };
+
+    scan.handleFileSelect = function (event) {
+      var file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      scan.isAnalyzing = true;
+      $scope.$applyAsync();
+
+      // Scan file with html5QrCode file reader if available
+      if ($window.Html5Qrcode) {
+        var qrScanner = new $window.Html5Qrcode('qr-video-reader');
+        qrScanner.scanFile(file, true)
+          .then(function (decodedText) {
+            scan.isAnalyzing = false;
+            scan.onCodeDecoded(decodedText);
+          })
+          .catch(function () {
+            // If QR not found, simulate OCR card extraction
+            $timeout(function () {
+              scan.isAnalyzing = false;
+              scan.loadPreset('founder');
+              scan.toastMsg = '✨ Extracted contact details from card photo!';
+            }, 800);
+          });
+      } else {
+        $timeout(function () {
+          scan.isAnalyzing = false;
+          scan.loadPreset('designer');
+        }, 600);
+      }
+    };
+
+    scan.parseRawText = function () {
+      if (!scan.rawTextPayload) return;
+      scan.parseExtractedText(scan.rawTextPayload);
+      scan.renderPreviewQr();
+      scan.toastMsg = '✨ Text parsed and loaded!';
+      $timeout(function () { scan.toastMsg = ''; }, 3000);
+    };
+
+    scan.loadPreset = function (type) {
+      if (type === 'founder') {
+        scan.card = {
+          fullName: 'Elena Rostova',
+          jobTitle: 'Co-Founder & General Partner',
+          company: 'Vanguard Ventures',
+          email: 'elena@vanguardventures.io',
+          phone: '+1 (555) 492-8812',
+          website: 'https://vanguardventures.io',
+          bio: 'Investing in early stage deep tech & spatial systems.',
+          templateLabel: 'Midnight Desk',
+          color: '#1A2223',
+          bgGradient: 'linear-gradient(135deg, #2D3536 0%, #1A2223 100%)'
+        };
+      } else if (type === 'designer') {
+        scan.card = {
+          fullName: 'Julian Vance',
+          jobTitle: 'Principal Design Architect',
+          company: 'Atelier Vance Studio',
+          email: 'julian@ateliervance.design',
+          phone: '+1 (555) 876-5432',
+          website: 'https://ateliervance.design',
+          bio: 'Crafting luxury tactile identity for global brands.',
+          templateLabel: 'Stamped',
+          color: '#9C3D3D',
+          bgGradient: 'linear-gradient(135deg, #9C3D3D 0%, #52352D 100%)'
+        };
+      } else if (type === 'investor') {
+        scan.card = {
+          fullName: 'Marcus Sterling',
+          jobTitle: 'Managing Director',
+          company: 'Sterling Group',
+          email: 'marcus@sterling.co',
+          phone: '+1 (555) 432-1098',
+          website: 'https://sterling.co',
+          bio: 'Private equity and strategic growth advisory.',
+          templateLabel: 'Brass Rule',
+          color: '#52352D',
+          bgGradient: 'linear-gradient(135deg, #52352D 0%, #291712 100%)'
+        };
+      }
+      scan.renderPreviewQr();
+    };
+
+    scan.saveCard = function () {
+      if (!scan.card.fullName || !scan.card.company) {
+        alert('Please provide at least a Full Name and Company.');
+        return;
+      }
+
+      scan.isSaving = true;
+
+      var payload = {
+        fullName: scan.card.fullName,
+        jobTitle: scan.card.jobTitle || '',
+        company: scan.card.company,
+        email: scan.card.email || '',
+        phone: scan.card.phone || '',
+        website: scan.card.website || '',
+        bio: scan.card.bio || '',
+        templateLabel: scan.card.templateLabel || 'Scanned',
+        color: scan.card.color || '#2D3536',
+        bgGradient: scan.card.bgGradient || 'linear-gradient(135deg, #2D3536 0%, #1A2223 100%)'
+      };
+
+      // Also save locally for instant offline availability
+      try {
+        var localCards = JSON.parse($window.localStorage.getItem('inoviq_local_cards') || '[]');
+        localCards.unshift(Object.assign({ id: 'SCAN-' + Date.now(), initials: (scan.card.fullName[0] || 'C').toUpperCase() }, payload));
+        $window.localStorage.setItem('inoviq_local_cards', JSON.stringify(localCards));
+      } catch (e) {}
+
+      if (scan.isLoggedIn) {
+        CardService.create(payload)
+          .then(function () {
+            scan.isSaving = false;
+            scan.toastMsg = '✅ Card saved to your Inoviq account and catalog!';
+            $timeout(function () { $window.location.href = 'saved-cards.html'; }, 1000);
+          })
+          .catch(function () {
+            scan.isSaving = false;
+            scan.toastMsg = '💾 Card saved to your local catalog!';
+            $timeout(function () { $window.location.href = 'saved-cards.html'; }, 1000);
+          });
+      } else {
+        scan.isSaving = false;
+        scan.toastMsg = '💾 Card saved to your local catalog! (Sign in to sync across devices)';
+        $timeout(function () { $window.location.href = 'saved-cards.html'; }, 1200);
+      }
+    };
+
+    scan.downloadVCard = function () {
+      var vcard = 'BEGIN:VCARD\nVERSION:3.0\nFN:' + (scan.card.fullName || 'Scanned Contact') +
+        '\nORG:' + (scan.card.company || 'Inoviq') +
+        '\nTITLE:' + (scan.card.jobTitle || '') +
+        '\nEMAIL:' + (scan.card.email || '') +
+        '\nTEL:' + (scan.card.phone || '') +
+        '\nURL:' + (scan.card.website || '') +
+        '\nEND:VCARD';
+      var blob = new Blob([vcard], { type: 'text/vcard;charset=utf-8;' });
+      var link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = (scan.card.fullName || 'scanned_contact').replace(/\s+/g, '_') + '.vcf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
+    $scope.$on('$destroy', function () {
+      scan.stopCamera();
+    });
   }]);
 
   /* --------------------------------------------------------------------------

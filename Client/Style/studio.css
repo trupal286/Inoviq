@@ -23,24 +23,27 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 56px;
+  height: 60px;
   padding: 0 20px;
   background: var(--paper-card);
-  border-bottom: 1px solid var(--border-line);
+  border-bottom: 1.5px solid var(--border-line);
   z-index: 100;
   gap: 16px;
   flex-shrink: 0;
   box-shadow: var(--shadow-sm);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .topbar-left {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
 }
 
-.btn-topbar-nav {
-  display: flex;
+.studio-back-btn {
+  display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
@@ -52,41 +55,79 @@
   font-weight: 600;
   text-decoration: none;
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
-.btn-topbar-nav:hover {
-  border-color: var(--border-dark);
-  transform: translateY(-1px);
+.studio-back-btn:hover {
+  border-color: var(--moss);
+  background: rgba(105, 124, 112, 0.1);
+  transform: translateX(-2px);
 }
 
-.brand-badge {
+.studio-topbar-divider {
+  width: 1px;
+  height: 22px;
+  background: var(--border-line);
+  flex-shrink: 0;
+}
+
+.studio-brand-badge {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   font-family: var(--font-serif);
-  font-weight: 700;
-  font-size: 16px;
-  letter-spacing: -0.2px;
+  font-weight: 600;
+  font-size: 17px;
   color: var(--ink-primary);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
 }
 
-.pulse-indicator {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background-color: #69C998;
-  box-shadow: 0 0 0 3px rgba(105, 201, 152, 0.25);
+.studio-brand-badge span.brand-moss {
+  color: var(--moss);
+  font-style: italic;
 }
 
-.version-tag {
+.studio-tag {
   font-family: var(--font-mono);
   font-size: 9.5px;
   font-weight: 700;
   padding: 2px 6px;
-  background: var(--bg-main);
+  background: rgba(105, 124, 112, 0.15);
   border: 1px solid var(--border-line);
   border-radius: 4px;
+  color: var(--ink-primary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.studio-nav-links-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.studio-nav-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px solid transparent;
   color: var(--ink-muted);
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.studio-nav-pill:hover {
+  color: var(--ink-primary);
+  background: var(--bg-main);
+  border-color: var(--border-line);
 }
 
 /* Format Pills Switcher in Top Bar */
@@ -98,13 +139,14 @@
   border-radius: 10px;
   border: 1px solid var(--border-line);
   gap: 3px;
+  flex-shrink: 0;
 }
 
 .format-pill-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 12px;
+  gap: 5px;
+  padding: 6px 12px;
   border-radius: 7px;
   border: none;
   background: transparent;
@@ -133,10 +175,15 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  flex: 1;
+  justify-content: flex-end;
 }
 
 .btn-theme-switcher {
-  padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 12px;
   border-radius: 8px;
   background: var(--bg-main);
   border: 1px solid var(--border-line);
@@ -146,17 +193,19 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
 .btn-theme-switcher:hover {
   border-color: var(--border-dark);
+  background: rgba(105, 124, 112, 0.12);
 }
 
 .btn-secondary-action {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
+  padding: 7px 14px;
   border-radius: 8px;
   background: var(--bg-main);
   border: 1px solid var(--border-line);
@@ -166,6 +215,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
 .btn-secondary-action:hover {
@@ -174,10 +224,10 @@
 }
 
 .btn-primary-action {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 16px;
+  padding: 7px 16px;
   border-radius: 8px;
   background: var(--ink-primary);
   color: var(--bg-main);
@@ -188,16 +238,30 @@
   cursor: pointer;
   transition: all 0.15s ease;
   box-shadow: var(--shadow-sm);
+  white-space: nowrap;
 }
 
 .btn-primary-action:hover:not(:disabled) {
+  opacity: 0.92;
   transform: translateY(-1px);
-  filter: brightness(1.1);
 }
 
 .btn-primary-action:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 1100px) {
+  .studio-nav-links-wrap {
+    display: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .topbar-format-pills {
+    display: none;
+  }
 }
 
 /* ==========================================================================
@@ -346,48 +410,28 @@
   gap: 12px;
 }
 
-/* Smart EMV Chip with Gold Specular Sheen */
-.smart-emv-chip {
-  position: relative;
-  width: 38px;
+.card-monogram-mark {
+  width: 28px;
   height: 28px;
-  border-radius: 5px;
-  background: linear-gradient(135deg, #D4AF37 0%, #F3E5AB 50%, #AA771C 100%);
-  border: 1px solid #785A14;
-  box-shadow: inset 0 1px 2px rgba(255,255,255,0.6), 0 3px 8px rgba(0,0,0,0.35);
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.smart-emv-chip .chip-line.horizontal {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: rgba(0, 0, 0, 0.45);
-}
-
-.smart-emv-chip .chip-line.vertical {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  bottom: 0;
-  width: 1px;
-  background: rgba(0, 0, 0, 0.45);
-}
-
-.nfc-wave-icon {
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: inherit;
   display: flex;
   align-items: center;
-  color: var(--accent);
+  justify-content: center;
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 13.5px;
+  flex-shrink: 0;
+  backdrop-filter: blur(4px);
 }
 
 .card-org-title {
   font-family: var(--font-mono);
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   opacity: 0.85;
 }

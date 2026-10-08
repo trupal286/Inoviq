@@ -2394,5 +2394,43 @@ body {
   gap: 2px;
 }
 
+/* ==========================================================================
+   RESPONSIVE TOPBAR & NAVIGATION ADJUSTMENTS
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .nav-topbar {
+    gap: 12px;
+  }
+  .nav-links {
+    gap: 12px;
+  }
+  .nav-search-wrap {
+    margin: 0 10px;
+    max-width: 260px;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-topbar {
+    flex-wrap: wrap;
+  }
+  .nav-links {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    padding-top: 8px;
+    gap: 8px;
+  }
+  .nav-search-wrap {
+    order: 4;
+    width: 100%;
+    max-width: 100%;
+    margin: 8px 0 0 0;
+  }
+  .nav-actions {
+    margin-left: auto;
+  }
+}
+
 
 

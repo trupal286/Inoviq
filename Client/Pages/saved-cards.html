@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="digiCardApp">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Inoviq Saved Cards — Your personal digital visiting card catalog, contacts, and shared identities.">
+  <title>Saved Cards Catalog — Inoviq</title>
+
+  <!-- Typography matching Inoviq Design System -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="../Style/style.css">
+
+  <!-- Apply saved theme before paint -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('inoviq_theme') || 'light';
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
+  </script>
+
+  <!-- External Libraries -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+    /* Catalog Page Custom Styles */
+    .catalog-top-banner {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: 32px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .catalog-filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--paper-card);
+      border: 1.5px solid var(--border-line);
+      border-radius: 14px;
+      padding: 10px 16px;
+      margin-bottom: 28px;
+      box-shadow: var(--shadow-sm);
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .category-pills {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      align-items: center;
+    }
+    .category-pills::-webkit-scrollbar { display: none; }
+
+    .category-pill {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12.5px;
+      font-weight: 500;
+      border: 1px solid var(--border-line);
+      background: var(--bg-main);
+      color: var(--ink-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .category-pill:hover, .category-pill.active {
+      background: var(--moss);
+      color: var(--plaster);
+      border-color: var(--moss);
+    }
+
+    .view-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .view-btn {
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: var(--bg-main);
+      border: 1px solid var(--border-line);
+      color: var(--ink-primary);
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.15s ease;
+    }
+
+    .view-btn.active {
+      border-color: var(--moss);
+      background: rgba(105, 124, 112, 0.15);
+    }
+
+    /* Grid Layout for Cards */
+    .cards-grid-layout {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 22px;
+      margin-bottom: 60px;
+    }
+
+    .saved-card-item {
+      background: var(--paper-card);
+      border: 1.5px solid var(--border-line);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 220px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .saved-card-item:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--moss);
+    }
+
+    .card-top-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .card-avatar-chip {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      color: #FFFDF8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .saved-card-name {
+      font-family: var(--font-serif);
+      font-size: 19px;
+      font-weight: 600;
+      color: var(--ink-primary);
+      line-height: 1.25;
+    }
+
+    .saved-card-role {
+      font-family: var(--font-sans);
+      font-size: 13px;
+      color: var(--ink-muted);
+      margin-top: 3px;
+    }
+
+    .saved-card-contacts {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--ink-light);
+    }
+
+    .saved-card-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-line);
+    }
+
+    .btn-card-action {
+      flex: 1;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      border: 1px solid var(--border-line);
+      background: var(--bg-main);
+      color: var(--ink-primary);
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .btn-card-action:hover {
+      border-color: var(--border-dark);
+      background: rgba(105, 124, 112, 0.12);
+    }
+
+    .btn-card-action.btn-del-action:hover {
+      border-color: #9C3D3D;
+      color: #9C3D3D;
+      background: rgba(156, 61, 61, 0.08);
+    }
+
+    /* Modal 3D Inspector */
+    .inspect-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(26, 34, 35, 0.75);
+      backdrop-filter: blur(10px);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .inspect-modal-backdrop.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .inspect-modal-shell {
+      background: var(--paper-card);
+      border: 1.5px solid var(--border-line);
+      border-radius: 20px;
+      padding: 32px;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: var(--shadow-3d);
+      position: relative;
+    }
+
+    .inspect-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: transparent;
+      border: none;
+      font-size: 24px;
+      color: var(--ink-muted);
+      cursor: pointer;
+    }
+
+    .modal-3d-card-stage {
+      perspective: 1000px;
+      margin: 20px auto;
+      width: 100%;
+      height: 240px;
+    }
+
+    .modal-flip-card {
+      width: 100%;
+      height: 100%;
+      border-radius: 16px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+      cursor: pointer;
+      box-shadow: var(--shadow-3d);
+    }
+
+    .modal-flip-card.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .modal-card-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      color: #F2EFE2;
+    }
+
+    .modal-card-face.modal-front {
+      background: linear-gradient(135deg, #2D3536 0%, #1A2223 100%);
+    }
+
+    .modal-card-face.modal-back {
+      background: linear-gradient(135deg, #1A2223 0%, #0D1213 100%);
+      transform: rotateY(180deg);
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 10px;
+    }
+
+    /* Add Card Prompt Card in Grid */
+    .add-card-placeholder {
+      border: 2px dashed var(--border-dark);
+      border-radius: 16px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--ink-muted);
+      min-height: 220px;
+      transition: all 0.2s ease;
+    }
+
+    .add-card-placeholder:hover {
+      border-color: var(--moss);
+      color: var(--ink-primary);
+      background: rgba(105, 124, 112, 0.06);
+      transform: translateY(-3px);
+    }
+  </style>
+</head>
+
+<body ng-controller="SavedCardsController as catalog">
+
+  <div class="wrap">
+
+    <!-- ===== NAV HEADER ===== -->
+    <header class="nav-header">
+      <div class="nav-topbar">
+        <a href="dashboard.html" class="brand-logo">
+          i<span>noviq</span>
+          <span class="brand-badge">CATALOG</span>
+        </a>
+
+        <!-- Main Navigation Links -->
+        <nav class="nav-links">
+          <a href="dashboard.html">Home</a>
+          <a href="dashboard.html#templates">Templates</a>
+          <a href="saved-cards.html" class="active">Saved Cards</a>
+          <a href="scan.html">Scan &amp; Import</a>
+        </nav>
+
+        <div class="nav-search-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
+          <input type="text" placeholder="Search saved cards, titles, companies..." ng-model="catalog.searchTerm" id="catalog-search-input">
+        </div>
+
+        <div class="nav-actions">
+          <button class="theme-toggle-btn" id="themeToggle" title="Toggle Light / Dark Theme" aria-label="Toggle Theme">🌙</button>
+          <a href="create-card.html" class="btn-primary" id="btn-create-top">➕ Create Card</a>
+
+          <a href="scan.html" class="btn-ghost" style="font-size: 13px;">📷 Scan Card</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== BANNER & ACTIONS ===== -->
+    <div class="catalog-top-banner">
+      <div>
+        <div class="eyebrow">DIGITAL PORTFOLIO &amp; CONTACT VAULT</div>
+        <h1 style="font-family: var(--font-serif); font-size: 32px; font-weight: 600; line-height: 1.2;">
+          Saved Visiting Cards &amp; Contacts
+        </h1>
+        <p style="font-size: 14.5px; color: var(--ink-muted); margin-top: 4px;">
+          Manage, inspect in 3D, export vCards, and share your digital network.
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <a href="scan.html" class="btn-ghost" style="padding: 10px 18px; font-size: 13px;">
+          📷 Scan &amp; Import
+        </a>
+        <a href="create-card.html" class="btn-primary" style="padding: 10px 18px; font-size: 13px;">
+          ➕ Create New Card
+        </a>
+      </div>
+    </div>
+
+    <!-- ===== STATS STRIP ===== -->
+    <div class="stats-strip" style="margin-bottom: 24px;">
+      <div class="stat-item">
+        <div class="stat-num">{{ catalog.filteredCards().length }}</div>
+        <div class="stat-lbl">Cards Shown</div>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-item">
+        <div class="stat-num">{{ catalog.totalCards() }}</div>
+        <div class="stat-lbl">Total in Vault</div>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-item">
+        <div class="stat-num">{{ catalog.templatesUsedCount() }}</div>
+        <div class="stat-lbl">Templates Active</div>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-item">
+        <div class="stat-num">100%</div>
+        <div class="stat-lbl">QR Ready</div>
+      </div>
+    </div>
+
+    <!-- ===== FILTER & TOOLBAR ===== -->
+    <div class="catalog-filter-bar">
+      <!-- Category Pills -->
+      <div class="category-pills">
+        <button class="category-pill" ng-class="{'active': catalog.selectedCategory === 'All'}" ng-click="catalog.setCategory('All')">All ({{ catalog.cards.length }})</button>
+        <button class="category-pill" ng-class="{'active': catalog.selectedCategory === 'Ledger'}" ng-click="catalog.setCategory('Ledger')">Ledger</button>
+        <button class="category-pill" ng-class="{'active': catalog.selectedCategory === 'Midnight Desk'}" ng-click="catalog.setCategory('Midnight Desk')">Midnight Desk</button>
+        <button class="category-pill" ng-class="{'active': catalog.selectedCategory === 'Stamped'}" ng-click="catalog.setCategory('Stamped')">Stamped</button>
+        <button class="category-pill" ng-class="{'active': catalog.selectedCategory === 'Brass Rule'}" ng-click="catalog.setCategory('Brass Rule')">Brass Rule</button>
+        <button class="category-pill" ng-class="{'active': catalog.selectedCategory === 'Scanned'}" ng-click="catalog.setCategory('Scanned')">📷 Scanned</button>
+      </div>
+
+      <!-- View Controls -->
+      <div class="view-controls">
+        <button class="view-btn" ng-class="{'active': catalog.viewMode === 'grid'}" ng-click="catalog.viewMode = 'grid'" title="Grid View">⊞ Grid</button>
+        <button class="view-btn" ng-class="{'active': catalog.viewMode === 'list'}" ng-click="catalog.viewMode = 'list'" title="List View">☰ List</button>
+      </div>
+    </div>
+
+    <!-- ===== GRID VIEW ===== -->
+    <div class="cards-grid-layout" ng-if="catalog.viewMode === 'grid'">
+      
+      <!-- Card Item -->
+      <div class="saved-card-item" ng-repeat="card in catalog.filteredCards() track by (card._id || card.id)">
+        <div>
+          <div class="card-top-strip">
+            <div class="card-avatar-chip" ng-style="{background: card.color || '#2D3536'}">
+              {{ card.initials || 'CD' }}
+            </div>
+            <span class="sample-tag-badge">{{ card.templateLabel || 'LEDGER' }}</span>
+          </div>
+
+          <div class="saved-card-name">{{ card.fullName }}</div>
+          <div class="saved-card-role">{{ card.jobTitle }} &middot; {{ card.company }}</div>
+
+          <div class="saved-card-contacts">
+            <div ng-if="card.email">✉️ {{ card.email }}</div>
+            <div ng-if="card.phone">📞 {{ card.phone }}</div>
+            <div ng-if="card.website">🌐 {{ card.website }}</div>
+          </div>
+        </div>
+
+        <div class="saved-card-actions">
+          <button class="btn-card-action" ng-click="catalog.openInspectModal(card)" title="3D Card Preview">
+            👁️ Inspect 3D
+          </button>
+          <button class="btn-card-action" ng-click="catalog.downloadVCard(card)" title="Export vCard">
+            📇 .VCF
+          </button>
+          <a ng-href="create-card.html?id={{ card._id || card.id }}" class="btn-card-action" title="Edit Card">
+            ✏️ Edit
+          </a>
+          <button class="btn-card-action btn-del-action" ng-click="catalog.deleteCard(card)" title="Delete Card">
+            🗑️
+          </button>
+        </div>
+      </div>
+
+      <!-- Add New Card Action Box -->
+      <a href="create-card.html" class="add-card-placeholder">
+        <div style="font-size: 32px; margin-bottom: 8px;">➕</div>
+        <div style="font-weight: 600; font-size: 15px;">Create New Visiting Card</div>
+        <div style="font-size: 12px; margin-top: 4px;">Custom layout, 3D physics &amp; QR</div>
+      </a>
+
+      <!-- Scan & Import Action Box -->
+      <a href="scan.html" class="add-card-placeholder">
+        <div style="font-size: 32px; margin-bottom: 8px;">📷</div>
+        <div style="font-weight: 600; font-size: 15px;">Scan &amp; Import Physical Card</div>
+        <div style="font-size: 12px; margin-top: 4px;">Camera OCR &amp; QR decoder</div>
+      </a>
+
+    </div>
+
+    <!-- ===== LIST VIEW ===== -->
+    <div class="cards-list" ng-if="catalog.viewMode === 'list'">
+      <div class="card-row" ng-repeat="card in catalog.filteredCards() track by (card._id || card.id)">
+        <div class="row-chip" ng-style="{background: card.color || '#2D3536'}">{{ card.initials }}</div>
+        <div class="row-info">
+          <div class="row-name">{{ card.fullName }}</div>
+          <div class="row-role">{{ card.jobTitle }} &middot; {{ card.company }} &middot; {{ card.email }}</div>
+        </div>
+        <div class="row-badge">{{ card.templateLabel || 'Ledger' }}</div>
+        <div class="row-actions">
+          <button class="btn-icon" ng-click="catalog.openInspectModal(card)" title="Inspect 3D Card">👁️</button>
+          <button class="btn-icon" ng-click="catalog.downloadVCard(card)" title="Download vCard">📇</button>
+          <button class="btn-icon btn-del" ng-click="catalog.deleteCard(card)" title="Delete Card">&#10005;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="site-footer">
+      <a href="dashboard.html" class="brand-logo">i<span>noviq</span></a>
+      <div class="footer-tag">Digital visiting cards for people who move fast.</div>
+      <div class="footer-links">
+        <a href="dashboard.html">Home</a>
+        <a href="dashboard.html#templates">Templates</a>
+        <a href="saved-cards.html">Saved Cards</a>
+        <a href="scan.html">Scan &amp; Import</a>
+        <a href="create-card.html">Create Card</a>
+      </div>
+    </footer>
+
+  </div><!-- /wrap -->
+
+  <!-- ===== 3D CARD INSPECT MODAL ===== -->
+  <div class="inspect-modal-backdrop" ng-class="{'is-open': catalog.inspectCardActive}" ng-click="catalog.closeInspectModal($event)">
+    <div class="inspect-modal-shell" ng-click="$event.stopPropagation()">
+      <button class="inspect-close-btn" ng-click="catalog.closeInspectModal($event)">&times;</button>
+      
+      <div class="card-id">CARD INSPECTOR · 3D PREVIEW</div>
+      <div style="font-family: var(--font-serif); font-size: 20px; font-weight: 600; margin-top: 4px;">
+        {{ catalog.selectedCard.fullName }}
+      </div>
+
+      <!-- 3D Card Stage -->
+      <div class="modal-3d-card-stage">
+        <div class="modal-flip-card" ng-class="{'is-flipped': catalog.isModalCardFlipped}" ng-click="catalog.isModalCardFlipped = !catalog.isModalCardFlipped" title="Click to Flip">
+          
+          <!-- Front -->
+          <div class="modal-card-face modal-front" ng-style="{background: catalog.selectedCard.bgGradient || 'linear-gradient(135deg, #2D3536 0%, #1A2223 100%)'}">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div class="card-avatar-chip" style="width: 28px; height: 28px; font-size: 11px; border-radius: 6px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);">{{ catalog.selectedCard.initials || 'IN' }}</div>
+              <span class="sample-tag-badge">{{ catalog.selectedCard.templateLabel || 'VERIFIED' }}</span>
+            </div>
+            <div>
+              <div style="font-family: var(--font-serif); font-size: 20px; font-weight: 600;">{{ catalog.selectedCard.fullName }}</div>
+              <div style="font-family: var(--font-mono); font-size: 11px; color: var(--baby-blue); text-transform: uppercase;">{{ catalog.selectedCard.jobTitle }} &middot; {{ catalog.selectedCard.company }}</div>
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 10px; opacity: 0.85;">
+              <div>✉️ {{ catalog.selectedCard.email }}</div>
+              <div>📞 {{ catalog.selectedCard.phone }}</div>
+            </div>
+          </div>
+
+          <!-- Back -->
+          <div class="modal-card-face modal-back">
+            <div id="modalQrCodeHolder" style="background: white; padding: 6px; border-radius: 8px; width: 90px; height: 90px; display: flex; align-items: center; justify-content: center;"></div>
+            <div style="font-family: var(--font-mono); font-size: 11px; color: var(--plaster);">
+              {{ catalog.selectedCard.website || 'https://inoviq.io' }}
+            </div>
+            <span class="sample-tag-badge">SCAN TO SAVE CONTACT</span>
+          </div>
+
+        </div>
+      </div>
+
+      <div style="text-align: center; font-family: var(--font-mono); font-size: 11px; color: var(--ink-light); margin-bottom: 16px;">
+        Tap card to flip between front &amp; live QR code
+      </div>
+
+      <!-- Action Buttons in Modal -->
+      <div style="display: flex; gap: 10px;">
+        <button class="btn-primary" style="flex: 1; padding: 10px;" ng-click="catalog.downloadVCard(catalog.selectedCard)">
+          📇 Export vCard (.VCF)
+        </button>
+        <button class="btn-ghost" style="padding: 10px 16px;" ng-click="catalog.copyShareLink(catalog.selectedCard)">
+          🔗 Copy Link
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="../app.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      var themeBtn = document.getElementById('themeToggle');
+      var currentTheme = localStorage.getItem('inoviq_theme') || 'light';
+
+      function applyTheme(theme) {
+        if (theme === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+          if (themeBtn) themeBtn.textContent = '☀️';
+        } else {
+          document.documentElement.removeAttribute('data-theme');
+          if (themeBtn) themeBtn.textContent = '🌙';
+        }
+      }
+      applyTheme(currentTheme);
+
+      if (themeBtn) {
+        themeBtn.addEventListener('click', function () {
+          currentTheme = (currentTheme === 'light') ? 'dark' : 'light';
+          localStorage.setItem('inoviq_theme', currentTheme);
+          applyTheme(currentTheme);
+        });
+      }
+    })();
+  </script>
+</body>
+
+</html>

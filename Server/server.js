@@ -51,6 +51,14 @@ app.get('/create-card', (req, res) => {
   res.sendFile(path.join(__dirname, '../Client/Pages/create-card.html'));
 });
 
+app.get('/scan', (req, res) => {
+  res.sendFile(path.join(__dirname, '../Client/Pages/scan.html'));
+});
+
+app.get('/saved-cards', (req, res) => {
+  res.sendFile(path.join(__dirname, '../Client/Pages/saved-cards.html'));
+});
+
 /* ── Connect to MongoDB then start server ── */
 connectDB().then(() => {
   app.listen(PORT, () => {
