@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="digiCardApp">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Manage your Inoviq account profile — update your name, username, and contact details.">
+  <title>My Profile · Inoviq</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../Style/style.css">
+  <!-- Apply saved theme before paint to prevent flash -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('inoviq_theme') || 'light';
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
+  </script>
+
+  <style>
+    /* =========================================================
+       PROFILE PAGE — Scoped Styles (extends style.css tokens)
+       ========================================================= */
+
+    /* ── Page shell ── */
+    .profile-shell {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 24px 28px 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    /* ── Loading state ── */
+    .profile-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 50vh;
+      gap: 16px;
+    }
+    .profile-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border-line);
+      border-top-color: var(--moss);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .profile-loading-txt {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-light);
+    }
+
+    /* ── Flash banners ── */
+    .profile-banner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-radius: 10px;
+      padding: 12px 18px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      margin-bottom: 24px;
+      animation: bannerIn 0.3s ease;
+    }
+    @keyframes bannerIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .profile-banner.success {
+      background: rgba(39, 174, 96, 0.12);
+      border: 1px solid rgba(39, 174, 96, 0.35);
+      color: #1e8449;
+    }
+    [data-theme="dark"] .profile-banner.success { color: #58d68d; }
+    .profile-banner.error {
+      background: rgba(156, 61, 61, 0.12);
+      border: 1px solid rgba(156, 61, 61, 0.35);
+      color: var(--stamp-red);
+    }
+
+    /* ── Hero card (avatar + name + email) ── */
+    .profile-hero {
+      background: var(--paper-card);
+      border: 1px solid var(--border-line);
+      border-radius: 20px;
+      padding: 40px 40px 36px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .profile-hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--moss), var(--baby-blue), var(--eucalyptus));
+    }
+
+    /* ── Large avatar ── */
+    .profile-avatar-wrap {
+      position: relative;
+      flex-shrink: 0;
+    }
+    .profile-avatar {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--espresso) 0%, var(--soot) 100%);
+      color: var(--baby-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-serif);
+      font-size: 32px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      box-shadow: var(--shadow-md);
+      border: 3px solid var(--border-line);
+    }
+    .profile-avatar-badge {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 22px;
+      height: 22px;
+      background: var(--moss);
+      border: 2px solid var(--paper-card);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .profile-avatar-badge svg {
+      color: var(--plaster);
+    }
+
+    /* ── Hero text block ── */
+    .profile-hero-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .profile-hero-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--moss);
+    }
+    .profile-hero-name {
+      font-family: var(--font-serif);
+      font-size: 30px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      color: var(--ink-primary);
+      line-height: 1.1;
+    }
+    .profile-hero-email {
+      font-size: 14px;
+      color: var(--ink-muted);
+    }
+    .profile-hero-username {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--moss);
+      margin-top: 2px;
+    }
+    .profile-hero-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    /* ── Info cards grid ── */
+    .profile-info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .profile-info-card {
+      background: var(--paper-card);
+      border: 1px solid var(--border-line);
+      border-radius: 14px;
+      padding: 20px 22px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+    .profile-info-card:hover {
+      border-color: var(--border-dark);
+      box-shadow: var(--shadow-md);
+    }
+    .profile-info-card .info-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-light);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .profile-info-card .info-label svg {
+      color: var(--moss);
+    }
+    .profile-info-card .info-value {
+      font-family: var(--font-sans);
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--ink-primary);
+      word-break: break-word;
+    }
+    .profile-info-card .info-value.empty {
+      color: var(--ink-light);
+      font-style: italic;
+      font-weight: 400;
+      font-size: 13px;
+    }
+
+    /* ── Edit form card ── */
+    .profile-edit-card {
+      background: var(--paper-card);
+      border: 1px solid var(--border-dark);
+      border-radius: 20px;
+      padding: 36px 40px;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .profile-edit-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--espresso), var(--moss));
+    }
+    .profile-edit-title {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: var(--ink-primary);
+    }
+    .profile-edit-desc {
+      font-size: 13px;
+      color: var(--ink-muted);
+      margin-bottom: 28px;
+    }
+
+    .profile-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px 24px;
+    }
+    .profile-form-grid .field.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .profile-form-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-line);
+      flex-wrap: wrap;
+    }
+
+    /* ── Danger zone (logout) ── */
+    .profile-danger-zone {
+      background: var(--paper-card);
+      border: 1px solid rgba(156, 61, 61, 0.25);
+      border-radius: 14px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .profile-danger-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .profile-danger-title {
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink-primary);
+    }
+    .profile-danger-desc {
+      font-size: 12.5px;
+      color: var(--ink-muted);
+    }
+
+    .btn-danger {
+      background: var(--stamp-red);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-family: var(--font-sans);
+      font-size: 13.5px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.18s ease;
+      white-space: nowrap;
+    }
+    .btn-danger:hover {
+      background: #7a2a2a;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* ── Section label ── */
+    .profile-section-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-light);
+      margin-bottom: 10px;
+      padding-left: 2px;
+    }
+
+    /* ── Membership badge ── */
+    .profile-member-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      background: rgba(177, 212, 208, 0.3);
+      color: var(--moss);
+      border: 1px solid rgba(177, 212, 208, 0.6);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 680px) {
+      .profile-shell {
+        padding: 16px 16px 80px;
+      }
+      .profile-hero {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 28px 24px 24px;
+        gap: 20px;
+      }
+      .profile-info-grid {
+        grid-template-columns: 1fr;
+      }
+      .profile-form-grid {
+        grid-template-columns: 1fr;
+      }
+      .profile-form-grid .field.full-width {
+        grid-column: 1;
+      }
+      .profile-edit-card {
+        padding: 24px 20px;
+      }
+      .profile-danger-zone {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .profile-hero-name {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body ng-controller="ProfileController as vm">
+
+  <div class="profile-shell">
+
+    <!-- ===== NAV HEADER ===== -->
+    <header class="nav-header">
+      <div class="nav-topbar">
+        <a href="dashboard.html" class="brand-logo">
+          i<span>noviq</span>
+          <span class="brand-badge">PRO</span>
+        </a>
+
+        <!-- Main Navigation Links -->
+        <nav class="nav-links">
+          <a href="dashboard.html" class="nav-link-item">Dashboard</a>
+          <a href="saved-cards.html" class="nav-link-item">Saved Cards</a>
+          <a href="scan.html" class="nav-link-item">Scan &amp; Import</a>
+          <a href="profile.html" class="nav-link-item active">My Profile</a>
+        </nav>
+
+        <div class="nav-actions">
+          <!-- Theme Toggle -->
+          <button class="theme-toggle-btn" id="themeToggle" title="Toggle Light / Dark Theme" aria-label="Toggle Theme">🌙</button>
+
+          <!-- Logged-in Account Dropdown -->
+          <div class="account-menu-container" ng-if="vm.isLoggedIn">
+            <button class="user-pill" ng-click="vm.toggleAccountMenu($event)" id="btn-account-user">
+              <div class="avatar-circle" title="{{ vm.getFullName(vm.currentUser) }}">{{ vm.getInitials(vm.currentUser) }}</div>
+              <span>{{ vm.currentUser.firstName || 'Profile' }}</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+            <div class="account-dropdown-menu" ng-if="vm.showAccountMenu" ng-click="$event.stopPropagation()">
+              <div class="account-dropdown-header">
+                <div class="user-name">{{ vm.getFullName(vm.currentUser) }}</div>
+                <div class="user-email">{{ vm.currentUser.email }}</div>
+              </div>
+              <div class="account-dropdown-divider"></div>
+              <a href="profile.html" class="account-dropdown-item">&#128100; My Profile</a>
+              <a href="dashboard.html" class="account-dropdown-item">&#128202; Dashboard</a>
+              <a href="saved-cards.html" class="account-dropdown-item">&#128199; Saved Cards</a>
+              <a href="create-card.html" class="account-dropdown-item">&#10024; Create Card</a>
+              <div class="account-dropdown-divider"></div>
+              <button class="account-dropdown-item btn-logout-item" ng-click="vm.logout()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                  <polyline points="16 17 21 12 16 7" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+                Log Out
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== LOADING STATE ===== -->
+    <div class="profile-loading" ng-if="vm.loading" id="profile-loading">
+      <div class="profile-spinner"></div>
+      <div class="profile-loading-txt">Loading profile&#8230;</div>
+    </div>
+
+    <!-- ===== MAIN CONTENT (when loaded) ===== -->
+    <div ng-if="!vm.loading">
+
+      <!-- Flash banners -->
+      <div class="profile-banner success" ng-if="vm.successMsg" id="profile-success-banner">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
+        {{ vm.successMsg }}
+      </div>
+      <div class="profile-banner error" ng-if="vm.errorMsg &amp;&amp; !vm.editMode" id="profile-error-banner">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        {{ vm.errorMsg }}
+      </div>
+
+      <!-- ===== HERO CARD ===== -->
+      <section class="profile-hero" id="profile-hero" ng-if="!vm.editMode">
+        <!-- Avatar -->
+        <div class="profile-avatar-wrap">
+          <div class="profile-avatar" title="{{ vm.getFullName(vm.currentUser) }}">
+            {{ vm.getInitials(vm.currentUser) }}
+          </div>
+          <div class="profile-avatar-badge">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <path d="M20 6 9 17l-5-5"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Info -->
+        <div class="profile-hero-info">
+          <div class="profile-hero-eyebrow">Member Account</div>
+          <div class="profile-hero-name" id="profile-full-name">{{ vm.getFullName(vm.currentUser) }}</div>
+          <div class="profile-hero-email" id="profile-email">{{ vm.currentUser.email }}</div>
+          <div class="profile-hero-username" ng-if="vm.currentUser.username" id="profile-username">
+            @{{ vm.currentUser.username }}
+          </div>
+          <div class="profile-hero-actions">
+            <span class="profile-member-badge">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
+              Active since {{ vm.formatDate(vm.currentUser.createdAt) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Edit button -->
+        <button class="btn-primary" ng-click="vm.enterEdit()" id="btn-edit-profile"
+          style="align-self: flex-start; flex-shrink: 0;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Edit Profile
+        </button>
+      </section>
+
+      <!-- ===== INFO GRID (view mode) ===== -->
+      <div class="profile-info-grid" ng-if="!vm.editMode">
+
+        <!-- Full Name -->
+        <div class="profile-info-card">
+          <div class="info-label">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            Full Name
+          </div>
+          <div class="info-value" id="info-full-name">{{ vm.getFullName(vm.currentUser) }}</div>
+        </div>
+
+        <!-- Email -->
+        <div class="profile-info-card">
+          <div class="info-label">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/></svg>
+            Email Address
+          </div>
+          <div class="info-value" id="info-email">{{ vm.currentUser.email }}</div>
+        </div>
+
+        <!-- Username -->
+        <div class="profile-info-card">
+          <div class="info-label">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l2 2"/></svg>
+            Username
+          </div>
+          <div class="info-value" ng-if="vm.currentUser.username" id="info-username">@{{ vm.currentUser.username }}</div>
+          <div class="info-value empty" ng-if="!vm.currentUser.username">Not set &#8212; add a username</div>
+        </div>
+
+        <!-- Phone -->
+        <div class="profile-info-card">
+          <div class="info-label">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.19 6.19l.95-.95a2 2 0 0 1 2.11-.45c.9.356 1.854.563 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            Phone Number
+          </div>
+          <div class="info-value" ng-if="vm.currentUser.phone" id="info-phone">{{ vm.currentUser.phone }}</div>
+          <div class="info-value empty" ng-if="!vm.currentUser.phone">Not provided</div>
+        </div>
+
+        <!-- Member since -->
+        <div class="profile-info-card">
+          <div class="info-label">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Member Since
+          </div>
+          <div class="info-value" id="info-created-at">{{ vm.formatDate(vm.currentUser.createdAt) }}</div>
+        </div>
+
+        <!-- Account ID -->
+        <div class="profile-info-card">
+          <div class="info-label">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Account ID
+          </div>
+          <div class="info-value" id="info-account-id"
+            style="font-family: var(--font-mono); font-size: 12.5px; letter-spacing: 0.05em;">
+            #{{ vm.currentUser._id ? vm.currentUser._id.slice(-8).toUpperCase() : '&mdash;' }}
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ===== EDIT FORM ===== -->
+      <div class="profile-edit-card" ng-if="vm.editMode" id="profile-edit-form">
+        <div class="profile-edit-title">Edit Profile</div>
+        <div class="profile-edit-desc">Update your personal information below. Email address cannot be changed.</div>
+
+        <!-- Inline error in edit mode -->
+        <div class="profile-banner error" ng-if="vm.errorMsg" id="profile-edit-error">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          {{ vm.errorMsg }}
+        </div>
+
+        <form ng-submit="vm.saveProfile()" novalidate id="edit-profile-form">
+          <div class="profile-form-grid">
+
+            <!-- First Name -->
+            <div class="field">
+              <label for="edit-first-name">First Name <span style="color:var(--stamp-red);">*</span></label>
+              <div class="field-input">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                </svg>
+                <input type="text" id="edit-first-name" ng-model="vm.form.firstName"
+                  placeholder="Your first name" maxlength="50" required>
+              </div>
+            </div>
+
+            <!-- Last Name -->
+            <div class="field">
+              <label for="edit-last-name">Last Name <span style="color:var(--stamp-red);">*</span></label>
+              <div class="field-input">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                </svg>
+                <input type="text" id="edit-last-name" ng-model="vm.form.lastName"
+                  placeholder="Your last name" maxlength="50" required>
+              </div>
+            </div>
+
+            <!-- Username -->
+            <div class="field">
+              <label for="edit-username">Username</label>
+              <div class="field-input">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="m12 8 4 4-4 4"/>
+                </svg>
+                <input type="text" id="edit-username" ng-model="vm.form.username"
+                  placeholder="@handle (3&#8211;30 chars)" minlength="3" maxlength="30">
+              </div>
+            </div>
+
+            <!-- Phone -->
+            <div class="field">
+              <label for="edit-phone">Phone Number</label>
+              <div class="field-input">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.19 6.19l.95-.95a2 2 0 0 1 2.11-.45c.9.356 1.854.563 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+                <input type="tel" id="edit-phone" ng-model="vm.form.phone"
+                  placeholder="+1 (555) 000-0000">
+              </div>
+            </div>
+
+            <!-- Email (read-only) -->
+            <div class="field full-width">
+              <label for="edit-email">
+                Email Address
+                <span style="font-family:var(--font-mono);font-size:9px;color:var(--ink-light);margin-left:6px;">READ ONLY</span>
+              </label>
+              <div class="field-input" style="background:var(--border-line);opacity:0.75;cursor:not-allowed;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/>
+                </svg>
+                <input type="email" id="edit-email" ng-model="vm.currentUser.email"
+                  disabled style="cursor:not-allowed;color:var(--ink-muted);">
+              </div>
+            </div>
+
+          </div><!-- /profile-form-grid -->
+
+          <!-- Form actions -->
+          <div class="profile-form-actions">
+            <button type="submit" class="btn-primary" id="btn-save-profile" ng-disabled="vm.saving">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                <polyline points="17 21 17 13 7 13 7 21"/>
+                <polyline points="7 3 7 8 15 8"/>
+              </svg>
+              <span ng-if="!vm.saving">Save Changes</span>
+              <span ng-if="vm.saving">Saving&#8230;</span>
+            </button>
+            <button type="button" class="btn-ghost" id="btn-cancel-edit"
+              ng-click="vm.cancelEdit()" ng-disabled="vm.saving">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div><!-- /profile-edit-card -->
+
+      <!-- ===== DANGER ZONE ===== -->
+      <div class="profile-section-label" ng-if="!vm.editMode">Session</div>
+      <div class="profile-danger-zone" ng-if="!vm.editMode" id="profile-danger-zone">
+        <div class="profile-danger-info">
+          <div class="profile-danger-title">Sign out of Inoviq</div>
+          <div class="profile-danger-desc">This will clear your session token and return you to the login screen.</div>
+        </div>
+        <button class="btn-danger" ng-click="vm.logout()" id="btn-logout">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Log Out
+        </button>
+      </div>
+
+    </div><!-- /ng-if !vm.loading -->
+
+  </div><!-- /profile-shell -->
+
+  <script src="../app.js"></script>
+  <script>
+    /* ── Theme toggle ── */
+    (function () {
+      'use strict';
+      var themeBtn = document.getElementById('themeToggle');
+      var currentTheme = localStorage.getItem('inoviq_theme') || 'light';
+
+      function applyTheme(theme) {
+        if (theme === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+          if (themeBtn) themeBtn.textContent = '\u2600\uFE0F';
+        } else {
+          document.documentElement.removeAttribute('data-theme');
+          if (themeBtn) themeBtn.textContent = '\uD83C\uDF19';
+        }
+        localStorage.setItem('inoviq_theme', theme);
+      }
+      applyTheme(currentTheme);
+
+      if (themeBtn) {
+        themeBtn.addEventListener('click', function () {
+          currentTheme = (currentTheme === 'light') ? 'dark' : 'light';
+          applyTheme(currentTheme);
+        });
+      }
+    })();
+  </script>
+
+</body>
+
+</html>

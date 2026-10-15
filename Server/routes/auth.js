@@ -190,4 +190,79 @@ router.get('/me', authMiddleware, async (req, res) => {
   }
 });
 
+/* ──────────────────────────────────────────────────────────
+   PUT /api/auth/profile — Update current user profile (protected)
+   ────────────────────────────────────────────────────────── */
+router.put('/profile', authMiddleware, async (req, res) => {
+  try {
+    const { firstName, lastName, username, phone } = req.body;
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found.'
+      });
+    }
+
+    // Validate required fields
+    if (!firstName || !firstName.trim()) {
+      return res.status(400).json({ success: false, message: 'First name is required.' });
+    }
+    if (!lastName || !lastName.trim()) {
+      return res.status(400).json({ success: false, message: 'Last name is required.' });
+    }
+
+    // Validate username uniqueness if provided
+    if (username && username.trim()) {
+      const cleanUsername = username.trim().toLowerCase();
+
+      if (cleanUsername.length < 3 || cleanUsername.length > 30) {
+        return res.status(400).json({ success: false, message: 'Username must be between 3 and 30 characters.' });
+      }
+
+      const existing = await User.findOne({
+        username: cleanUsername,
+        _id: { $ne: req.user.id }
+      });
+      if (existing) {
+        return res.status(409).json({ success: false, message: 'That username is already taken.' });
+      }
+      user.username = cleanUsername;
+    } else {
+      // Allow clearing username
+      user.username = undefined;
+    }
+
+    user.firstName = firstName.trim();
+    user.lastName = lastName.trim();
+    user.phone = (phone || '').trim();
+
+    await user.save();
+
+    // Re-issue token so client JWT payload stays fresh
+    const token = generateToken(user);
+
+    res.json({
+      success: true,
+      message: 'Profile updated successfully!',
+      token,
+      user: user.toJSON()
+    });
+
+  } catch (err) {
+    console.error('Update profile error:', err);
+
+    if (err.name === 'ValidationError') {
+      const messages = Object.values(err.errors).map(e => e.message);
+      return res.status(400).json({ success: false, message: messages.join(' ') });
+    }
+    if (err.code === 11000) {
+      return res.status(409).json({ success: false, message: 'That username is already taken.' });
+    }
+
+    res.status(500).json({ success: false, message: 'Server error. Please try again.' });
+  }
+});
+
 module.exports = router;

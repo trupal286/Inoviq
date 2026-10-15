@@ -88,6 +88,18 @@
           }
           return res.data;
         });
+      },
+
+      updateProfile: function (profileData) {
+        return $http.put(API + '/profile', profileData, {
+          headers: { 'Authorization': 'Bearer ' + $window.localStorage.getItem(TOKEN_KEY) }
+        }).then(function (res) {
+          if (res.data.success) {
+            $window.localStorage.setItem(TOKEN_KEY, res.data.token);
+            $window.localStorage.setItem(USER_KEY, JSON.stringify(res.data.user));
+          }
+          return res.data;
+        });
       }
     };
   }]);
@@ -246,6 +258,166 @@
           auth.errorMsg = (err.data && err.data.message) || 'Signup failed. Please try again.';
           $scope.$applyAsync();
         });
+    };
+  }]);
+
+  /* --------------------------------------------------------------------------
+     ProfileController — handles profile view & edit
+     -------------------------------------------------------------------------- */
+  app.controller('ProfileController', ['$scope', '$window', 'AuthService', function ($scope, $window, AuthService) {
+    var vm = this;
+
+    /* ── State ── */
+    vm.isLoggedIn   = AuthService.isLoggedIn();
+    vm.currentUser  = AuthService.getCurrentUser();
+    vm.loading      = true;
+    vm.editMode     = false;
+    vm.saving       = false;
+    vm.errorMsg     = '';
+    vm.successMsg   = '';
+    vm.showAccountMenu = false;
+
+    /* ── Redirect guests to login ── */
+    if (!vm.isLoggedIn) {
+      $window.location.href = 'login.html?redirect=profile.html';
+      return;
+    }
+
+    /* ── Edit form fields ── */
+    vm.form = {
+      firstName: '',
+      lastName:  '',
+      username:  '',
+      phone:     ''
+    };
+
+    /* ── Helper: initials from user object ── */
+    vm.getInitials = function (user) {
+      if (!user) return 'IN';
+      return (((user.firstName || '')[0] || '') + ((user.lastName || '')[0] || '')).toUpperCase() || 'IN';
+    };
+
+    /* ── Helper: full name ── */
+    vm.getFullName = function (user) {
+      if (!user) return '';
+      return (user.firstName || '') + ' ' + (user.lastName || '');
+    };
+
+    /* ── Format date ── */
+    vm.formatDate = function (isoStr) {
+      if (!isoStr) return '—';
+      var d = new Date(isoStr);
+      var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+    };
+
+    /* ── Populate form from user object ── */
+    function populateForm(user) {
+      vm.form.firstName = user.firstName || '';
+      vm.form.lastName  = user.lastName  || '';
+      vm.form.username  = user.username  || '';
+      vm.form.phone     = user.phone     || '';
+    }
+
+    /* ── Fetch fresh profile from server ── */
+    AuthService.fetchProfile()
+      .then(function (data) {
+        vm.loading = false;
+        if (data.success) {
+          vm.currentUser = data.user;
+          populateForm(data.user);
+        } else {
+          vm.errorMsg = data.message || 'Failed to load profile.';
+        }
+        $scope.$applyAsync();
+      })
+      .catch(function (err) {
+        vm.loading = false;
+        if (err && err.status === 401) {
+          $window.location.href = 'login.html?redirect=profile.html';
+          return;
+        }
+        vm.errorMsg = (err && err.data && err.data.message) || 'Failed to load profile. Please refresh.';
+        $scope.$applyAsync();
+      });
+
+    /* ── Toggle edit mode ── */
+    vm.enterEdit = function () {
+      vm.editMode  = true;
+      vm.errorMsg  = '';
+      vm.successMsg = '';
+      populateForm(vm.currentUser);
+    };
+
+    vm.cancelEdit = function () {
+      vm.editMode   = false;
+      vm.errorMsg   = '';
+      vm.successMsg = '';
+      populateForm(vm.currentUser);
+    };
+
+    /* ── Save profile ── */
+    vm.saveProfile = function () {
+      vm.errorMsg   = '';
+      vm.successMsg = '';
+
+      /* Client-side validation */
+      if (!vm.form.firstName || !vm.form.firstName.trim()) {
+        vm.errorMsg = 'First name is required.'; return;
+      }
+      if (!vm.form.lastName || !vm.form.lastName.trim()) {
+        vm.errorMsg = 'Last name is required.'; return;
+      }
+      if (vm.form.username && vm.form.username.trim().length > 0 &&
+          vm.form.username.trim().length < 3) {
+        vm.errorMsg = 'Username must be at least 3 characters.'; return;
+      }
+
+      vm.saving = true;
+
+      AuthService.updateProfile({
+        firstName: vm.form.firstName.trim(),
+        lastName:  vm.form.lastName.trim(),
+        username:  vm.form.username.trim(),
+        phone:     vm.form.phone.trim()
+      })
+        .then(function (data) {
+          vm.saving = false;
+          if (data.success) {
+            vm.currentUser = data.user;
+            vm.successMsg  = 'Profile updated successfully!';
+            vm.editMode    = false;
+            // Clear success message after 4 seconds
+            setTimeout(function () {
+              vm.successMsg = '';
+              $scope.$applyAsync();
+            }, 4000);
+          } else {
+            vm.errorMsg = data.message || 'Update failed.';
+          }
+          $scope.$applyAsync();
+        })
+        .catch(function (err) {
+          vm.saving   = false;
+          vm.errorMsg = (err && err.data && err.data.message) || 'Update failed. Please try again.';
+          $scope.$applyAsync();
+        });
+    };
+
+    /* ── Account dropdown ── */
+    vm.toggleAccountMenu = function ($event) {
+      if ($event) $event.stopPropagation();
+      vm.showAccountMenu = !vm.showAccountMenu;
+    };
+    $window.addEventListener('click', function () {
+      if (vm.showAccountMenu) {
+        $scope.$apply(function () { vm.showAccountMenu = false; });
+      }
+    });
+
+    /* ── Logout ── */
+    vm.logout = function () {
+      AuthService.logout();
     };
   }]);
 
