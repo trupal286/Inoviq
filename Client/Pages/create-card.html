@@ -110,6 +110,26 @@
     function InoviqStudioApp() {
       // Theme State (Inherits or sets document theme)
       const [theme, setTheme] = useState(() => localStorage.getItem('inoviq_theme') || 'light');
+
+      // Auth Guard: redirect to login if not authenticated
+      useEffect(() => {
+        const token = localStorage.getItem('inoviq_token');
+        if (!token) {
+          window.location.href = 'login.html?redirect=create-card.html';
+        } else {
+          // Optionally pre-fill name/email from stored user
+          try {
+            const user = JSON.parse(localStorage.getItem('inoviq_user') || 'null');
+            if (user) {
+              setCardData(prev => ({
+                ...prev,
+                fullName: prev.fullName || ((user.firstName || '') + ' ' + (user.lastName || '')).trim(),
+                email: prev.email || (user.email || '')
+              }));
+            }
+          } catch(e) {}
+        }
+      }, []);
       
       useEffect(() => {
         if (theme === 'dark') {
@@ -128,18 +148,18 @@
       const [cardFormat, setCardFormat] = useState('business');
       const [activeTab, setActiveTab] = useState('info'); // 'info', 'design', 'transform', 'templates'
 
-      // Card Information Model
+      // Card Information Model — starts empty, user fills in their own details
       const [cardData, setCardData] = useState({
-        fullName: 'Alex Morgan',
-        jobTitle: 'Principal Product Architect',
-        company: 'Inoviq Global Studios',
-        email: 'alex.morgan@inoviq.io',
-        phone: '+1 (555) 019-2834',
-        website: 'https://inoviq.io',
-        location: 'San Francisco, CA',
-        bio: 'Crafting tactile spatial systems and physical digital identity.',
+        fullName: '',
+        jobTitle: '',
+        company: '',
+        email: '',
+        phone: '',
+        website: '',
+        location: '',
+        bio: '',
         badgeText: '',
-        handle: '@alexmorgan',
+        handle: '',
         orgTag: ''
       });
 

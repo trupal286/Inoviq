@@ -475,6 +475,20 @@
         </div>
       </div>
 
+      <!-- Empty state for logged-in users with no real cards yet -->
+      <div ng-if="catalog.isLoggedIn && catalog.cards.length === 0" style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: var(--ink-muted);">
+        <div style="font-size: 40px; margin-bottom: 12px;">📭</div>
+        <div style="font-family: var(--font-serif); font-size: 20px; font-weight: 600; color: var(--ink-primary); margin-bottom: 8px;">Your vault is empty</div>
+        <div style="font-family: var(--font-mono); font-size: 12px; line-height: 1.6;">Create your first digital visiting card or scan a physical card to get started.</div>
+      </div>
+
+      <!-- Guest notice: clarify these are demo cards -->
+      <div ng-if="!catalog.isLoggedIn" style="grid-column: 1 / -1; text-align: center; padding: 4px 0 12px;">
+        <span style="font-family: var(--font-mono); font-size: 11px; color: var(--ink-muted); background: var(--paper-card); border: 1px solid var(--border-line); border-radius: 20px; padding: 4px 14px;">
+          📌 These are sample cards — <a href="login.html" style="color: var(--moss);">sign in</a> to see your real catalog
+        </span>
+      </div>
+
       <!-- Add New Card Action Box -->
       <a href="create-card.html" class="add-card-placeholder">
         <div style="font-size: 32px; margin-bottom: 8px;">➕</div>

@@ -125,20 +125,33 @@
           <!-- 3-D flip card -->
           <div class="card-flip" id="heroCard">
             <div class="face front">
-              <div class="card-header">
-                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                  <div class="card-id">CARD · SAMPLE {{ vm.heroCard.id }}</div>
-                  <span class="sample-tag-badge">SAMPLE CARD</span>
-                </div>
-                <div class="card-name">{{ vm.heroCard.fullName }}</div>
-                <div class="card-role">{{ vm.heroCard.jobTitle }} — {{ vm.heroCard.company }}</div>
+
+              <!-- PLACEHOLDER STATE: logged in but no cards yet -->
+              <div ng-if="vm.isLoggedIn && vm.heroCard.isPlaceholder" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; gap:12px; text-align:center; padding: 20px;">
+                <div style="font-size: 32px;">✨</div>
+                <div style="font-family:var(--font-serif); font-size:18px; font-weight:600; color:var(--plaster);">Welcome, {{ vm.heroCard.fullName || 'to Inoviq' }}!</div>
+                <div style="font-family:var(--font-mono); font-size:11px; color:var(--ink-light); line-height:1.5;">You haven't created a card yet.<br>Build your first digital card now.</div>
+                <a href="create-card.html" class="btn-primary" style="margin-top:6px; font-size:12px; padding:8px 18px;">Create Your Card →</a>
               </div>
-              <div class="card-foot">
-                <span class="card-url">{{ vm.heroCard.website }}</span>
-                <div class="card-mark">{{ vm.heroCard.initials }}</div>
+
+              <!-- REAL CARD FRONT: guest sample card OR logged-in user's actual card -->
+              <div ng-if="!vm.heroCard.isPlaceholder">
+                <div class="card-header">
+                  <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <div class="card-id">{{ vm.isLoggedIn ? 'MY CARD · ' + (vm.heroCard.templateLabel || 'INOVIQ') : 'CARD · SAMPLE' }}</div>
+                    <span class="sample-tag-badge" ng-if="!vm.isLoggedIn">SAMPLE CARD</span>
+                    <span class="sample-tag-badge" ng-if="vm.isLoggedIn" style="background: var(--moss); color: var(--plaster);">MY CARD</span>
+                  </div>
+                  <div class="card-name">{{ vm.heroCard.fullName }}</div>
+                  <div class="card-role">{{ vm.heroCard.jobTitle }}{{ vm.heroCard.jobTitle && vm.heroCard.company ? ' — ' : '' }}{{ vm.heroCard.company }}</div>
+                </div>
+                <div class="card-foot">
+                  <span class="card-url">{{ vm.heroCard.website }}</span>
+                  <div class="card-mark">{{ vm.heroCard.initials }}</div>
+                </div>
               </div>
             </div>
-            <div class="face back">
+            <div class="face back" ng-if="!vm.heroCard.isPlaceholder">
               <div class="qr-block" id="qrBlock" ng-click="vm.onQrClick()" style="cursor:pointer;"
                 title="Click or Scan to Save Contact">
                 <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -149,11 +162,11 @@
                 </svg>
               </div>
 
-              <!-- Realistic Demo Contact Details -->
+              <!-- Contact Details -->
               <div class="demo-contact-details">
-                <div>✉️ {{ vm.heroCard.email }}</div>
-                <div>📞 {{ vm.heroCard.phone }}</div>
-                <div>🌐 {{ vm.heroCard.website }}</div>
+                <div ng-if="vm.heroCard.email">✉️ {{ vm.heroCard.email }}</div>
+                <div ng-if="vm.heroCard.phone">📞 {{ vm.heroCard.phone }}</div>
+                <div ng-if="vm.heroCard.website">🌐 {{ vm.heroCard.website }}</div>
               </div>
 
               <button type="button" class="btn-primary btn-save-contact" ng-click="vm.onQrClick()"
@@ -161,7 +174,12 @@
                 💾 Save Contact
               </button>
 
-              <small class="back-label" style="font-size: 9px; opacity: 0.8;">SCAN OR CLICK TO SAVE DEMO CONTACT</small>
+              <small class="back-label" style="font-size: 9px; opacity: 0.8;">{{ vm.isLoggedIn ? 'SCAN OR CLICK TO SAVE CONTACT' : 'SCAN OR CLICK TO SAVE DEMO CONTACT' }}</small>
+            </div>
+
+            <!-- Back face placeholder -->
+            <div class="face back" ng-if="vm.heroCard.isPlaceholder" style="display:flex; align-items:center; justify-content:center;">
+              <a href="create-card.html" class="btn-primary" style="font-size:12px;">Start Creating →</a>
             </div>
           </div>
 

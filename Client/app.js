@@ -530,17 +530,19 @@
             vm.heroCard = vm.cards[0];
             vm.heroIndex = 0;
           } else {
+            // No cards yet — show a placeholder card using only the user's real name
             vm.heroCard = {
               id: 0,
-              fullName: vm.currentUser ? (vm.currentUser.firstName + ' ' + vm.currentUser.lastName) : 'Your Name',
-              jobTitle: 'Principal Architect',
-              company: 'Inoviq Global',
-              email: vm.currentUser ? vm.currentUser.email : 'contact@inoviq.io',
-              phone: '+1 (555) 019-2834',
-              website: 'inoviq.io',
-              templateLabel: 'Ledger',
-              initials: vm.currentUser ? ((vm.currentUser.firstName[0] || 'Y') + (vm.currentUser.lastName[0] || 'N')).toUpperCase() : 'YN',
-              color: '#2D3536'
+              fullName: vm.currentUser ? (vm.currentUser.firstName + ' ' + vm.currentUser.lastName).trim() : '',
+              jobTitle: '',
+              company: '',
+              email: vm.currentUser ? vm.currentUser.email : '',
+              phone: '',
+              website: '',
+              templateLabel: '',
+              initials: vm.currentUser ? ((vm.currentUser.firstName || '?')[0] + (vm.currentUser.lastName || '?')[0]).toUpperCase() : '??',
+              color: '#2D3536',
+              isPlaceholder: true
             };
           }
         })
@@ -781,20 +783,18 @@
     ];
 
     function loadSavedCards() {
-      var localCards = [];
-      try {
-        var raw = $window.localStorage.getItem('inoviq_local_cards');
-        if (raw) localCards = JSON.parse(raw);
-      } catch (e) {}
-
       if (catalog.isLoggedIn) {
+        // Logged-in: show ONLY real cards from API, never mix in demo data
         CardService.list().then(function (data) {
-          catalog.cards = (data.cards && data.cards.length > 0) ? data.cards : localCards.concat(defaultShowcase);
+          catalog.cards = (data.cards && data.cards.length > 0) ? data.cards : [];
+          $scope.$applyAsync();
         }).catch(function () {
-          catalog.cards = localCards.concat(defaultShowcase);
+          catalog.cards = [];
+          $scope.$applyAsync();
         });
       } else {
-        catalog.cards = localCards.concat(defaultShowcase);
+        // Guest: show showcase demo cards only
+        catalog.cards = defaultShowcase;
       }
     }
 
@@ -924,15 +924,16 @@
     scan.rawTextPayload = '';
     scan.html5QrCode = null;
 
+    // Starts empty — populated when a real QR/vCard is scanned
     scan.card = {
-      fullName: 'Alexandre Moreau',
-      jobTitle: 'Design Technologist',
-      company: 'Atelier Spatial',
-      email: 'alexandre@atelierspatial.com',
-      phone: '+1 (555) 789-0123',
-      website: 'https://atelierspatial.com',
-      bio: 'Physical computing and brand identity systems.',
-      templateLabel: 'Ledger',
+      fullName: '',
+      jobTitle: '',
+      company: '',
+      email: '',
+      phone: '',
+      website: '',
+      bio: '',
+      templateLabel: 'Scanned',
       color: '#2D3536',
       bgGradient: 'linear-gradient(135deg, #2D3536 0%, #1A2223 100%)'
     };
