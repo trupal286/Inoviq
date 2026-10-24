@@ -82,16 +82,17 @@ html {
 
 body {
   background-color: var(--bg-main);
-  background-image: 
-    radial-gradient(var(--border-line) 1px, transparent 1px),
-    linear-gradient(to right, rgba(45, 53, 54, 0.02) 1px, transparent 1px);
-  background-size: 16px 16px, 32px 32px;
+  background-image: radial-gradient(rgba(27, 39, 64, 0.035) 1px, transparent 1px);
+  background-size: 14px 14px;
   font-family: var(--font-sans);
   color: var(--ink-primary);
   line-height: 1.5;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+[data-theme="dark"] body {
+  background-image: radial-gradient(rgba(242, 239, 226, 0.06) 1px, transparent 1px);
 }
 
 /* Global Container Shells */
@@ -141,6 +142,23 @@ body {
   align-items: center;
   gap: 8px;
 }
+
+.brand-logo-img {
+  height: 42px;
+  width: auto;
+  max-width: 220px;
+  display: block;
+  object-fit: contain;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+.brand-logo:hover .brand-logo-img,
+.studio-brand-badge:hover .brand-logo-img {
+  transform: scale(1.05);
+}
+[data-theme="dark"] .brand-logo-img {
+  filter: invert(0.92) hue-rotate(180deg) brightness(1.15);
+}
+
 .brand-logo span, .logo span {
   color: var(--moss);
   font-style: italic;
@@ -160,23 +178,38 @@ body {
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 10px;
 }
 .nav-links span, .nav-links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 500;
-  color: var(--ink-muted);
+  letter-spacing: -0.01em;
+  color: var(--ink-primary);
+  background: var(--paper-card);
+  border: 1px solid var(--border-line);
   text-decoration: none;
   cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 6px;
+  padding: 7px 16px;
+  border-radius: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   transition: all 0.18s ease;
+  white-space: nowrap;
 }
-.nav-links span:hover, .nav-links a:hover,
+.nav-links span:hover, .nav-links a:hover {
+  background: var(--mist);
+  border-color: var(--moss);
+  color: var(--espresso);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
 .nav-links span.active, .nav-links a.active {
-  color: var(--ink-primary);
-  background: rgba(105, 124, 112, 0.12);
+  background: var(--espresso);
+  color: var(--plaster);
+  border-color: var(--espresso);
 }
 
 .nav-right, .nav-actions {

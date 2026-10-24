@@ -29,10 +29,18 @@ app.use(cookieParser());
 app.use('/api/auth', authRoutes);
 app.use('/api/cards', cardRoutes);
 
+/* ── Disable caching for live development ── */
+app.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  next();
+});
+
 /* ── Serve static files from Client ── */
-app.use(express.static(path.join(__dirname, '../Client')));
-app.use(express.static(path.join(__dirname, '../Client/Pages')));
-app.use('/Style', express.static(path.join(__dirname, '../Client/Style')));
+app.use(express.static(path.join(__dirname, '../Client'), { etag: false, maxAge: 0 }));
+app.use(express.static(path.join(__dirname, '../Client/Pages'), { etag: false, maxAge: 0 }));
+app.use('/Style', express.static(path.join(__dirname, '../Client/Style'), { etag: false, maxAge: 0 }));
 
 /* ── Page Routes (serve HTML pages) ── */
 app.get('/', (req, res) => {

@@ -6,6 +6,8 @@
 
 /* Inherits tokens from style.css (:root & [data-theme="dark"]) */
 
+
+
 .studio-react-shell {
   display: flex;
   flex-direction: column;
@@ -37,97 +39,62 @@
 .topbar-left {
   display: flex;
   align-items: center;
-  gap: 12px;
   flex: 1;
   min-width: 0;
 }
 
-.studio-back-btn {
+.studio-brand-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 8px;
-  background: var(--bg-main);
-  border: 1px solid var(--border-line);
-  color: var(--ink-primary);
-  font-size: 12.5px;
-  font-weight: 600;
   text-decoration: none;
-  transition: all 0.15s ease;
-  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-.studio-back-btn:hover {
-  border-color: var(--moss);
-  background: rgba(105, 124, 112, 0.1);
-  transform: translateX(-2px);
+.studio-brand-badge:hover {
+  transform: scale(1.03);
+  opacity: 0.92;
 }
 
-.studio-topbar-divider {
-  width: 1px;
-  height: 22px;
-  background: var(--border-line);
+/* Mode Switcher: Edit Mode vs 3D Preview (2 options on create card) */
+.studio-mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg-main);
+  border: 1.5px solid var(--border-line);
+  border-radius: 24px;
+  padding: 3px;
+  gap: 4px;
+  box-shadow: var(--shadow-sm);
   flex-shrink: 0;
 }
 
-.studio-brand-badge {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--font-serif);
-  font-weight: 600;
-  font-size: 17px;
-  color: var(--ink-primary);
-  text-decoration: none;
-  letter-spacing: -0.01em;
-  white-space: nowrap;
-}
-
-.studio-brand-badge span.brand-moss {
-  color: var(--moss);
-  font-style: italic;
-}
-
-.studio-tag {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  font-weight: 700;
-  padding: 2px 6px;
-  background: rgba(105, 124, 112, 0.15);
-  border: 1px solid var(--border-line);
-  border-radius: 4px;
-  color: var(--ink-primary);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.studio-nav-links-wrap {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.studio-nav-pill {
+.studio-mode-btn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 5px 10px;
-  border-radius: 6px;
-  background: transparent;
+  gap: 6px;
+  padding: 6px 15px;
+  border-radius: 20px;
   border: 1px solid transparent;
+  background: transparent;
   color: var(--ink-muted);
-  font-size: 12px;
-  font-weight: 500;
-  text-decoration: none;
-  transition: all 0.15s ease;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
   white-space: nowrap;
 }
 
-.studio-nav-pill:hover {
+.studio-mode-btn:hover {
   color: var(--ink-primary);
-  background: var(--bg-main);
+}
+
+.studio-mode-btn.active {
+  background: var(--paper-card);
+  color: var(--ink-primary);
   border-color: var(--border-line);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 /* Format Pills Switcher in Top Bar */
@@ -183,67 +150,80 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 7px 12px;
-  border-radius: 8px;
-  background: var(--bg-main);
+  padding: 7px 16px;
+  border-radius: 20px;
+  background: var(--paper-card);
   border: 1px solid var(--border-line);
   color: var(--ink-primary);
-  font-family: var(--font-sans);
-  font-size: 12px;
-  font-weight: 600;
+  font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.01em !important;
   cursor: pointer;
-  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.18s ease;
   white-space: nowrap;
 }
 
 .btn-theme-switcher:hover {
-  border-color: var(--border-dark);
-  background: rgba(105, 124, 112, 0.12);
+  background: var(--mist);
+  border-color: var(--moss);
+  color: var(--espresso);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-secondary-action {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 14px;
-  border-radius: 8px;
-  background: var(--bg-main);
+  padding: 7px 16px;
+  border-radius: 20px;
+  background: var(--paper-card);
   border: 1px solid var(--border-line);
   color: var(--ink-primary);
-  font-family: var(--font-sans);
-  font-size: 12.5px;
-  font-weight: 600;
+  font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.01em !important;
   cursor: pointer;
-  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.18s ease;
   white-space: nowrap;
 }
 
 .btn-secondary-action:hover {
-  border-color: var(--border-dark);
+  background: var(--mist);
+  border-color: var(--moss);
+  color: var(--espresso);
   transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-primary-action {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 16px;
-  border-radius: 8px;
-  background: var(--ink-primary);
-  color: var(--bg-main);
-  border: 1px solid var(--ink-primary);
-  font-family: var(--font-sans);
-  font-size: 12.5px;
-  font-weight: 600;
+  padding: 7px 18px;
+  border-radius: 20px;
+  background: var(--espresso);
+  color: var(--plaster);
+  border: 1px solid var(--espresso);
+  font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
   cursor: pointer;
-  transition: all 0.15s ease;
   box-shadow: var(--shadow-sm);
+  transition: all 0.18s ease;
   white-space: nowrap;
 }
 
 .btn-primary-action:hover:not(:disabled) {
-  opacity: 0.92;
+  background: var(--soot);
+  color: var(--plaster);
   transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .btn-primary-action:disabled {
@@ -252,14 +232,8 @@
   transform: none;
 }
 
-@media (max-width: 1100px) {
-  .studio-nav-links-wrap {
-    display: none;
-  }
-}
-
 @media (max-width: 860px) {
-  .topbar-format-pills {
+  .studio-mode-toggle span {
     display: none;
   }
 }
@@ -280,10 +254,7 @@
 .studio-canvas {
   position: relative;
   background-color: var(--bg-main);
-  background-image: 
-    radial-gradient(var(--border-line) 1.2px, transparent 1.2px),
-    linear-gradient(to right, var(--border-line) 1px, transparent 1px);
-  background-size: 20px 20px, 40px 40px;
+  background-image: none;
   display: flex;
   align-items: center;
   justify-content: center;
