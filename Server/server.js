@@ -91,14 +91,30 @@ app.use(express.static(path.join(__dirname, '../Client'), { etag: false, maxAge:
 app.use(express.static(path.join(__dirname, '../Client/Pages'), { etag: false, maxAge: 0, index: false }));
 app.use('/Style', express.static(path.join(__dirname, '../Client/Style'), { etag: false, maxAge: 0 }));
 
+const os = require('os');
+
+function getNetworkIP() {
+  const interfaces = os.networkInterfaces();
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name]) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        return iface.address;
+      }
+    }
+  }
+  return '127.0.0.1';
+}
+
 /* ── Connect to MongoDB then start server ── */
 connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`\n  ╔══════════════════════════════════════════╗`);
-    console.log(`  ║        INOVIQ SERVER — v2.0.0            ║`);
-    console.log(`  ╠══════════════════════════════════════════╣`);
-    console.log(`  ║  ➜  Local:   http://127.0.0.1:${PORT}       ║`);
-    console.log(`  ║  ➜  API:     http://127.0.0.1:${PORT}/api   ║`);
-    console.log(`  ╚══════════════════════════════════════════╝\n`);
+  app.listen(PORT, '0.0.0.0', () => {
+    const netIP = getNetworkIP();
+    console.log(`\n  ╔══════════════════════════════════════════════════════╗`);
+    console.log(`  ║              INOVIQ SERVER — v2.0.0                  ║`);
+    console.log(`  ╠══════════════════════════════════════════════════════╣`);
+    console.log(`  ║  ➜  Local:    http://127.0.0.1:${PORT}                  ║`);
+    console.log(`  ║  ➜  On Phone: http://${netIP}:${PORT}               ║`);
+    console.log(`  ║  ➜  API:      http://127.0.0.1:${PORT}/api              ║`);
+    console.log(`  ╚══════════════════════════════════════════════════════╝\n`);
   });
 });
