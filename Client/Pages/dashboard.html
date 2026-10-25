@@ -53,9 +53,14 @@
 
         <div class="nav-actions">
           <!-- Theme Toggle Switcher -->
-          <button class="theme-toggle-btn" id="themeToggle" title="Toggle Light / Dark Theme" aria-label="Toggle Theme">🌙</button>
+          <button class="theme-toggle-btn" id="themeToggle" title="Toggle Light / Dark Theme" aria-label="Toggle Theme"><svg class="theme-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
 
-          <a href="create-card.html" class="btn-primary" id="btn-create-top">➕ Create Card</a>
+          <a href="create-card.html" class="btn-primary" id="btn-create-top" style="display: inline-flex; align-items: center; gap: 7px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            <span>Create Card</span>
+          </a>
 
           <!-- Logged-in Account Dropdown -->
           <div class="account-menu-container" ng-if="vm.isLoggedIn">
@@ -73,11 +78,26 @@
                 <div class="user-email">{{ vm.currentUser.email }}</div>
               </div>
               <div class="account-dropdown-divider"></div>
-              <a href="profile.html" class="account-dropdown-item">👤 My Profile</a>
-              <a href="dashboard.html" class="account-dropdown-item">📊 Dashboard</a>
-              <a href="saved-cards.html" class="account-dropdown-item">📇 Saved Cards</a>
-              <a href="scan.html" class="account-dropdown-item">📷 Scan &amp; Import</a>
-              <a href="create-card.html" class="account-dropdown-item">✨ Create Card</a>
+              <a href="profile.html" class="account-dropdown-item" style="display: flex; align-items: center; gap: 10px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+                <span>My Profile</span>
+              </a>
+              <a href="dashboard.html" class="account-dropdown-item" style="display: flex; align-items: center; gap: 10px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>Dashboard</span>
+              </a>
+              <a href="saved-cards.html" class="account-dropdown-item" style="display: flex; align-items: center; gap: 10px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                <span>Saved Cards</span>
+              </a>
+              <a href="scan.html" class="account-dropdown-item" style="display: flex; align-items: center; gap: 10px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+                <span>Scan &amp; Import</span>
+              </a>
+              <a href="create-card.html" class="account-dropdown-item" style="display: flex; align-items: center; gap: 10px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>Create Card</span>
+              </a>
               <div class="account-dropdown-divider"></div>
               <button class="account-dropdown-item btn-logout-item" ng-click="vm.logout()">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -128,8 +148,7 @@
 
               <!-- PLACEHOLDER STATE: logged in but no cards yet -->
               <div ng-if="vm.isLoggedIn && vm.heroCard.isPlaceholder" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; gap:12px; text-align:center; padding: 20px;">
-                <div style="font-size: 32px;">✨</div>
-                <div style="font-family:var(--font-serif); font-size:18px; font-weight:600; color:var(--plaster);">Welcome, {{ vm.heroCard.fullName || 'to Inoviq' }}!</div>
+                                <div style="font-family:var(--font-serif); font-size:18px; font-weight:600; color:var(--plaster);">Welcome, {{ vm.heroCard.fullName || 'to Inoviq' }}!</div>
                 <div style="font-family:var(--font-mono); font-size:11px; color:var(--ink-light); line-height:1.5;">You haven't created a card yet.<br>Build your first digital card now.</div>
                 <a href="create-card.html" class="btn-primary" style="margin-top:6px; font-size:12px; padding:8px 18px;">Create Your Card →</a>
               </div>
@@ -164,14 +183,14 @@
 
               <!-- Contact Details -->
               <div class="demo-contact-details">
-                <div ng-if="vm.heroCard.email">✉️ {{ vm.heroCard.email }}</div>
-                <div ng-if="vm.heroCard.phone">📞 {{ vm.heroCard.phone }}</div>
-                <div ng-if="vm.heroCard.website">🌐 {{ vm.heroCard.website }}</div>
+                <div ng-if="vm.heroCard.email" style="display: flex; align-items: center; justify-content: center; gap: 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg><span>{{ vm.heroCard.email }}</span></div>
+                <div ng-if="vm.heroCard.phone" style="display: flex; align-items: center; justify-content: center; gap: 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>{{ vm.heroCard.phone }}</span></div>
+                <div ng-if="vm.heroCard.website" style="display: flex; align-items: center; justify-content: center; gap: 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg><span>{{ vm.heroCard.website }}</span></div>
               </div>
 
               <button type="button" class="btn-primary btn-save-contact" ng-click="vm.onQrClick()"
                 style="padding: 5px 14px; font-size: 11px; border-radius: 6px; margin-top: 2px;">
-                💾 Save Contact
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:5px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg><span>Save Contact</span>
               </button>
 
               <small class="back-label" style="font-size: 9px; opacity: 0.8;">{{ vm.isLoggedIn ? 'SCAN OR CLICK TO SAVE CONTACT' : 'SCAN OR CLICK TO SAVE DEMO CONTACT' }}</small>
@@ -445,7 +464,7 @@
         <a ng-href="{{ vm.getLoginUrl() }}" class="btn-secondary btn-auth-modal">Log In</a>
       </div>
       <div class="auth-modal-foot">
-        <span>🔒 256-bit encrypted · Free forever</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>256-bit encrypted · Free forever</span></span>
       </div>
     </div>
   </div>
@@ -465,10 +484,10 @@
       function applyTheme(theme) {
         if (theme === 'dark') {
           document.documentElement.setAttribute('data-theme', 'dark');
-          if (themeBtn) themeBtn.textContent = '☀️';
+          if (themeBtn) themeBtn.innerHTML = '<svg class="theme-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="5" fill="#FFB800"/><line x1="12" y1="2" x2="12" y2="4.5" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/><line x1="12" y1="19.5" x2="12" y2="22" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/><line x1="2" y1="12" x2="4.5" y2="12" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/><line x1="19.5" y1="12" x2="22" y2="12" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/><line x1="4.93" y1="4.93" x2="6.7" y2="6.7" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/><line x1="17.3" y1="17.3" x2="19.07" y2="19.07" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/><line x1="4.93" y1="19.07" x2="6.7" y2="17.3" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/><line x1="17.3" y1="6.7" x2="19.07" y2="4.93" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/></svg>';
         } else {
           document.documentElement.removeAttribute('data-theme');
-          if (themeBtn) themeBtn.textContent = '🌙';
+          if (themeBtn) themeBtn.innerHTML = '<svg class="theme-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
         }
       }
       applyTheme(currentTheme);

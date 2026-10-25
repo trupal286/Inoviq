@@ -363,10 +363,20 @@
         </div>
 
         <div class="nav-actions">
-          <button class="theme-toggle-btn" id="themeToggle" title="Toggle Light / Dark Theme" aria-label="Toggle Theme">🌙</button>
-          <a href="create-card.html" class="btn-primary" id="btn-create-top">➕ Create Card</a>
+          <button class="theme-toggle-btn" id="themeToggle" title="Toggle Light / Dark Theme" aria-label="Toggle Theme"><svg class="theme-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+          <a href="create-card.html" class="btn-primary" id="btn-create-top" style="display: inline-flex; align-items: center; gap: 7px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            <span>Create Card</span>
+          </a>
 
-          <a href="scan.html" class="btn-ghost" style="font-size: 13px;">📷 Scan Card</a>
+          <a href="scan.html" class="btn-ghost" style="font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>
+            </svg>
+            <span>Scan Card</span>
+          </a>
         </div>
       </div>
     </header>
@@ -385,10 +395,10 @@
 
       <div style="display: flex; gap: 10px;">
         <a href="scan.html" class="btn-ghost" style="padding: 10px 18px; font-size: 13px;">
-          📷 Scan &amp; Import
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:5px;"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg><span>Scan &amp; Import</span>
         </a>
         <a href="create-card.html" class="btn-primary" style="padding: 10px 18px; font-size: 13px;">
-          ➕ Create New Card
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:5px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>Create New Card</span>
         </a>
       </div>
     </div>
@@ -425,13 +435,16 @@
         <button class="category-pill" ng-class="{'active': catalog.selectedCategory === 'Midnight Desk'}" ng-click="catalog.setCategory('Midnight Desk')">Midnight Desk</button>
         <button class="category-pill" ng-class="{'active': catalog.selectedCategory === 'Stamped'}" ng-click="catalog.setCategory('Stamped')">Stamped</button>
         <button class="category-pill" ng-class="{'active': catalog.selectedCategory === 'Brass Rule'}" ng-click="catalog.setCategory('Brass Rule')">Brass Rule</button>
-        <button class="category-pill" ng-class="{'active': catalog.selectedCategory === 'Scanned'}" ng-click="catalog.setCategory('Scanned')">📷 Scanned</button>
+        <button class="category-pill" ng-class="{'active': catalog.selectedCategory === 'Scanned'}" ng-click="catalog.setCategory('Scanned')" style="display:inline-flex;align-items:center;gap:5px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+          <span>Scanned</span>
+        </button>
       </div>
 
       <!-- View Controls -->
       <div class="view-controls">
         <button class="view-btn" ng-class="{'active': catalog.viewMode === 'grid'}" ng-click="catalog.viewMode = 'grid'" title="Grid View">⊞ Grid</button>
-        <button class="view-btn" ng-class="{'active': catalog.viewMode === 'list'}" ng-click="catalog.viewMode = 'list'" title="List View">☰ List</button>
+        <button class="view-btn" ng-class="{'active': catalog.viewMode === 'list'}" ng-click="catalog.viewMode = 'list'" title="List View"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:4px;"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg><span>List</span></button>
       </div>
     </div>
 
@@ -452,31 +465,29 @@
           <div class="saved-card-role">{{ card.jobTitle }} &middot; {{ card.company }}</div>
 
           <div class="saved-card-contacts">
-            <div ng-if="card.email">✉️ {{ card.email }}</div>
-            <div ng-if="card.phone">📞 {{ card.phone }}</div>
-            <div ng-if="card.website">🌐 {{ card.website }}</div>
+            <div ng-if="card.email" style="display:flex;align-items:center;gap:5px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg><span>{{ card.email }}</span></div>
+            <div ng-if="card.phone" style="display:flex;align-items:center;gap:5px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>{{ card.phone }}</span></div>
+            <div ng-if="card.website" style="display:flex;align-items:center;gap:5px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg><span>{{ card.website }}</span></div>
           </div>
         </div>
 
         <div class="saved-card-actions">
           <button class="btn-card-action" ng-click="catalog.openInspectModal(card)" title="3D Card Preview">
-            👁️ Inspect 3D
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:4px;"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg><span>Inspect 3D</span>
           </button>
           <button class="btn-card-action" ng-click="catalog.downloadVCard(card)" title="Export vCard">
-            📇 .VCF
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:4px;"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>.VCF</span>
           </button>
           <a ng-href="create-card.html?id={{ card._id || card.id }}" class="btn-card-action" title="Edit Card">
-            ✏️ Edit
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:4px;"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg><span>Edit</span>
           </a>
-          <button class="btn-card-action btn-del-action" ng-click="catalog.deleteCard(card)" title="Delete Card">
-            🗑️
-          </button>
+          <button class="btn-card-action btn-del-action" ng-click="catalog.deleteCard(card)" title="Delete Card"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>
         </div>
       </div>
 
       <!-- Empty state for logged-in users with no real cards yet -->
       <div ng-if="catalog.isLoggedIn && catalog.cards.length === 0" style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: var(--ink-muted);">
-        <div style="font-size: 40px; margin-bottom: 12px;">📭</div>
+        <div style="display:flex;justify-content:center;margin-bottom:12px;opacity:0.6;"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/><line x1="2" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="22" y2="16"/></svg></div>
         <div style="font-family: var(--font-serif); font-size: 20px; font-weight: 600; color: var(--ink-primary); margin-bottom: 8px;">Your vault is empty</div>
         <div style="font-family: var(--font-mono); font-size: 12px; line-height: 1.6;">Create your first digital visiting card or scan a physical card to get started.</div>
       </div>
@@ -484,20 +495,20 @@
       <!-- Guest notice: clarify these are demo cards -->
       <div ng-if="!catalog.isLoggedIn" style="grid-column: 1 / -1; text-align: center; padding: 4px 0 12px;">
         <span style="font-family: var(--font-mono); font-size: 11px; color: var(--ink-muted); background: var(--paper-card); border: 1px solid var(--border-line); border-radius: 20px; padding: 4px 14px;">
-          📌 These are sample cards — <a href="login.html" style="color: var(--moss);">sign in</a> to see your real catalog
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:5px;"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.89A2 2 0 0 1 15 10.77V6a3 3 0 0 0-6 0v4.77a2 2 0 0 1-1.11 1.79l-1.78.89A2 2 0 0 0 5 15.24Z"/></svg>These are sample cards — <a href="login.html" style="color: var(--moss);">sign in</a> to see your real catalog
         </span>
       </div>
 
       <!-- Add New Card Action Box -->
       <a href="create-card.html" class="add-card-placeholder">
-        <div style="font-size: 32px; margin-bottom: 8px;">➕</div>
+        <div style="display:flex;justify-content:center;margin-bottom:8px;opacity:0.8;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
         <div style="font-weight: 600; font-size: 15px;">Create New Visiting Card</div>
         <div style="font-size: 12px; margin-top: 4px;">Custom layout, 3D physics &amp; QR</div>
       </a>
 
       <!-- Scan & Import Action Box -->
       <a href="scan.html" class="add-card-placeholder">
-        <div style="font-size: 32px; margin-bottom: 8px;">📷</div>
+        <div style="display:flex;justify-content:center;margin-bottom:8px;opacity:0.8;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></div>
         <div style="font-weight: 600; font-size: 15px;">Scan &amp; Import Physical Card</div>
         <div style="font-size: 12px; margin-top: 4px;">Camera OCR &amp; QR decoder</div>
       </a>
@@ -514,8 +525,8 @@
         </div>
         <div class="row-badge">{{ card.templateLabel || 'Ledger' }}</div>
         <div class="row-actions">
-          <button class="btn-icon" ng-click="catalog.openInspectModal(card)" title="Inspect 3D Card">👁️</button>
-          <button class="btn-icon" ng-click="catalog.downloadVCard(card)" title="Download vCard">📇</button>
+          <button class="btn-icon" ng-click="catalog.openInspectModal(card)" title="Inspect 3D Card"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          <button class="btn-icon" ng-click="catalog.downloadVCard(card)" title="Download vCard"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></button>
           <button class="btn-icon btn-del" ng-click="catalog.deleteCard(card)" title="Delete Card">&#10005;</button>
         </div>
       </div>
@@ -561,8 +572,8 @@
               <div style="font-family: var(--font-mono); font-size: 11px; color: var(--baby-blue); text-transform: uppercase;">{{ catalog.selectedCard.jobTitle }} &middot; {{ catalog.selectedCard.company }}</div>
             </div>
             <div style="font-family: var(--font-mono); font-size: 10px; opacity: 0.85;">
-              <div>✉️ {{ catalog.selectedCard.email }}</div>
-              <div>📞 {{ catalog.selectedCard.phone }}</div>
+              <div style="display:flex;align-items:center;gap:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg><span>{{ catalog.selectedCard.email }}</span></div>
+              <div style="display:flex;align-items:center;gap:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>{{ catalog.selectedCard.phone }}</span></div>
             </div>
           </div>
 
@@ -585,10 +596,10 @@
       <!-- Action Buttons in Modal -->
       <div style="display: flex; gap: 10px;">
         <button class="btn-primary" style="flex: 1; padding: 10px;" ng-click="catalog.downloadVCard(catalog.selectedCard)">
-          📇 Export vCard (.VCF)
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:5px;"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Export vCard (.VCF)</span>
         </button>
         <button class="btn-ghost" style="padding: 10px 16px;" ng-click="catalog.copyShareLink(catalog.selectedCard)">
-          🔗 Copy Link
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:5px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span>Copy Link</span>
         </button>
       </div>
 
@@ -605,10 +616,10 @@
       function applyTheme(theme) {
         if (theme === 'dark') {
           document.documentElement.setAttribute('data-theme', 'dark');
-          if (themeBtn) themeBtn.textContent = '☀️';
+          if (themeBtn) themeBtn.innerHTML = '<svg class="theme-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="5" fill="#FFB800"/><line x1="12" y1="2" x2="12" y2="4.5" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/><line x1="12" y1="19.5" x2="12" y2="22" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/><line x1="2" y1="12" x2="4.5" y2="12" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/><line x1="19.5" y1="12" x2="22" y2="12" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/><line x1="4.93" y1="4.93" x2="6.7" y2="6.7" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/><line x1="17.3" y1="17.3" x2="19.07" y2="19.07" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/><line x1="4.93" y1="19.07" x2="6.7" y2="17.3" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/><line x1="17.3" y1="6.7" x2="19.07" y2="4.93" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/></svg>';
         } else {
           document.documentElement.removeAttribute('data-theme');
-          if (themeBtn) themeBtn.textContent = '🌙';
+          if (themeBtn) themeBtn.innerHTML = '<svg class="theme-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
         }
       }
       applyTheme(currentTheme);

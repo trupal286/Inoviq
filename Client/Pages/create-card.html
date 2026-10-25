@@ -626,7 +626,29 @@
                 id="btn-theme-toggle"
                 style={{ fontFamily: "'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif", fontSize: '13.5px', fontWeight: 500, letterSpacing: '-0.01em' }}
               >
-                {theme === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode'}
+                {theme === 'light' ? (
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                    </svg>
+                    Dark Mode
+                  </span>
+                ) : (
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="12" r="5" fill="#FFB800"/>
+                      <line x1="12" y1="2" x2="12" y2="4.5" stroke="#FFB800" strokeWidth="2.4" strokeLinecap="round"/>
+                      <line x1="12" y1="19.5" x2="12" y2="22" stroke="#FFB800" strokeWidth="2.4" strokeLinecap="round"/>
+                      <line x1="2" y1="12" x2="4.5" y2="12" stroke="#FFB800" strokeWidth="2.4" strokeLinecap="round"/>
+                      <line x1="19.5" y1="12" x2="22" y2="12" stroke="#FFB800" strokeWidth="2.4" strokeLinecap="round"/>
+                      <line x1="4.93" y1="4.93" x2="6.7" y2="6.7" stroke="#FFB800" strokeWidth="2.4" strokeLinecap="round"/>
+                      <line x1="17.3" y1="17.3" x2="19.07" y2="19.07" stroke="#FFB800" strokeWidth="2.4" strokeLinecap="round"/>
+                      <line x1="4.93" y1="19.07" x2="6.7" y2="17.3" stroke="#FFB800" strokeWidth="2.4" strokeLinecap="round"/>
+                      <line x1="17.3" y1="6.7" x2="19.07" y2="4.93" stroke="#FFB800" strokeWidth="2.4" strokeLinecap="round"/>
+                    </svg>
+                    Light Mode
+                  </span>
+                )}
               </button>
 
               <button
@@ -1027,7 +1049,10 @@
                   
                   {/* Image Upload */}
                   <div className="inspector-module-card">
-                    <div className="module-title">🖼️ Custom Photo / Logo</div>
+                    <div className="module-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                        <span>Custom Photo / Logo</span>
+                      </div>
                     <div className="upload-action-row" style={{ marginTop: '10px' }}>
                       <button type="button" className="btn-upload-file" onClick={() => fileInputRef.current.click()}>
                         {uploadedImage ? 'Replace Image' : 'Upload Photo / Logo'}
@@ -1100,7 +1125,10 @@
 
                   {/* QR Code Module */}
                   <div className="inspector-module-card" style={{ marginTop: '16px' }}>
-                    <div className="module-title">🏁 Dynamic QR Code Engine</div>
+                    <div className="module-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
+                        <span>Dynamic QR Code Engine</span>
+                      </div>
 
                     <div className="form-field-group" style={{ marginTop: '10px' }}>
                       <label className="form-label">QR Encode Data</label>
@@ -1143,7 +1171,7 @@
 
                   <div className="templates-list-stack">
                     <div className={`template-choice-card ${cardFormat === 'business' ? 'active' : ''}`} onClick={() => applyFormat('business')}>
-                      <div className="template-icon">💼</div>
+                      <div className="template-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="7" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
                       <div className="template-info">
                         <span className="template-title">Executive Business Card</span>
                         <span className="template-ratio">Landscape 3.5 : 2 (560 × 320)</span>
@@ -1152,7 +1180,7 @@
                     </div>
 
                     <div className={`template-choice-card ${cardFormat === 'event' ? 'active' : ''}`} onClick={() => applyFormat('event')}>
-                      <div className="template-icon">🎫</div>
+                      <div className="template-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg></div>
                       <div className="template-info">
                         <span className="template-title">Conference &amp; VIP Event Pass</span>
                         <span className="template-ratio">Portrait 2 : 3 (340 × 510)</span>
@@ -1161,7 +1189,7 @@
                     </div>
 
                     <div className={`template-choice-card ${cardFormat === 'social' ? 'active' : ''}`} onClick={() => applyFormat('social')}>
-                      <div className="template-icon">📱</div>
+                      <div className="template-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
                       <div className="template-info">
                         <span className="template-title">Social Media Feed Showcase</span>
                         <span className="template-ratio">Square 1 : 1 (420 × 420)</span>
@@ -1170,7 +1198,7 @@
                     </div>
 
                     <div className={`template-choice-card ${cardFormat === 'mobile' ? 'active' : ''}`} onClick={() => applyFormat('mobile')}>
-                      <div className="template-icon">🔗</div>
+                      <div className="template-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
                       <div className="template-info">
                         <span className="template-title">Mobile Screen Bio Pass</span>
                         <span className="template-ratio">Tall 9 : 16 (320 × 570)</span>
@@ -1179,7 +1207,7 @@
                     </div>
 
                     <div className={`template-choice-card ${cardFormat === 'editorial' ? 'active' : ''}`} onClick={() => applyFormat('editorial')}>
-                      <div className="template-icon">📜</div>
+                      <div className="template-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg></div>
                       <div className="template-info">
                         <span className="template-title">Tactile Editorial Plaster</span>
                         <span className="template-ratio">Inoviq Signature Theme</span>

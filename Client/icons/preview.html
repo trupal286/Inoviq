@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Theme Icons Preview</title>
+  <style>
+    body {
+      background: #111318;
+      color: #fff;
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      gap: 32px;
+      padding: 50px;
+      align-items: center;
+      justify-content: center;
+    }
+    .preview-card {
+      background: #1a1d24;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 28px 36px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .preview-card.light {
+      background: #ffffff;
+      color: #111827;
+      border-color: #e5e7eb;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+    .toggle-demo-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.06);
+      color: inherit;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 16px 0;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .preview-card.light .toggle-demo-btn {
+      background: #f3f4f6;
+      border-color: #e5e7eb;
+    }
+    .toggle-demo-btn:hover {
+      transform: scale(1.1) rotate(12deg);
+    }
+    h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    p {
+      margin: 8px 0 0;
+      font-size: 13px;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <div class="preview-card">
+    <h3>Sun Icon (Dark Mode View)</h3>
+    <div class="toggle-demo-btn">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="5" fill="#FFB800"/>
+        <line x1="12" y1="2" x2="12" y2="4.5" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/>
+        <line x1="12" y1="19.5" x2="12" y2="22" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/>
+        <line x1="2" y1="12" x2="4.5" y2="12" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/>
+        <line x1="19.5" y1="12" x2="22" y2="12" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/>
+        <line x1="4.93" y1="4.93" x2="6.7" y2="6.7" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/>
+        <line x1="17.3" y1="17.3" x2="19.07" y2="19.07" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/>
+        <line x1="4.93" y1="19.07" x2="6.7" y2="17.3" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/>
+        <line x1="17.3" y1="6.7" x2="19.07" y2="4.93" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <p>Displays in Dark theme to switch to Light</p>
+  </div>
+
+  <div class="preview-card light">
+    <h3>Moon Icon (Light Mode View)</h3>
+    <div class="toggle-demo-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="#111827">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </div>
+    <p>Complete solid crescent in Light theme</p>
+  </div>
+</body>
+</html>
