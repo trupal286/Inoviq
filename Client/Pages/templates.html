@@ -16,8 +16,8 @@
     rel="stylesheet">
 
   <!-- Core Inoviq Stylesheets -->
-  <link rel="stylesheet" href="../Style/style.css?v=5.0">
-  <link rel="stylesheet" href="../Style/studio.css?v=5.0">
+  <link rel="stylesheet" href="../Style/style.css?v=5.3">
+  <link rel="stylesheet" href="../Style/studio.css?v=5.3">
   <link rel="stylesheet" href="../Style/auth-modal.css?v=1.0">
 
   <!-- Apply saved theme before paint to prevent flash -->
@@ -216,6 +216,75 @@
       position: relative;
       overflow: hidden;
       border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    @media (max-width: 768px) {
+      .templates-shell {
+        padding: 12px 14px 60px !important;
+        gap: 16px !important;
+      }
+
+      .templates-banner h1 {
+        font-size: 24px !important;
+        line-height: 1.25 !important;
+      }
+
+      .templates-banner p {
+        font-size: 13px !important;
+        line-height: 1.45 !important;
+      }
+
+      .templates-stage-layout {
+        padding: 14px 12px !important;
+        gap: 16px !important;
+        border-radius: 14px !important;
+      }
+
+      .stage-viewport {
+        min-height: 220px !important;
+        padding: 10px !important;
+        border-radius: 12px !important;
+      }
+
+      .stage-card-3d {
+        max-width: 320px !important;
+        height: 185px !important;
+        border-radius: 14px !important;
+      }
+
+      .stage-card-face {
+        padding: 16px 16px !important;
+        border-radius: 14px !important;
+      }
+
+      .card-spec-panel {
+        gap: 14px !important;
+      }
+
+      .card-spec-panel h2 {
+        font-size: 22px !important;
+      }
+
+      .card-spec-panel p {
+        font-size: 12.5px !important;
+        line-height: 1.45 !important;
+      }
+
+      .gallery-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+      }
+
+      .gallery-item-card {
+        padding: 12px !important;
+        gap: 10px !important;
+        border-radius: 12px !important;
+      }
+
+      .gallery-card-thumb {
+        height: 120px !important;
+        padding: 12px !important;
+      }
     }
   </style>
 </head>

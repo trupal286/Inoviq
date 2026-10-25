@@ -14,7 +14,7 @@
     href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
     rel="stylesheet">
 
-  <link rel="stylesheet" href="../Style/style.css?v=5.0">
+  <link rel="stylesheet" href="../Style/style.css?v=5.3">
 
   <!-- Apply saved theme before paint -->
   <script>
@@ -53,6 +53,46 @@
 
   <style>
     /* Scan & Import Page Custom Styling */
+    .page-hero-banner {
+      margin-top: 24px;
+    }
+    .page-hero-title {
+      font-family: var(--font-serif);
+      font-size: 30px;
+      font-weight: 600;
+      line-height: 1.2;
+      color: var(--ink-heading);
+    }
+    .page-hero-desc {
+      font-size: 14.5px;
+      color: var(--ink-muted);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+    .tab-label-compact {
+      display: none;
+    }
+    @media (max-width: 600px) {
+      .page-hero-banner {
+        margin-top: 10px !important;
+      }
+      .page-hero-title {
+        font-size: 22px !important;
+        line-height: 1.25 !important;
+      }
+      .page-hero-desc {
+        font-size: 12.5px !important;
+        margin-top: 4px !important;
+        line-height: 1.45 !important;
+      }
+      .tab-label-full {
+        display: none !important;
+      }
+      .tab-label-compact {
+        display: inline !important;
+      }
+    }
+
     .scan-workspace {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -477,12 +517,12 @@
   <div class="wrap">
 
     <!-- ===== HEADER BANNER ===== -->
-    <section style="margin-top: 28px;">
+    <section class="page-hero-banner">
       <div class="eyebrow">DIGITAL INGESTION ENGINE</div>
-      <h1 style="font-family: var(--font-serif); font-size: 32px; font-weight: 600; line-height: 1.2;">
+      <h1 class="page-hero-title">
         Scan QR or Visiting Card &amp; Import Instantly
       </h1>
-      <p style="font-size: 15px; color: var(--ink-muted); margin-top: 6px;">
+      <p class="page-hero-desc">
         Point your camera at a QR code, upload a business card photo, or drop a vCard file to capture contact data into your Inoviq catalog.
       </p>
     </section>
@@ -500,7 +540,8 @@
               <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
               <circle cx="12" cy="13" r="3"/>
             </svg>
-            <span>Camera Scanner</span>
+            <span class="tab-label-full">Camera Scanner</span>
+            <span class="tab-label-compact">Camera</span>
           </button>
           <button type="button" class="scan-tab-btn" ng-class="{'active': scan.activeTab === 'upload'}" ng-click="scan.setTab('upload')">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -508,7 +549,8 @@
               <circle cx="9" cy="9" r="2"/>
               <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
             </svg>
-            <span>Upload Card / Image</span>
+            <span class="tab-label-full">Upload Card / Image</span>
+            <span class="tab-label-compact">Upload Image</span>
           </button>
           <button type="button" class="scan-tab-btn" ng-class="{'active': scan.activeTab === 'vcard'}" ng-click="scan.setTab('vcard')">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -517,7 +559,8 @@
               <line x1="7" y1="15" x2="7.01" y2="15"/>
               <line x1="11" y1="15" x2="13" y2="15"/>
             </svg>
-            <span>vCard / Text Paste</span>
+            <span class="tab-label-full">vCard / Text Paste</span>
+            <span class="tab-label-compact">vCard / Text</span>
           </button>
         </div>
 

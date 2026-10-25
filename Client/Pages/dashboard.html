@@ -13,7 +13,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="../Style/style.css?v=5.0">
+  <link rel="stylesheet" href="../Style/style.css?v=5.3">
   <link rel="stylesheet" href="../Style/auth-modal.css?v=1.0">
   
   <!-- Apply saved theme before paint to prevent flash -->
@@ -129,7 +129,7 @@
     <section class="hero" id="hero">
       <div class="hero-copy">
         <div class="eyebrow">PUBLIC DEMO PREVIEW · DIGITAL CARDS IN ACTION</div>
-        <h1>Hand someone<br>your card, <em>without</em><br>the paper.</h1>
+        <h1>Hand someone <br>your card, <em>without</em> <br>the paper.</h1>
         <p class="sub">Build a card, generate its QR, and swap details the moment you meet someone — every detail filed
           straight into their contacts.</p>
         <div class="cta-row">
@@ -203,7 +203,7 @@
             </div>
           </div>
 
-          <div class="card-hint">hover to flip</div>
+          <div class="card-hint"><span class="desktop-only">hover to flip</span><span class="mobile-only">tap to flip</span></div>
           <button class="btn-shuffle" id="btn-shuffle" ng-click="vm.shuffleHeroCard()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
               <polyline points="16 3 21 3 21 8" />
