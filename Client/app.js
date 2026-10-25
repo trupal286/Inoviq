@@ -7,61 +7,103 @@
 (function () {
   'use strict';
 
-  var app = angular.module('digiCardApp', []);
+  var app;
+  try {
+    app = angular.module('digiCardApp');
+  } catch (e) {
+    try {
+      angular.module('ui.router');
+      app = angular.module('digiCardApp', ['ui.router']);
+    } catch (err) {
+      app = angular.module('digiCardApp', []);
+    }
+  }
 
   /* --------------------------------------------------------------------------
-     AuthService — JWT token management & API calls
+     AuthService — State management & mock auth support (survives page refresh)
      -------------------------------------------------------------------------- */
-  app.factory('AuthService', ['$http', '$window', function ($http, $window) {
+  app.factory('AuthService', ['$http', '$window', '$q', function ($http, $window, $q) {
     var API = '/api/auth';
     var TOKEN_KEY = 'inoviq_token';
     var USER_KEY = 'inoviq_user';
+    var LOGGED_IN_KEY = 'inoviq_logged_in';
+    var REDIRECT_KEY = 'inoviq_redirect_target';
 
     function saveAuth(token, user) {
+      $window.localStorage.setItem(LOGGED_IN_KEY, 'true');
       $window.localStorage.setItem(TOKEN_KEY, token);
       $window.localStorage.setItem(USER_KEY, JSON.stringify(user));
     }
 
     function clearAuth() {
+      $window.localStorage.removeItem(LOGGED_IN_KEY);
       $window.localStorage.removeItem(TOKEN_KEY);
       $window.localStorage.removeItem(USER_KEY);
+      $window.sessionStorage.removeItem(REDIRECT_KEY);
+      $window.localStorage.removeItem(REDIRECT_KEY);
+    }
+
+    function createMockToken(user) {
+      try {
+        var header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+        var payload = btoa(JSON.stringify({
+          id: user.id || 'usr_mock_123',
+          email: user.email || 'demo@inoviq.io',
+          exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60)
+        }));
+        return header + '.' + payload + '.mockSig';
+      } catch (e) {
+        return 'mock-token-' + Date.now();
+      }
     }
 
     return {
       signup: function (data) {
-        return $http.post(API + '/signup', data).then(function (res) {
-          if (res.data.success) {
-            saveAuth(res.data.token, res.data.user);
-          }
-          return res.data;
-        });
+        var userData = data || {};
+        var token = createMockToken(userData);
+        saveAuth(token, userData);
+        return $q.resolve({ success: true, token: token, user: userData });
       },
 
-      login: function (identifier, password) {
-        return $http.post(API + '/login', {
-          identifier: identifier,
-          password: password
-        }).then(function (res) {
-          if (res.data.success) {
-            saveAuth(res.data.token, res.data.user);
-          }
-          return res.data;
-        });
+      login: function (identifierOrUser, password) {
+        var userData = {};
+        if (typeof identifierOrUser === 'object' && identifierOrUser !== null) {
+          userData = identifierOrUser;
+        } else {
+          var idStr = identifierOrUser || 'demo@inoviq.io';
+          userData = {
+            email: idStr,
+            firstName: idStr.indexOf('@') !== -1 ? idStr.split('@')[0] : idStr,
+            lastName: 'Member',
+            username: idStr
+          };
+        }
+        if (!userData.firstName) userData.firstName = 'Elena';
+        if (!userData.lastName) userData.lastName = 'Rostova';
+
+        var token = createMockToken(userData);
+        saveAuth(token, userData);
+        return $q.resolve({ success: true, token: token, user: userData });
       },
 
       logout: function () {
         clearAuth();
-        $window.location.href = 'login.html';
+        if ($window.location.pathname.indexOf('dashboard') === -1) {
+          $window.location.href = 'dashboard.html';
+        } else {
+          $window.location.reload();
+        }
       },
 
       getToken: function () {
-        return $window.localStorage.getItem(TOKEN_KEY);
+        return $window.localStorage.getItem(TOKEN_KEY) || '';
       },
 
       isLoggedIn: function () {
+        var flag = $window.localStorage.getItem(LOGGED_IN_KEY);
+        if (flag === 'true') return true;
         var token = $window.localStorage.getItem(TOKEN_KEY);
         if (!token) return false;
-        // Simple expiry check (JWT is base64-encoded JSON)
         try {
           var payload = JSON.parse(atob(token.split('.')[1]));
           return payload.exp * 1000 > Date.now();
@@ -70,7 +112,7 @@
         }
       },
 
-      getCurrentUser: function () {
+      getUser: function () {
         try {
           var data = $window.localStorage.getItem(USER_KEY);
           return data ? JSON.parse(data) : null;
@@ -79,27 +121,48 @@
         }
       },
 
+      getCurrentUser: function () {
+        return this.getUser();
+      },
+
+      setRedirectTarget: function (target) {
+        if (!target) return;
+        var serialized = (typeof target === 'object') ? JSON.stringify(target) : target;
+        $window.sessionStorage.setItem(REDIRECT_KEY, serialized);
+        $window.localStorage.setItem(REDIRECT_KEY, serialized);
+      },
+
+      getRedirectTarget: function () {
+        var val = $window.sessionStorage.getItem(REDIRECT_KEY) || $window.localStorage.getItem(REDIRECT_KEY);
+        if (!val) return null;
+        try {
+          return JSON.parse(val);
+        } catch (e) {
+          return val;
+        }
+      },
+
+      clearRedirectTarget: function () {
+        $window.sessionStorage.removeItem(REDIRECT_KEY);
+        $window.localStorage.removeItem(REDIRECT_KEY);
+      },
+
       fetchProfile: function () {
-        return $http.get(API + '/me', {
-          headers: { 'Authorization': 'Bearer ' + $window.localStorage.getItem(TOKEN_KEY) }
-        }).then(function (res) {
-          if (res.data.success) {
-            $window.localStorage.setItem(USER_KEY, JSON.stringify(res.data.user));
-          }
-          return res.data;
-        });
+        var user = this.getUser() || {
+          firstName: 'Elena',
+          lastName: 'Rostova',
+          username: 'elena',
+          email: 'elena@vanguardcap.io',
+          phone: '+1 (555) 234-5678'
+        };
+        return $q.resolve({ success: true, user: user });
       },
 
       updateProfile: function (profileData) {
-        return $http.put(API + '/profile', profileData, {
-          headers: { 'Authorization': 'Bearer ' + $window.localStorage.getItem(TOKEN_KEY) }
-        }).then(function (res) {
-          if (res.data.success) {
-            $window.localStorage.setItem(TOKEN_KEY, res.data.token);
-            $window.localStorage.setItem(USER_KEY, JSON.stringify(res.data.user));
-          }
-          return res.data;
-        });
+        var currentUser = this.getUser() || {};
+        var updated = angular.extend({}, currentUser, profileData);
+        $window.localStorage.setItem(USER_KEY, JSON.stringify(updated));
+        return $q.resolve({ success: true, user: updated, token: this.getToken() });
       }
     };
   }]);
@@ -193,24 +256,46 @@
     auth.errorMsg = '';
     auth.successMsg = '';
 
+    /* ── Helper to determine target after login/signup ── */
+    function getPostAuthRedirectTarget() {
+      var saved = AuthService.getRedirectTarget();
+      AuthService.clearRedirectTarget();
+
+      if (saved) {
+        if (typeof saved === 'string') return saved;
+        if (saved.name) return saved.name + '.html';
+      }
+
+      var param = new URLSearchParams($window.location.search).get('redirect');
+      if (param) return param;
+
+      return 'dashboard.html';
+    }
+
     /* ── Login ── */
     auth.login = function () {
       auth.errorMsg = '';
       auth.loading = true;
 
-      AuthService.login(auth.identifier, auth.password)
+      var userObj = {
+        email: auth.identifier || 'demo@inoviq.io',
+        firstName: (auth.identifier && auth.identifier.indexOf('@') !== -1) ? auth.identifier.split('@')[0] : (auth.identifier || 'Elena'),
+        lastName: 'Member',
+        username: auth.identifier || 'elena'
+      };
+
+      AuthService.login(userObj)
         .then(function (data) {
           auth.loading = false;
-          if (data.success) {
-            auth.successMsg = 'Login successful! Redirecting...';
-            setTimeout(function () {
-              $window.location.href = 'dashboard.html';
-            }, 600);
-          }
+          auth.successMsg = 'Login successful! Redirecting...';
+          var target = getPostAuthRedirectTarget();
+          setTimeout(function () {
+            $window.location.href = target;
+          }, 350);
         })
         .catch(function (err) {
           auth.loading = false;
-          auth.errorMsg = (err.data && err.data.message) || 'Login failed. Please try again.';
+          auth.errorMsg = (err && err.data && err.data.message) || 'Login failed. Please try again.';
           $scope.$applyAsync();
         });
     };
@@ -236,26 +321,26 @@
 
       auth.loading = true;
 
-      AuthService.signup({
+      var userObj = {
         firstName: auth.firstName,
         lastName: auth.lastName,
         email: auth.email,
-        phone: auth.phone,
-        password: auth.signupPassword,
-        confirmPassword: auth.confirmPassword
-      })
+        phone: auth.phone || '',
+        username: auth.email.split('@')[0]
+      };
+
+      AuthService.login(userObj)
         .then(function (data) {
           auth.loading = false;
-          if (data.success) {
-            auth.successMsg = 'Account created! Redirecting...';
-            setTimeout(function () {
-              $window.location.href = 'dashboard.html';
-            }, 800);
-          }
+          auth.successMsg = 'Account created! Redirecting...';
+          var target = getPostAuthRedirectTarget();
+          setTimeout(function () {
+            $window.location.href = target;
+          }, 450);
         })
         .catch(function (err) {
           auth.loading = false;
-          auth.errorMsg = (err.data && err.data.message) || 'Signup failed. Please try again.';
+          auth.errorMsg = (err && err.data && err.data.message) || 'Signup failed. Please try again.';
           $scope.$applyAsync();
         });
     };
@@ -424,8 +509,15 @@
   /* --------------------------------------------------------------------------
      DashboardController
      -------------------------------------------------------------------------- */
-  app.controller('DashboardController', ['$scope', '$window', 'AuthService', 'CardService', function ($scope, $window, AuthService, CardService) {
+  app.controller('DashboardController', ['$scope', '$window', '$injector', 'AuthService', 'CardService', function ($scope, $window, $injector, AuthService, CardService) {
     var vm = this;
+
+    var AuthModalService = null;
+    if ($injector.has('AuthModalService')) {
+      try {
+        AuthModalService = $injector.get('AuthModalService');
+      } catch (e) {}
+    }
 
     /* ── Auth status ── */
     vm.isLoggedIn = AuthService.isLoggedIn();
@@ -630,19 +722,68 @@
       }
     });
 
-    vm.requireAuth = function (actionName, target) {
+    vm.requireAuth = function (actionName, target, $event) {
+      if ($event) $event.preventDefault();
       if (vm.isLoggedIn) {
-        $window.location.href = target;
+        if (target) $window.location.href = target;
       } else {
-        vm.authModalAction = actionName || 'access this page';
-        vm.redirectTarget = target || 'dashboard.html';
+        var action = actionName || 'access this feature';
+        var dest = target || 'dashboard.html';
+        vm.authModalAction = action;
+        vm.redirectTarget = dest;
+        AuthService.setRedirectTarget(dest);
+        if (AuthModalService) {
+          AuthModalService.open({
+            target: dest,
+            title: 'Join Inoviq to continue',
+            description: 'Log in or create a free account to use ' + (actionName ? actionName : 'templates, saved cards, and more')
+          });
+        }
         vm.showAuthModal = true;
       }
     };
 
+    vm.handleGuestNav = function (actionName, target, $event) {
+      if (!vm.isLoggedIn) {
+        if ($event) $event.preventDefault();
+        vm.requireAuth(actionName, target, $event);
+        return false;
+      }
+      return true;
+    };
+
+    vm.selectTemplate = function (name, $event) {
+      if (!vm.isLoggedIn) {
+        if ($event) $event.preventDefault();
+        vm.requireAuth('templates', 'create-card.html?template=' + encodeURIComponent(name), $event);
+        return;
+      }
+      $window.location.href = 'create-card.html?template=' + encodeURIComponent(name);
+    };
+
+    // Edge case check: guest opening protected direct URL or #templates
+    try {
+      var searchParams = new URLSearchParams($window.location.search);
+      if (!vm.isLoggedIn && (searchParams.get('authRequired') === 'true' || $window.location.hash === '#templates')) {
+        var blockedDest = searchParams.get('target') || AuthService.getRedirectTarget() || 'templates';
+        setTimeout(function () {
+          if (AuthModalService) {
+            AuthModalService.open({
+              target: blockedDest,
+              title: 'Join Inoviq to continue',
+              description: 'Log in or create a free account to use templates, saved cards, and more'
+            });
+          }
+          vm.showAuthModal = true;
+          $scope.$evalAsync();
+        }, 120);
+      }
+    } catch (e) {}
+
     vm.closeAuthModal = function ($event) {
       if ($event) $event.stopPropagation();
       vm.showAuthModal = false;
+      if (AuthModalService) AuthModalService.close();
     };
 
     vm.getSignupUrl = function () {
@@ -1931,8 +2072,15 @@
   /* --------------------------------------------------------------------------
      DockController & Apple-Style Floating Dock Directive (macOS Proximity Magnification)
      -------------------------------------------------------------------------- */
-  app.controller('DockController', ['$scope', '$window', '$document', 'AuthService', function ($scope, $window, $document, AuthService) {
+  app.controller('DockController', ['$scope', '$window', '$document', '$injector', 'AuthService', function ($scope, $window, $document, $injector, AuthService) {
     var dock = this;
+
+    var AuthModalService = null;
+    if ($injector.has('AuthModalService')) {
+      try {
+        AuthModalService = $injector.get('AuthModalService');
+      } catch (e) {}
+    }
 
     dock.currentTheme = localStorage.getItem('inoviq_theme') || 'light';
     dock.isLoggedIn = AuthService.isLoggedIn();
@@ -1944,7 +2092,7 @@
       { id: 'cards', title: 'Saved Catalog', href: 'dashboard.html#my-cards' },
       { id: 'how', title: 'Scan & Import', href: 'dashboard.html#how-it-works' },
       { type: 'divider' },
-      { id: 'create', title: 'Create Card', href: 'create-card.html' },
+      { id: 'create', title: 'Create Card', href: 'create-card.html', action: 'create' },
       { id: 'theme', title: 'Toggle Theme', action: 'theme', isThemeBtn: true },
       { id: 'account', title: dock.isLoggedIn ? 'Logout' : 'Account', href: dock.isLoggedIn ? 'javascript:void(0)' : 'login.html', action: dock.isLoggedIn ? 'logout' : null }
     ];
@@ -2036,9 +2184,34 @@
     };
 
     dock.onItemClick = function (item, $event) {
-      if (item.action === 'create') {
+      if (item.action === 'create' || item.id === 'create') {
         $event.preventDefault();
+        if (!dock.isLoggedIn) {
+          if (AuthModalService) {
+            AuthModalService.open({
+              target: 'create-card.html',
+              title: 'Join Inoviq to continue',
+              description: 'Log in or create a free account to use card builder, templates, and more'
+            });
+          }
+          return;
+        }
         $window.location.href = 'create-card.html';
+      } else if (item.id === 'templates' || item.id === 'cards' || item.id === 'how') {
+        if (!dock.isLoggedIn) {
+          $event.preventDefault();
+          var targetName = (item.id === 'cards') ? 'saved cards' : (item.id === 'templates' ? 'templates' : 'scan & import');
+          var targetUrl = (item.id === 'cards') ? 'saved-cards.html' : (item.id === 'templates' ? '#templates' : 'scan.html');
+          if (AuthModalService) {
+            AuthModalService.open({
+              target: targetUrl,
+              title: 'Join Inoviq to continue',
+              description: 'Log in or create a free account to use ' + targetName + ', templates, and more'
+            });
+          }
+          return;
+        }
+        dock.activeId = item.id;
       } else if (item.action === 'theme') {
         $event.preventDefault();
         dock.toggleTheme();

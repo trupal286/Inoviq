@@ -37,6 +37,27 @@
     })();
   </script>
 
+  <!-- Protected Route Access Control: Block guests and redirect to dashboard with popup -->
+  <script>
+    (function () {
+      var isAuth = localStorage.getItem('inoviq_logged_in') === 'true';
+      if (!isAuth) {
+        var token = localStorage.getItem('inoviq_token');
+        if (token) {
+          try {
+            var payload = JSON.parse(atob(token.split('.')[1]));
+            if (payload.exp && payload.exp * 1000 > Date.now()) isAuth = true;
+          } catch (e) {}
+        }
+      }
+      if (!isAuth) {
+        sessionStorage.setItem('inoviq_redirect_target', 'create-card.html');
+        localStorage.setItem('inoviq_redirect_target', 'create-card.html');
+        window.location.replace('dashboard.html?authRequired=true&target=create-card.html');
+      }
+    })();
+  </script>
+
   <!-- React 18, Babel & Utility Engines -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>

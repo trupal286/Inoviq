@@ -19,6 +19,25 @@
       if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
     })();
   </script>
+
+  <!-- Edge Case: Logged-in users who open login should be redirected to dashboard -->
+  <script>
+    (function () {
+      var isAuth = localStorage.getItem('inoviq_logged_in') === 'true';
+      if (!isAuth) {
+        var token = localStorage.getItem('inoviq_token');
+        if (token) {
+          try {
+            var payload = JSON.parse(atob(token.split('.')[1]));
+            if (payload.exp && payload.exp * 1000 > Date.now()) isAuth = true;
+          } catch (e) {}
+        }
+      }
+      if (isAuth) {
+        window.location.replace('dashboard.html');
+      }
+    })();
+  </script>
 </head>
 
 <body ng-controller="AuthController as auth">
@@ -131,6 +150,7 @@
 
   </div><!-- /login-shell -->
 
+  <script src="../services/auth.service.js"></script>
   <script src="../app.js"></script>
   <script>
     (function () {

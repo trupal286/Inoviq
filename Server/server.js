@@ -71,6 +71,14 @@ app.get('/profile', (req, res) => {
   res.sendFile(path.join(__dirname, '../Client/Pages/profile.html'));
 });
 
+app.get('/templates', (req, res) => {
+  res.sendFile(path.join(__dirname, '../Client/Pages/dashboard.html'));
+});
+
+app.get('/contacts', (req, res) => {
+  res.sendFile(path.join(__dirname, '../Client/Pages/saved-cards.html'));
+});
+
 /* ── Connect to MongoDB then start server ── */
 connectDB().then(() => {
   app.listen(PORT, () => {

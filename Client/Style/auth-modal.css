@@ -1,0 +1,243 @@
+/* ==========================================================================
+   INOVIQ — Auth Gate Modal Component Styles (auth-modal.css)
+   Aesthetic Tokens:
+   Dark Charcoal Background: #0D0F10 / #141718
+   Dark Surface:             #181B1D
+   Brass:                    #C9A96E
+   Sage:                     #5E9670
+   Rust:                     #B5583F
+   Fonts: Instrument Serif, Manrope, Space Mono (with system fallbacks)
+   ========================================================================== */
+
+:root {
+  --auth-modal-font-serif: 'Instrument Serif', 'Fraunces', Georgia, serif;
+  --auth-modal-font-sans: 'Manrope', 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --auth-modal-font-mono: 'Space Mono', 'IBM Plex Mono', monospace;
+  --auth-modal-charcoal: #0D0F10;
+  --auth-modal-surface: #171A1C;
+  --auth-modal-surface-border: rgba(201, 169, 110, 0.28);
+  --auth-modal-surface-glow: rgba(201, 169, 110, 0.08);
+  --auth-modal-brass: #C9A96E;
+  --auth-modal-brass-hover: #D7BC88;
+  --auth-modal-sage: #5E9670;
+  --auth-modal-rust: #B5583F;
+  --auth-modal-text-primary: #F4EFE6;
+  --auth-modal-text-muted: rgba(244, 239, 230, 0.68);
+  --auth-modal-backdrop-bg: rgba(9, 11, 12, 0.78);
+}
+
+/* ── Backdrop with Soft Blur ── */
+.auth-gate-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: var(--auth-modal-backdrop-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.auth-gate-backdrop.is-active,
+.auth-gate-backdrop[aria-hidden="false"] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* ── Centered Card with Fade/Scale-In Animation ── */
+.auth-gate-card {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  background: linear-gradient(180deg, #1A1D20 0%, #131618 100%);
+  border: 1px solid var(--auth-modal-surface-border);
+  box-shadow: 
+    0 24px 60px -12px rgba(0, 0, 0, 0.7),
+    0 0 40px var(--auth-modal-surface-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 34px 30px 28px;
+  color: var(--auth-modal-text-primary);
+  text-align: center;
+  box-sizing: border-box;
+  transform: scale(0.92) translateY(8px);
+  opacity: 0;
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.auth-gate-backdrop.is-active .auth-gate-card,
+.auth-gate-backdrop[aria-hidden="false"] .auth-gate-card {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+/* ── Close (X) Button ── */
+.auth-gate-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(244, 239, 230, 0.6);
+  font-size: 20px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.auth-gate-close:hover {
+  background: rgba(201, 169, 110, 0.15);
+  border-color: rgba(201, 169, 110, 0.4);
+  color: var(--auth-modal-brass);
+  transform: rotate(90deg);
+}
+
+/* ── Pill Tag ── */
+.auth-gate-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(201, 169, 110, 0.12);
+  border: 1px solid rgba(201, 169, 110, 0.3);
+  color: var(--auth-modal-brass);
+  font-family: var(--auth-modal-font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+/* ── Modal Title ── */
+.auth-gate-title {
+  font-family: var(--auth-modal-font-serif);
+  font-size: 28px;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  margin: 0 0 10px;
+  color: #FFFFFF;
+}
+
+/* ── Modal Description ── */
+.auth-gate-text {
+  font-family: var(--auth-modal-font-sans);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--auth-modal-text-muted);
+  margin: 0 0 26px;
+  max-width: 360px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ── Button Group ── */
+.auth-gate-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+/* ── Primary Brass Button for "Sign up" ── */
+.btn-auth-signup {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 13px 20px;
+  background: var(--auth-modal-brass);
+  color: #0A0D0E !important;
+  font-family: var(--auth-modal-font-sans);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px -4px rgba(201, 169, 110, 0.45);
+  transition: all 0.22s ease;
+}
+
+.btn-auth-signup:hover {
+  background: var(--auth-modal-brass-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -4px rgba(201, 169, 110, 0.65);
+}
+
+/* ── Outlined Button for "Log in" ── */
+.btn-auth-login {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 20px;
+  background: transparent;
+  color: var(--auth-modal-text-primary) !important;
+  font-family: var(--auth-modal-font-sans);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 1px solid rgba(201, 169, 110, 0.42);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.22s ease;
+}
+
+.btn-auth-login:hover {
+  background: rgba(201, 169, 110, 0.1);
+  border-color: var(--auth-modal-brass);
+  color: var(--auth-modal-brass) !important;
+  transform: translateY(-2px);
+}
+
+/* ── Footer Trust Stamp ── */
+.auth-gate-footer {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--auth-modal-font-mono);
+  font-size: 11px;
+  color: rgba(244, 239, 230, 0.45);
+  letter-spacing: 0.04em;
+}
+
+.auth-gate-footer svg {
+  color: var(--auth-modal-sage);
+}
+
+/* ── Responsive on Mobile ── */
+@media (max-width: 480px) {
+  .auth-gate-card {
+    padding: 26px 20px 22px;
+    border-radius: 14px;
+  }
+  .auth-gate-title {
+    font-size: 24px;
+  }
+  .auth-gate-text {
+    font-size: 13px;
+  }
+}

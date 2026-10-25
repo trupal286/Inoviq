@@ -14,6 +14,7 @@
     href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="../Style/style.css?v=5.0">
+  <link rel="stylesheet" href="../Style/auth-modal.css?v=1.0">
   
   <!-- Apply saved theme before paint to prevent flash -->
   <script>
@@ -37,9 +38,9 @@
 
         <!-- Main Navigation Links -->
         <nav class="nav-links">
-          <a href="#templates" class="nav-link-item">Templates</a>
-          <a href="saved-cards.html" class="nav-link-item">Saved Cards</a>
-          <a href="scan.html" class="nav-link-item">Scan &amp; Import</a>
+          <a href="#templates" class="nav-link-item" ng-click="vm.handleGuestNav('templates', '#templates', $event)">Templates</a>
+          <a href="saved-cards.html" class="nav-link-item" ng-click="vm.handleGuestNav('saved cards', 'saved-cards.html', $event)">Saved Cards</a>
+          <a href="scan.html" class="nav-link-item" ng-click="vm.handleGuestNav('scan & import', 'scan.html', $event)">Scan &amp; Import</a>
         </nav>
 
         <div class="nav-search-wrap">
@@ -55,7 +56,7 @@
           <!-- Theme Toggle Switcher -->
           <button class="theme-toggle-btn" id="themeToggle" title="Toggle Light / Dark Theme" aria-label="Toggle Theme"><svg class="theme-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
 
-          <a href="create-card.html" class="btn-primary" id="btn-create-top" style="display: inline-flex; align-items: center; gap: 7px;">
+          <a href="create-card.html" class="btn-primary" id="btn-create-top" ng-click="vm.handleGuestNav('card builder', 'create-card.html', $event)" style="display: inline-flex; align-items: center; gap: 7px;">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
@@ -132,8 +133,8 @@
         <p class="sub">Build a card, generate its QR, and swap details the moment you meet someone — every detail filed
           straight into their contacts.</p>
         <div class="cta-row">
-          <a href="create-card.html" class="btn-primary btn-lg" id="btn-hero-create">Create your card</a>
-          <a href="#templates" class="btn-ghost btn-lg" id="btn-browse">Browse templates</a>
+          <a href="create-card.html" class="btn-primary btn-lg" id="btn-hero-create" ng-click="vm.handleGuestNav('card builder', 'create-card.html', $event)">Create your card</a>
+          <a href="#templates" class="btn-ghost btn-lg" id="btn-browse" ng-click="vm.handleGuestNav('templates', '#templates', $event)">Browse templates</a>
         </div>
       </div>
 
@@ -273,28 +274,28 @@
           <div class="eyebrow-small">04 of 12 shown</div>
           <div class="catalog-title">Ready-made templates</div>
         </div>
-        <button class="btn-ghost" id="btn-all-tpl">View all 12 &rarr;</button>
+        <button class="btn-ghost" id="btn-all-tpl" ng-click="vm.handleGuestNav('templates', '#templates', $event)">View all 12 &rarr;</button>
       </div>
       <div class="rail">
-        <div class="tpl" id="tpl-01" ng-click="vm.selectTemplate('Ledger')">
+        <div class="tpl" id="tpl-01" ng-click="vm.selectTemplate('Ledger', $event)">
           <div class="tpl-num">01</div>
           <div class="tpl-swatch s1"><span class="swatch-aa">Aa</span></div>
           <div class="tpl-name">Ledger</div>
           <div class="tpl-tag">Studio &amp; consulting</div>
         </div>
-        <div class="tpl" id="tpl-02" ng-click="vm.selectTemplate('Midnight Desk')">
+        <div class="tpl" id="tpl-02" ng-click="vm.selectTemplate('Midnight Desk', $event)">
           <div class="tpl-num">02</div>
           <div class="tpl-swatch s2"><span class="swatch-aa">Aa</span></div>
           <div class="tpl-name">Midnight Desk</div>
           <div class="tpl-tag">Tech &amp; founders</div>
         </div>
-        <div class="tpl" id="tpl-03" ng-click="vm.selectTemplate('Stamped')">
+        <div class="tpl" id="tpl-03" ng-click="vm.selectTemplate('Stamped', $event)">
           <div class="tpl-num">03</div>
           <div class="tpl-swatch s3"><span class="swatch-aa">Aa</span></div>
           <div class="tpl-name">Stamped</div>
           <div class="tpl-tag">Creative &amp; agency</div>
         </div>
-        <div class="tpl" id="tpl-04" ng-click="vm.selectTemplate('Brass Rule')">
+        <div class="tpl" id="tpl-04" ng-click="vm.selectTemplate('Brass Rule', $event)">
           <div class="tpl-num">04</div>
           <div class="tpl-swatch s4"><span class="swatch-aa">Aa</span></div>
           <div class="tpl-name">Brass Rule</div>
@@ -344,7 +345,7 @@
             No sample cards match &ldquo;{{ vm.searchTerm }}&rdquo;.
           </p>
 
-          <a href="create-card.html" class="card-row row-add" id="btn-add-row-guest" style="text-decoration: none;">
+          <a href="create-card.html" class="card-row row-add" id="btn-add-row-guest" ng-click="vm.handleGuestNav('card builder', 'create-card.html', $event)" style="text-decoration: none;">
             <div class="row-chip add-chip">+</div>
             <div class="row-info">
               <div class="row-name">Create your custom card</div>
@@ -450,25 +451,12 @@
 
   </div><!-- /wrap -->
 
-  <!-- Auth Prompt Modal Component -->
-  <div class="auth-modal-backdrop" ng-class="{'is-open': vm.showAuthModal}" ng-click="vm.closeAuthModal($event)">
-    <div class="auth-modal-card" ng-click="$event.stopPropagation()">
-      <button class="auth-modal-close" ng-click="vm.closeAuthModal($event)">&times;</button>
-      <div class="card-id">AUTHENTICATION REQUIRED</div>
-      <h3 class="auth-modal-title">Sign in to continue</h3>
-      <p class="auth-modal-desc">
-        You need an Inoviq account to <span class="auth-action-name">{{ vm.authModalAction }}</span>.
-      </p>
-      <div class="auth-modal-buttons">
-        <a ng-href="{{ vm.getSignupUrl() }}" class="btn-primary btn-auth-modal">Create Account</a>
-        <a ng-href="{{ vm.getLoginUrl() }}" class="btn-secondary btn-auth-modal">Log In</a>
-      </div>
-      <div class="auth-modal-foot">
-        <span style="display:inline-flex;align-items:center;gap:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>256-bit encrypted · Free forever</span></span>
-      </div>
-    </div>
-  </div>
+  <!-- Reusable Auth Gate Popup Component -->
+  <auth-gate></auth-gate>
 
+  <script src="../services/auth.service.js"></script>
+  <script src="../services/auth-modal.service.js"></script>
+  <script src="../components/auth-gate.component.js"></script>
   <script src="../app.js"></script>
   <script>
     /* ================================================================

@@ -24,6 +24,27 @@
     })();
   </script>
 
+  <!-- Protected Route Access Control: Block guests and redirect to dashboard with popup -->
+  <script>
+    (function () {
+      var isAuth = localStorage.getItem('inoviq_logged_in') === 'true';
+      if (!isAuth) {
+        var token = localStorage.getItem('inoviq_token');
+        if (token) {
+          try {
+            var payload = JSON.parse(atob(token.split('.')[1]));
+            if (payload.exp && payload.exp * 1000 > Date.now()) isAuth = true;
+          } catch (e) {}
+        }
+      }
+      if (!isAuth) {
+        sessionStorage.setItem('inoviq_redirect_target', 'saved-cards.html');
+        localStorage.setItem('inoviq_redirect_target', 'saved-cards.html');
+        window.location.replace('dashboard.html?authRequired=true&target=saved-cards.html');
+      }
+    })();
+  </script>
+
   <!-- External Libraries -->
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
