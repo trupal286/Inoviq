@@ -47,8 +47,10 @@
       try {
         var header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
         var payload = btoa(JSON.stringify({
-          id: user.id || 'usr_mock_123',
+          id: user.id || '000000000000000000000001',
           email: user.email || 'demo@inoviq.io',
+          firstName: user.firstName || 'Elena',
+          lastName: user.lastName || 'Rostova',
           exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60)
         }));
         return header + '.' + payload + '.mockSig';
@@ -60,22 +62,71 @@
     return {
       signup: function (data) {
         var userData = data || {};
+        if (userData.email && userData.signupPassword) {
+          return $http.post(API + '/signup', {
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            email: userData.email,
+            phone: userData.phone || '',
+            password: userData.signupPassword,
+            confirmPassword: userData.confirmPassword
+          }).then(function (res) {
+            if (res.data && res.data.success) {
+              saveAuth(res.data.token, res.data.user);
+              return res.data;
+            }
+            return res.data;
+          }).catch(function (err) {
+            if (err && (err.status === 400 || err.status === 409)) {
+              return $q.reject(err);
+            }
+            var token = createMockToken(userData);
+            saveAuth(token, userData);
+            return $q.resolve({ success: true, token: token, user: userData });
+          });
+        }
         var token = createMockToken(userData);
         saveAuth(token, userData);
         return $q.resolve({ success: true, token: token, user: userData });
       },
 
       login: function (identifierOrUser, password) {
+        var idStr = typeof identifierOrUser === 'string' ? identifierOrUser : (identifierOrUser && (identifierOrUser.email || identifierOrUser.username));
+        var passStr = password || (identifierOrUser && identifierOrUser.password);
+
+        if (idStr && passStr) {
+          return $http.post(API + '/login', {
+            identifier: idStr,
+            password: passStr
+          }).then(function (res) {
+            if (res.data && res.data.success) {
+              saveAuth(res.data.token, res.data.user);
+              return res.data;
+            }
+            return res.data;
+          }).catch(function (err) {
+            if (err && err.status === 401 && err.data && err.data.message) {
+              return $q.reject(err);
+            }
+            var userData = typeof identifierOrUser === 'object' ? identifierOrUser : { email: idStr };
+            if (!userData.firstName) userData.firstName = (idStr.indexOf('@') !== -1 ? idStr.split('@')[0] : idStr);
+            if (!userData.lastName) userData.lastName = 'Member';
+            var token = createMockToken(userData);
+            saveAuth(token, userData);
+            return $q.resolve({ success: true, token: token, user: userData });
+          });
+        }
+
         var userData = {};
         if (typeof identifierOrUser === 'object' && identifierOrUser !== null) {
           userData = identifierOrUser;
         } else {
-          var idStr = identifierOrUser || 'demo@inoviq.io';
+          var id = identifierOrUser || 'demo@inoviq.io';
           userData = {
-            email: idStr,
-            firstName: idStr.indexOf('@') !== -1 ? idStr.split('@')[0] : idStr,
+            email: id,
+            firstName: id.indexOf('@') !== -1 ? id.split('@')[0] : id,
             lastName: 'Member',
-            username: idStr
+            username: id
           };
         }
         if (!userData.firstName) userData.firstName = 'Elena';
@@ -221,6 +272,9 @@
         if (response.status === 401) {
           $window.localStorage.removeItem('inoviq_token');
           $window.localStorage.removeItem('inoviq_user');
+          $window.localStorage.removeItem('inoviq_logged_in');
+          $window.sessionStorage.removeItem('inoviq_redirect_target');
+          $window.localStorage.removeItem('inoviq_redirect_target');
           // Only redirect if not already on login/signup page
           if ($window.location.pathname.indexOf('login') === -1 &&
               $window.location.pathname.indexOf('signup') === -1) {
@@ -261,15 +315,65 @@
       var saved = AuthService.getRedirectTarget();
       AuthService.clearRedirectTarget();
 
+      var target = null;
       if (saved) {
-        if (typeof saved === 'string') return saved;
-        if (saved.name) return saved.name + '.html';
+        if (typeof saved === 'string') target = saved;
+        else if (saved.name) {
+          target = saved.name === 'templates' ? 'dashboard.html#templates' : (saved.name === 'cards' ? 'saved-cards.html' : saved.name + '.html');
+        } else if (saved.url) {
+          target = saved.url;
+        }
       }
 
-      var param = new URLSearchParams($window.location.search).get('redirect');
-      if (param) return param;
+      if (!target) {
+        try {
+          target = new URLSearchParams($window.location.search).get('redirect');
+        } catch (e) {}
+      }
 
-      return 'dashboard.html';
+      if (!target && $window.location.hash && $window.location.hash !== '#' && $window.location.pathname.indexOf('login') !== -1) {
+        target = 'dashboard.html' + $window.location.hash;
+      }
+
+      if (!target) {
+        return 'dashboard.html';
+      }
+
+      try {
+        target = decodeURIComponent(target);
+      } catch (e) {}
+
+      target = target.trim();
+
+      if (target === 'login.html' || target === 'signup.html' ||
+          target === 'login' || target === 'signup' ||
+          target === '/login.html' || target === '/signup.html' ||
+          target === '/login' || target === '/signup' ||
+          target === '' || target === '/') {
+        return 'dashboard.html';
+      }
+
+      if (target.charAt(0) === '#') {
+        return 'dashboard.html' + target;
+      }
+
+      if (target === 'templates') {
+        return 'dashboard.html#templates';
+      }
+
+      if (target === 'dashboard' || target === '/dashboard') {
+        return 'dashboard.html';
+      }
+
+      if (target === 'cards' || target === '/cards') {
+        return 'saved-cards.html';
+      }
+
+      if (target.indexOf('.') === -1 && target.indexOf('/') === -1) {
+        return target + '.html';
+      }
+
+      return target;
     }
 
     /* ── Login ── */
@@ -281,16 +385,21 @@
         email: auth.identifier || 'demo@inoviq.io',
         firstName: (auth.identifier && auth.identifier.indexOf('@') !== -1) ? auth.identifier.split('@')[0] : (auth.identifier || 'Elena'),
         lastName: 'Member',
-        username: auth.identifier || 'elena'
+        username: auth.identifier || 'elena',
+        password: auth.password
       };
 
-      AuthService.login(userObj)
+      AuthService.login(userObj, auth.password)
         .then(function (data) {
           auth.loading = false;
           auth.successMsg = 'Login successful! Redirecting...';
           var target = getPostAuthRedirectTarget();
           setTimeout(function () {
-            $window.location.href = target;
+            if ($window.location.replace) {
+              $window.location.replace(target);
+            } else {
+              $window.location.href = target;
+            }
           }, 350);
         })
         .catch(function (err) {
@@ -326,16 +435,26 @@
         lastName: auth.lastName,
         email: auth.email,
         phone: auth.phone || '',
-        username: auth.email.split('@')[0]
+        username: auth.email.split('@')[0],
+        signupPassword: auth.signupPassword,
+        confirmPassword: auth.confirmPassword
       };
 
-      AuthService.login(userObj)
+      var signupAction = (typeof AuthService.signup === 'function')
+        ? AuthService.signup(userObj)
+        : AuthService.login(userObj, auth.signupPassword);
+
+      signupAction
         .then(function (data) {
           auth.loading = false;
           auth.successMsg = 'Account created! Redirecting...';
           var target = getPostAuthRedirectTarget();
           setTimeout(function () {
-            $window.location.href = target;
+            if ($window.location.replace) {
+              $window.location.replace(target);
+            } else {
+              $window.location.href = target;
+            }
           }, 450);
         })
         .catch(function (err) {
@@ -825,7 +944,15 @@
 
     vm.getUserInitials = function () {
       if (!vm.currentUser) return 'IN';
-      return ((vm.currentUser.firstName || '')[0] + (vm.currentUser.lastName || '')[0]).toUpperCase();
+      var f = (vm.currentUser.firstName || '').trim();
+      var l = (vm.currentUser.lastName || '').trim();
+      if (!f && !l) {
+        var email = vm.currentUser.email || '';
+        return (email ? email[0] : 'IN').toUpperCase();
+      }
+      var init1 = f ? f[0] : '';
+      var init2 = l ? l[0] : '';
+      return (init1 + init2 || 'IN').toUpperCase();
     };
 
     vm.getUserName = function () {
@@ -1165,7 +1292,7 @@
 
     /* ── Decode & Populate ── */
     scan.onCodeDecoded = function (raw) {
-      scan.toastMsg = '🎯 QR Code Detected & Parsed!';
+      scan.toastMsg = 'QR Code Detected & Parsed!';
       $scope.$apply(function () {
         scan.parseExtractedText(raw);
         scan.renderPreviewQr();
@@ -1258,7 +1385,7 @@
             $timeout(function () {
               scan.isAnalyzing = false;
               scan.loadPreset('founder');
-              scan.toastMsg = '✨ Extracted contact details from card photo!';
+              scan.toastMsg = 'Extracted contact details from card photo!';
             }, 800);
           });
       } else {
@@ -1273,7 +1400,7 @@
       if (!scan.rawTextPayload) return;
       scan.parseExtractedText(scan.rawTextPayload);
       scan.renderPreviewQr();
-      scan.toastMsg = '✨ Text parsed and loaded!';
+      scan.toastMsg = 'Text parsed and loaded!';
       $timeout(function () { scan.toastMsg = ''; }, 3000);
     };
 
@@ -1353,17 +1480,17 @@
         CardService.create(payload)
           .then(function () {
             scan.isSaving = false;
-            scan.toastMsg = '✅ Card saved to your Inoviq account and catalog!';
+            scan.toastMsg = 'Card saved to your Inoviq account and catalog!';
             $timeout(function () { $window.location.href = 'saved-cards.html'; }, 1000);
           })
           .catch(function () {
             scan.isSaving = false;
-            scan.toastMsg = '💾 Card saved to your local catalog!';
+            scan.toastMsg = 'Card saved to your local catalog!';
             $timeout(function () { $window.location.href = 'saved-cards.html'; }, 1000);
           });
       } else {
         scan.isSaving = false;
-        scan.toastMsg = '💾 Card saved to your local catalog! (Sign in to sync across devices)';
+        scan.toastMsg = 'Card saved to your local catalog! (Sign in to sync across devices)';
         $timeout(function () { $window.location.href = 'saved-cards.html'; }, 1200);
       }
     };

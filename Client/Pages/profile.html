@@ -49,12 +49,14 @@
 
     /* ── Page shell ── */
     .profile-shell {
-      max-width: 860px;
+      max-width: 1280px;
+      width: 100%;
       margin: 0 auto;
       padding: 24px 28px 80px;
       display: flex;
       flex-direction: column;
-      gap: 0;
+      gap: 28px;
+      box-sizing: border-box;
     }
 
     /* ── Loading state ── */
@@ -214,9 +216,19 @@
     /* ── Info cards grid ── */
     .profile-info-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
       margin-bottom: 24px;
+    }
+    @media (max-width: 980px) {
+      .profile-info-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 620px) {
+      .profile-info-grid {
+        grid-template-columns: 1fr;
+      }
     }
     .profile-info-card {
       background: var(--paper-card);
@@ -457,10 +469,22 @@
                 <div class="user-email">{{ vm.currentUser.email }}</div>
               </div>
               <div class="account-dropdown-divider"></div>
-              <a href="profile.html" class="account-dropdown-item">&#128100; My Profile</a>
-              <a href="dashboard.html" class="account-dropdown-item">&#128202; Dashboard</a>
-              <a href="saved-cards.html" class="account-dropdown-item">&#128199; Saved Cards</a>
-              <a href="create-card.html" class="account-dropdown-item">&#10024; Create Card</a>
+              <a href="profile.html" class="account-dropdown-item" style="display: flex; align-items: center; gap: 10px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+                <span>My Profile</span>
+              </a>
+              <a href="dashboard.html" class="account-dropdown-item" style="display: flex; align-items: center; gap: 10px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>Dashboard</span>
+              </a>
+              <a href="saved-cards.html" class="account-dropdown-item" style="display: flex; align-items: center; gap: 10px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                <span>Saved Cards</span>
+              </a>
+              <a href="create-card.html" class="account-dropdown-item" style="display: flex; align-items: center; gap: 10px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>Create Card</span>
+              </a>
               <div class="account-dropdown-divider"></div>
               <button class="account-dropdown-item btn-logout-item" ng-click="vm.logout()">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -593,8 +617,8 @@
             Account ID
           </div>
           <div class="info-value" id="info-account-id"
-            style="font-family: var(--font-mono); font-size: 12.5px; letter-spacing: 0.05em;">
-            #{{ vm.currentUser._id ? vm.currentUser._id.slice(-8).toUpperCase() : '&mdash;' }}
+            style="font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.05em;">
+            #{{ (vm.currentUser._id || vm.currentUser.id || 'INV-001092').slice(-8).toUpperCase() }}
           </div>
         </div>
 

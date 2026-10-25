@@ -12,6 +12,15 @@ router.use(authMiddleware);
    ────────────────────────────────────────────────────────── */
 router.get('/', async (req, res) => {
   try {
+    const mongoose = require('mongoose');
+    if (!req.user || !req.user.id || !mongoose.Types.ObjectId.isValid(req.user.id)) {
+      return res.json({
+        success: true,
+        count: 0,
+        cards: []
+      });
+    }
+
     const cards = await Card.find({ userId: req.user.id })
       .sort({ createdAt: -1 });
 

@@ -11,7 +11,12 @@
   try {
     app = angular.module('digiCardApp');
   } catch (e) {
-    app = angular.module('digiCardApp', []);
+    try {
+      angular.module('ui.router');
+      app = angular.module('digiCardApp', ['ui.router']);
+    } catch (err) {
+      app = angular.module('digiCardApp', []);
+    }
   }
 
   app.factory('AuthService', ['$window', '$q', function ($window, $q) {
@@ -27,8 +32,10 @@
       try {
         var header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
         var payload = btoa(JSON.stringify({
-          id: user.id || 'usr_mock_123',
+          id: user.id || '000000000000000000000001',
           email: user.email || 'member@inoviq.io',
+          firstName: user.firstName || 'Elena',
+          lastName: user.lastName || 'Rostova',
           exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60) // 7 days
         }));
         return header + '.' + payload + '.mockSignature';

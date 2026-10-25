@@ -24,18 +24,41 @@
   <!-- Edge Case: Logged-in users who open signup should be redirected to dashboard -->
   <script>
     (function () {
-      var isAuth = localStorage.getItem('inoviq_logged_in') === 'true';
-      if (!isAuth) {
-        var token = localStorage.getItem('inoviq_token');
-        if (token) {
-          try {
-            var payload = JSON.parse(atob(token.split('.')[1]));
-            if (payload.exp && payload.exp * 1000 > Date.now()) isAuth = true;
-          } catch (e) {}
+      var flag = localStorage.getItem('inoviq_logged_in') === 'true';
+      var token = localStorage.getItem('inoviq_token');
+      var isAuth = false;
+
+      if (flag && token) {
+        try {
+          var parts = token.split('.');
+          if (parts.length === 3) {
+            var payload = JSON.parse(atob(parts[1]));
+            if (!payload.exp || payload.exp * 1000 > Date.now()) {
+              isAuth = true;
+            }
+          } else if (token.indexOf('mock') !== -1) {
+            isAuth = true;
+          }
+        } catch (e) {
+          isAuth = false;
         }
       }
+
       if (isAuth) {
-        window.location.replace('dashboard.html');
+        var param = new URLSearchParams(window.location.search).get('redirect');
+        if (!param && window.location.hash && window.location.hash !== '#') {
+          param = 'dashboard.html' + window.location.hash;
+        }
+        if (!param || param === 'login.html' || param === 'signup.html' || param === 'login' || param === 'signup') {
+          param = 'dashboard.html';
+        }
+        try { param = decodeURIComponent(param); } catch (e) {}
+        if (param.charAt(0) === '#') param = 'dashboard.html' + param;
+        if (param === 'templates') param = 'dashboard.html#templates';
+        if (param === 'dashboard') param = 'dashboard.html';
+        if (param === 'cards') param = 'saved-cards.html';
+        if (param.indexOf('.') === -1 && param.indexOf('/') === -1 && !param.startsWith('#')) param += '.html';
+        window.location.replace(param);
       }
     })();
   </script>

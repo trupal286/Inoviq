@@ -37,13 +37,20 @@ app.use((req, res, next) => {
   next();
 });
 
-/* ── Serve static files from Client ── */
-app.use(express.static(path.join(__dirname, '../Client'), { etag: false, maxAge: 0 }));
-app.use(express.static(path.join(__dirname, '../Client/Pages'), { etag: false, maxAge: 0 }));
-app.use('/Style', express.static(path.join(__dirname, '../Client/Style'), { etag: false, maxAge: 0 }));
-
 /* ── Page Routes (serve HTML pages) ── */
 app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../Client/Pages/dashboard.html'));
+});
+
+app.get('/index.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../Client/Pages/dashboard.html'));
+});
+
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, '../Client/Pages/dashboard.html'));
+});
+
+app.get('/dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, '../Client/Pages/dashboard.html'));
 });
 
@@ -78,6 +85,11 @@ app.get('/templates', (req, res) => {
 app.get('/contacts', (req, res) => {
   res.sendFile(path.join(__dirname, '../Client/Pages/saved-cards.html'));
 });
+
+/* ── Serve static files from Client ── */
+app.use(express.static(path.join(__dirname, '../Client'), { etag: false, maxAge: 0, index: false }));
+app.use(express.static(path.join(__dirname, '../Client/Pages'), { etag: false, maxAge: 0, index: false }));
+app.use('/Style', express.static(path.join(__dirname, '../Client/Style'), { etag: false, maxAge: 0 }));
 
 /* ── Connect to MongoDB then start server ── */
 connectDB().then(() => {

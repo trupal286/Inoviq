@@ -18,7 +18,12 @@
   try {
     app = angular.module('digiCardApp');
   } catch (e) {
-    app = angular.module('digiCardApp', []);
+    try {
+      angular.module('ui.router');
+      app = angular.module('digiCardApp', ['ui.router']);
+    } catch (err) {
+      app = angular.module('digiCardApp', []);
+    }
   }
 
   app.directive('authGate', [
