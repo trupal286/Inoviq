@@ -167,20 +167,33 @@
       white-space: nowrap;
     }
 
-    .groupby-pill-btn:hover {
-      color: var(--ink-primary);
+    .groupby-pill-btn:hover,
+    .groupby-pill-btn:active {
+      background: rgba(75, 64, 56, 0.12) !important;
+      color: var(--mocha, #4B4038) !important;
+    }
+
+    .groupby-pill-btn.active:hover,
+    .groupby-pill-btn.active:active {
+      background: var(--mocha, #4B4038) !important;
+      color: #FFFFFF !important;
+    }
+
+    .groupby-pill-btn:not(.active) {
+      background: transparent !important;
+      color: var(--ink-muted) !important;
     }
 
     .groupby-pill-btn.active {
-      background: var(--mocha, #4B4038);
-      color: #FFFFFF;
+      background: var(--mocha, #4B4038) !important;
+      color: #FFFFFF !important;
       font-weight: 600;
       box-shadow: var(--shadow-sm);
     }
 
     [data-theme="dark"] .groupby-pill-btn.active {
-      background: #203B63;
-      color: #F3F5FA;
+      background: #203B63 !important;
+      color: #F3F5FA !important;
     }
 
     .btn-clear-filters {
@@ -670,11 +683,11 @@
         <!-- GroupBy Control Cluster -->
         <div class="filter-control-cluster">
           <span class="control-label-text">Group By:</span>
-          <div class="groupby-btn-cluster">
-            <button class="groupby-pill-btn" ng-class="{'active': catalog.groupBy === 'none'}" ng-click="catalog.setGroupBy('none')" title="Flat list without grouping">None</button>
-            <button class="groupby-pill-btn" ng-class="{'active': catalog.groupBy === 'company'}" ng-click="catalog.setGroupBy('company')" title="Group contacts by Company">🏢 Company</button>
-            <button class="groupby-pill-btn" ng-class="{'active': catalog.groupBy === 'template'}" ng-click="catalog.setGroupBy('template')" title="Group cards by Template style">🎨 Template</button>
-            <button class="groupby-pill-btn" ng-class="{'active': catalog.groupBy === 'alpha'}" ng-click="catalog.setGroupBy('alpha')" title="Group contacts alphabetically A-Z">🔤 A–Z</button>
+          <div class="groupby-btn-cluster" id="groupby-cluster">
+            <button type="button" class="groupby-pill-btn active" ng-click="catalog.groupBy = 'none'" onclick="activateGroupByBtn(this)" title="Flat list without grouping">None</button>
+            <button type="button" class="groupby-pill-btn" ng-click="catalog.groupBy = 'company'" onclick="activateGroupByBtn(this)" title="Group contacts by Company">🏢 Company</button>
+            <button type="button" class="groupby-pill-btn" ng-click="catalog.groupBy = 'template'" onclick="activateGroupByBtn(this)" title="Group cards by Template style">🎨 Template</button>
+            <button type="button" class="groupby-pill-btn" ng-click="catalog.groupBy = 'alpha'" onclick="activateGroupByBtn(this)" title="Group contacts alphabetically A-Z">🔤 A–Z</button>
           </div>
         </div>
 
@@ -946,6 +959,13 @@
   </div>
 
   <script src="../app.js"></script>
+  <script>
+    function activateGroupByBtn(btn) {
+      var btns = document.querySelectorAll('#groupby-cluster .groupby-pill-btn');
+      btns.forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+    }
+  </script>
   <script>
     (function () {
       'use strict';
