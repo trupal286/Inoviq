@@ -79,7 +79,11 @@ app.get('/profile', (req, res) => {
 });
 
 app.get('/templates', (req, res) => {
-  res.sendFile(path.join(__dirname, '../Client/Pages/dashboard.html'));
+  res.sendFile(path.join(__dirname, '../Client/Pages/templates.html'));
+});
+
+app.get('/templates.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../Client/Pages/templates.html'));
 });
 
 app.get('/contacts', (req, res) => {

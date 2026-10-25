@@ -1,29 +1,50 @@
 /* ==========================================================================
    INOVIQ — Auth Gate Modal Component Styles (auth-modal.css)
-   Aesthetic Tokens:
-   Dark Charcoal Background: #0D0F10 / #141718
-   Dark Surface:             #181B1D
-   Brass:                    #C9A96E
-   Sage:                     #5E9670
-   Rust:                     #B5583F
-   Fonts: Instrument Serif, Manrope, Space Mono (with system fallbacks)
+   Light & Dark Custom Palettes:
+   Light:
+   - Surface / Cards: #FFFFFF
+   - Background:      #EFEFEF
+   - Buttons:         #4B4038
+   - Borders:         rgba(154, 134, 120, 0.35)
+   Dark:
+   - Background:      #080F1D
+   - Surface / Cards: #0C1727
+   - Borders/Divider: #203653
+   - Navigation/Btn:  #203B63 / #35598B
+   - Text Primary:    #F3F5FA
+   - Text Secondary:  #9BAEC7
+   - Accent Sky:      #AFCDE5
    ========================================================================== */
 
 :root {
   --auth-modal-font-serif: 'Instrument Serif', 'Fraunces', Georgia, serif;
   --auth-modal-font-sans: 'Manrope', 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --auth-modal-font-mono: 'Space Mono', 'IBM Plex Mono', monospace;
-  --auth-modal-charcoal: #0D0F10;
-  --auth-modal-surface: #171A1C;
-  --auth-modal-surface-border: rgba(201, 169, 110, 0.28);
-  --auth-modal-surface-glow: rgba(201, 169, 110, 0.08);
-  --auth-modal-brass: #C9A96E;
-  --auth-modal-brass-hover: #D7BC88;
-  --auth-modal-sage: #5E9670;
-  --auth-modal-rust: #B5583F;
-  --auth-modal-text-primary: #F4EFE6;
-  --auth-modal-text-muted: rgba(244, 239, 230, 0.68);
-  --auth-modal-backdrop-bg: rgba(9, 11, 12, 0.78);
+  --auth-modal-charcoal: #EFEFEF;
+  --auth-modal-surface: #FFFFFF;
+  --auth-modal-surface-border: rgba(154, 134, 120, 0.35);
+  --auth-modal-surface-glow: rgba(174, 196, 212, 0.25);
+  --auth-modal-brass: #4B4038;
+  --auth-modal-brass-hover: #0A0A0A;
+  --auth-modal-sage: #9A8678;
+  --auth-modal-rust: #9C3D3D;
+  --auth-modal-text-primary: #000000;
+  --auth-modal-text-muted: #4B4038;
+  --auth-modal-backdrop-bg: rgba(10, 10, 10, 0.50);
+}
+
+[data-theme="dark"] {
+  --auth-modal-charcoal: #080F1D;
+  --auth-modal-surface: #0C1727;
+  --auth-modal-surface-border: #203653;
+  --auth-modal-surface-glow: rgba(32, 59, 99, 0.40);
+  --auth-modal-brass: #203B63;
+  --auth-modal-brass-hover: #35598B;
+  --auth-modal-sage: #AFCDE5;
+  --auth-modal-rust: #E86A6A;
+  --auth-modal-text-primary: #F3F5FA;
+  --auth-modal-text-muted: #9BAEC7;
+  --auth-modal-backdrop-bg: rgba(8, 15, 29, 0.78);
 }
 
 /* ── Backdrop with Soft Blur ── */
@@ -56,12 +77,11 @@
   position: relative;
   width: 100%;
   max-width: 440px;
-  background: linear-gradient(180deg, #1A1D20 0%, #131618 100%);
-  border: 1px solid var(--auth-modal-surface-border);
+  background: var(--auth-modal-surface);
+  border: 1.5px solid var(--auth-modal-surface-border);
   box-shadow: 
-    0 24px 60px -12px rgba(0, 0, 0, 0.7),
-    0 0 40px var(--auth-modal-surface-glow),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    0 24px 60px -12px rgba(0, 0, 0, 0.5),
+    0 0 35px var(--auth-modal-surface-glow);
   border-radius: 18px;
   padding: 34px 30px 28px;
   color: var(--auth-modal-text-primary);
@@ -86,9 +106,9 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: rgba(244, 239, 230, 0.6);
+  background: rgba(154, 134, 120, 0.12);
+  border: 1px solid var(--auth-modal-surface-border);
+  color: var(--auth-modal-text-muted);
   font-size: 20px;
   line-height: 1;
   display: inline-flex;
@@ -100,9 +120,8 @@
 }
 
 .auth-gate-close:hover {
-  background: rgba(201, 169, 110, 0.15);
-  border-color: rgba(201, 169, 110, 0.4);
-  color: var(--auth-modal-brass);
+  background: var(--auth-modal-surface-border);
+  color: var(--auth-modal-text-primary);
   transform: rotate(90deg);
 }
 
@@ -113,8 +132,8 @@
   gap: 6px;
   padding: 4px 12px;
   border-radius: 999px;
-  background: rgba(201, 169, 110, 0.12);
-  border: 1px solid rgba(201, 169, 110, 0.3);
+  background: rgba(174, 196, 212, 0.22);
+  border: 1px solid var(--auth-modal-surface-border);
   color: var(--auth-modal-brass);
   font-family: var(--auth-modal-font-mono);
   font-size: 10px;
@@ -124,15 +143,21 @@
   margin-bottom: 16px;
 }
 
+[data-theme="dark"] .auth-gate-badge {
+  background: rgba(32, 59, 99, 0.35);
+  color: #AFCDE5;
+  border-color: #35598B;
+}
+
 /* ── Modal Title ── */
 .auth-gate-title {
   font-family: var(--auth-modal-font-serif);
   font-size: 28px;
-  font-weight: 400;
+  font-weight: 500;
   letter-spacing: -0.015em;
   line-height: 1.2;
   margin: 0 0 10px;
-  color: #FFFFFF;
+  color: var(--auth-modal-text-primary);
 }
 
 /* ── Modal Description ── */
@@ -155,7 +180,7 @@
   margin-bottom: 20px;
 }
 
-/* ── Primary Brass Button for "Sign up" ── */
+/* ── Primary Button for "Sign up" ── */
 .btn-auth-signup {
   display: inline-flex;
   align-items: center;
@@ -164,7 +189,7 @@
   width: 100%;
   padding: 13px 20px;
   background: var(--auth-modal-brass);
-  color: #0A0D0E !important;
+  color: #FFFFFF !important;
   font-family: var(--auth-modal-font-sans);
   font-weight: 700;
   font-size: 14px;
@@ -174,14 +199,24 @@
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  box-shadow: 0 8px 24px -4px rgba(201, 169, 110, 0.45);
+  box-shadow: 0 6px 18px -4px rgba(0, 0, 0, 0.2);
   transition: all 0.22s ease;
 }
 
 .btn-auth-signup:hover {
   background: var(--auth-modal-brass-hover);
   transform: translateY(-2px);
-  box-shadow: 0 12px 28px -4px rgba(201, 169, 110, 0.65);
+  box-shadow: 0 10px 24px -4px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .btn-auth-signup {
+  background: #203B63;
+  color: #F3F5FA !important;
+  border: 1px solid #35598B;
+}
+
+[data-theme="dark"] .btn-auth-signup:hover {
+  background: #35598B;
 }
 
 /* ── Outlined Button for "Log in" ── */
@@ -200,17 +235,28 @@
   letter-spacing: 0.03em;
   text-transform: uppercase;
   text-decoration: none;
-  border: 1px solid rgba(201, 169, 110, 0.42);
+  border: 1.5px solid var(--auth-modal-surface-border);
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.22s ease;
 }
 
 .btn-auth-login:hover {
-  background: rgba(201, 169, 110, 0.1);
+  background: rgba(174, 196, 212, 0.25);
   border-color: var(--auth-modal-brass);
   color: var(--auth-modal-brass) !important;
   transform: translateY(-2px);
+}
+
+[data-theme="dark"] .btn-auth-login {
+  color: #AFCDE5 !important;
+  border-color: #203653;
+}
+
+[data-theme="dark"] .btn-auth-login:hover {
+  background: #203B63;
+  border-color: #35598B;
+  color: #F3F5FA !important;
 }
 
 /* ── Footer Trust Stamp ── */
@@ -220,7 +266,7 @@
   gap: 7px;
   font-family: var(--auth-modal-font-mono);
   font-size: 11px;
-  color: rgba(244, 239, 230, 0.45);
+  color: var(--auth-modal-text-muted);
   letter-spacing: 0.04em;
 }
 

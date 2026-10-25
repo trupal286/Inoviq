@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Inoviq Ready-Made Templates — 12 curated tactile digital visiting card archetypes with 3D perspective tilt physics, QR code integration, and direct Card Studio customization.">
+  <title>Templates Catalog — Inoviq</title>
+
+  <!-- Typography matching Inoviq Design System -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+
+  <!-- Core Inoviq Stylesheets -->
+  <link rel="stylesheet" href="../Style/style.css?v=5.0">
+  <link rel="stylesheet" href="../Style/studio.css?v=5.0">
+  <link rel="stylesheet" href="../Style/auth-modal.css?v=1.0">
+
+  <!-- Apply saved theme before paint to prevent flash -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('inoviq_theme') || 'light';
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
+  </script>
+
+  <!-- React 18, Babel & QR Code Engines -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+    /* Scoped Templates Page Custom Styles */
+    .templates-shell {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 24px 28px 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .templates-banner {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .templates-filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      background: var(--paper-card);
+      border: 1.5px solid var(--border-line);
+      border-radius: 16px;
+      padding: 12px 18px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .templates-stage-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      background: var(--paper-card);
+      border: 1.5px solid var(--border-line);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: var(--shadow-md);
+      position: relative;
+      overflow: hidden;
+    }
+
+    @media (max-width: 992px) {
+      .templates-stage-layout {
+        grid-template-columns: 1fr;
+        padding: 24px;
+      }
+    }
+
+    /* 3D Perspective Stage Viewport */
+    .stage-viewport {
+      perspective: 1200px;
+      min-height: 360px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 50% 50%, rgba(154, 134, 120, 0.12) 0%, transparent 70%);
+      border-radius: 16px;
+      position: relative;
+      user-select: none;
+      padding: 20px;
+    }
+
+    .stage-card-3d {
+      width: 100%;
+      max-width: 440px;
+      height: 250px;
+      border-radius: 18px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+      cursor: pointer;
+    }
+
+    .stage-card-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      border-radius: 18px;
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      box-sizing: border-box;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .stage-card-back {
+      transform: rotateY(180deg);
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 12px;
+    }
+
+    .card-spec-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .spec-badge-pill {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      width: fit-content;
+    }
+
+    .spec-palette-dots {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .palette-circle-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid var(--paper-card);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+      cursor: pointer;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 22px;
+    }
+
+    .gallery-item-card {
+      background: var(--paper-card);
+      border: 1.5px solid var(--border-line);
+      border-radius: 16px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+
+    .gallery-item-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--mocha, #4B4038);
+    }
+
+    .gallery-item-card.is-active {
+      border-color: var(--mocha, #4B4038);
+      box-shadow: 0 0 0 2px var(--mocha, #4B4038), var(--shadow-md);
+    }
+
+    [data-theme="dark"] .gallery-item-card.is-active {
+      border-color: #35598B;
+      box-shadow: 0 0 0 2px #35598B, var(--shadow-md);
+    }
+
+    .gallery-card-thumb {
+      height: 140px;
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+
+<body>
+  <div id="templates-root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    /* All 12 Curated Inoviq Templates */
+    const TEMPLATES_CATALOG = [
+      {
+        id: 'ledger',
+        name: 'Ledger',
+        category: 'Studio & Consulting',
+        group: 'studio',
+        num: '01',
+        tagline: 'Minimalist editorial archetype with tactile charcoal and mist typography.',
+        bg: '#2D3536',
+        bgGrad: 'linear-gradient(135deg, #2D3536 0%, #1A2223 100%)',
+        text: '#F2EFE2',
+        accent: '#B3C9D6',
+        muted: '#98AA9D',
+        chip: '#D4AF37',
+        fontFamily: "'Fraunces', Georgia, serif",
+        recommended: 'Founders, consultants, architects, and studio partners.',
+        sample: {
+          fullName: 'Elena Rostova',
+          role: 'Principal Partner',
+          company: 'Vanguard Capital',
+          email: 'elena@vanguardcap.io',
+          phone: '+1 (555) 234-5678',
+          website: 'https://vanguardcap.io'
+        }
+      },
+      {
+        id: 'midnight-desk',
+        name: 'Midnight Desk',
+        category: 'Tech & Founders',
+        group: 'tech',
+        num: '02',
+        tagline: 'Sleek dark obsidian with crisp silver foil and high-contrast digital ink.',
+        bg: '#18181B',
+        bgGrad: 'linear-gradient(135deg, #27272A 0%, #09090B 100%)',
+        text: '#FAFAFA',
+        accent: '#E4E4E7',
+        muted: '#A1A1AA',
+        chip: '#D4D4D8',
+        fontFamily: "'Work Sans', -apple-system, sans-serif",
+        recommended: 'Software architects, CTOs, venture founders, and builders.',
+        sample: {
+          fullName: 'Marcus Sterling',
+          role: 'Founder & CEO',
+          company: 'Monolith Protocol',
+          email: 'marcus@monolith.xyz',
+          phone: '+1 (555) 432-1098',
+          website: 'https://monolith.xyz'
+        }
+      },
+      {
+        id: 'stamped',
+        name: 'Stamped',
+        category: 'Creative & Agency',
+        group: 'creative',
+        num: '03',
+        tagline: 'Deep crimson wax seal tone with embossed warm sand serif typography.',
+        bg: '#7F1D1D',
+        bgGrad: 'linear-gradient(135deg, #991B1B 0%, #450A0A 100%)',
+        text: '#FEF2F2',
+        accent: '#FCA5A5',
+        muted: '#FECACA',
+        chip: '#F59E0B',
+        fontFamily: "'Fraunces', Georgia, serif",
+        recommended: 'Creative directors, agency heads, authors, and designers.',
+        sample: {
+          fullName: 'Julian Vance',
+          role: 'Creative Director',
+          company: 'Atelier Vance',
+          email: 'julian@ateliervance.design',
+          phone: '+1 (555) 876-5432',
+          website: 'https://ateliervance.design'
+        }
+      },
+      {
+        id: 'brass-rule',
+        name: 'Brass Rule',
+        category: 'Finance & Legal',
+        group: 'finance',
+        num: '04',
+        tagline: 'Rich espresso leather tone bordered by golden brass rule lines.',
+        bg: '#451A03',
+        bgGrad: 'linear-gradient(135deg, #78350F 0%, #291003 100%)',
+        text: '#FEF3C7',
+        accent: '#FDE68A',
+        muted: '#D97706',
+        chip: '#F59E0B',
+        fontFamily: "'Fraunces', Georgia, serif",
+        recommended: 'Attorneys, legal partners, managing directors, and private bankers.',
+        sample: {
+          fullName: 'Dr. Soraya Mir',
+          role: 'Chief Legal Scientist',
+          company: 'Aetheria Labs',
+          email: 'soraya@aetheria.org',
+          phone: '+1 (555) 654-3210',
+          website: 'https://aetheria.org'
+        }
+      },
+      {
+        id: 'eucalyptus-moss',
+        name: 'Eucalyptus & Moss',
+        category: 'Architecture & Sage',
+        group: 'craft',
+        num: '05',
+        tagline: 'Organic forest sage with soft botanical ivory highlights.',
+        bg: '#37473D',
+        bgGrad: 'linear-gradient(135deg, #37473D 0%, #233028 100%)',
+        text: '#F2EFE2',
+        accent: '#98AA9D',
+        muted: '#B1D4D0',
+        chip: '#E2C068',
+        fontFamily: "'Fraunces', Georgia, serif",
+        recommended: 'Landscape architects, interior designers, and sustainability directors.',
+        sample: {
+          fullName: 'Clara Holm',
+          role: 'Lead Architect',
+          company: 'Moss & Holm Studio',
+          email: 'clara@mossholm.dk',
+          phone: '+45 20 12 34 56',
+          website: 'https://mossholm.dk'
+        }
+      },
+      {
+        id: 'plaster-paper-light',
+        name: 'Plaster Paper Light',
+        category: 'Craft & Minimal',
+        group: 'craft',
+        num: '06',
+        tagline: 'Warm textured plaster paper with crisp dark espresso typography.',
+        bg: '#F2EFE2',
+        bgGrad: 'linear-gradient(135deg, #FFFDF8 0%, #F2EFE2 100%)',
+        text: '#2D3536',
+        accent: '#52352D',
+        muted: '#697C70',
+        chip: '#B89230',
+        fontFamily: "'Work Sans', -apple-system, sans-serif",
+        recommended: 'Editorial writers, artisan makers, ceramicists, and gallerists.',
+        sample: {
+          fullName: 'Tobias Becker',
+          role: 'Master Craftsman',
+          company: 'Plaster & Co.',
+          email: 'tobias@plaster.art',
+          phone: '+49 30 987654',
+          website: 'https://plaster.art'
+        }
+      },
+      {
+        id: 'baby-blue-aurora',
+        name: 'Baby Blue Aurora',
+        category: 'Product & SaaS',
+        group: 'tech',
+        num: '07',
+        tagline: 'Ethereal mist sky blue with sharp slate typography and modern glass aura.',
+        bg: '#B1D4D0',
+        bgGrad: 'linear-gradient(135deg, #D5ECE9 0%, #B1D4D0 100%)',
+        text: '#1A2223',
+        accent: '#2D3536',
+        muted: '#52352D',
+        chip: '#785A14',
+        fontFamily: "'Work Sans', -apple-system, sans-serif",
+        recommended: 'Product managers, UX researchers, growth leaders, and app designers.',
+        sample: {
+          fullName: 'Liam Chen',
+          role: 'Head of Product',
+          company: 'Aurora Labs',
+          email: 'liam@auroralabs.io',
+          phone: '+1 (555) 789-0123',
+          website: 'https://auroralabs.io'
+        }
+      },
+      {
+        id: 'royal-monolith',
+        name: 'Royal Monolith',
+        category: 'Executive & Luxury',
+        group: 'finance',
+        num: '08',
+        tagline: 'Deep midnight obsidian with electric cyan accents and gold crest.',
+        bg: '#0F172A',
+        bgGrad: 'linear-gradient(135deg, #0F172A 0%, #050810 100%)',
+        text: '#F8FAFC',
+        accent: '#38BDF8',
+        muted: '#94A3B8',
+        chip: '#FBBF24',
+        fontFamily: "'Fraunces', Georgia, serif",
+        recommended: 'Executive chairmen, private equity partners, and luxury brand managers.',
+        sample: {
+          fullName: 'Gaston de Valois',
+          role: 'Managing Partner',
+          company: 'Monolith Holdings',
+          email: 'gaston@monolith-holdings.ch',
+          phone: '+41 22 819 0000',
+          website: 'https://monolith-holdings.ch'
+        }
+      },
+      {
+        id: 'cyber-neon',
+        name: 'Cyber Neon',
+        category: 'Web3 & Gaming',
+        group: 'tech',
+        num: '09',
+        tagline: 'Deep cyber navy with electric emerald matrix accents and mono font.',
+        bg: '#050814',
+        bgGrad: 'linear-gradient(135deg, #0B132B 0%, #030712 100%)',
+        text: '#00F0FF',
+        accent: '#7000FF',
+        muted: '#798099',
+        chip: '#00FF9D',
+        fontFamily: "'IBM Plex Mono', monospace",
+        recommended: 'Web3 protocol engineers, game designers, and digital artists.',
+        sample: {
+          fullName: 'Vesper Zero',
+          role: 'Lead Protocol Dev',
+          company: 'CyberMesh Zero',
+          email: 'vesper@cybermesh.network',
+          phone: '+1 (555) 010-1010',
+          website: 'https://cybermesh.network'
+        }
+      },
+      {
+        id: 'swiss-grid',
+        name: 'Swiss Grid',
+        category: 'Typography Systems',
+        group: 'studio',
+        num: '10',
+        tagline: 'Crisp Bauhaus pure white with bold black grid structure and vermilion dot.',
+        bg: '#FFFFFF',
+        bgGrad: 'linear-gradient(135deg, #FFFFFF 0%, #F4F4F5 100%)',
+        text: '#18181B',
+        accent: '#EF4444',
+        muted: '#71717A',
+        chip: '#18181B',
+        fontFamily: "'Work Sans', -apple-system, sans-serif",
+        recommended: 'Typography directors, design systems engineers, and brand strategists.',
+        sample: {
+          fullName: 'Maxime Müller',
+          role: 'Design Systems Lead',
+          company: 'Zurich Design Bureau',
+          email: 'm.mueller@zurichdesign.ch',
+          phone: '+41 44 211 4455',
+          website: 'https://zurichdesign.ch'
+        }
+      },
+      {
+        id: 'espresso-heritage',
+        name: 'Espresso Heritage',
+        category: 'Hospitality & Craft',
+        group: 'craft',
+        num: '11',
+        tagline: 'Warm dark roasted mocha with antiqued brass typography.',
+        bg: '#3B231C',
+        bgGrad: 'linear-gradient(135deg, #52352D 0%, #291712 100%)',
+        text: '#FFFDF8',
+        accent: '#F5D166',
+        muted: '#B3C9D6',
+        chip: '#F5D166',
+        fontFamily: "'Fraunces', Georgia, serif",
+        recommended: 'Restaurateurs, boutique hotel owners, sommeliers, and roasters.',
+        sample: {
+          fullName: 'Matteo Rossi',
+          role: 'Founder & Patron',
+          company: 'Caffè Firenze 1928',
+          email: 'matteo@caffefirenze.it',
+          phone: '+39 055 210099',
+          website: 'https://caffefirenze.it'
+        }
+      },
+      {
+        id: 'velvet-sunset',
+        name: 'Velvet Sunset',
+        category: 'Media & Entertainment',
+        group: 'creative',
+        num: '12',
+        tagline: 'Deep royal plum velvet with warm honey gold and coral dusk accents.',
+        bg: '#31103F',
+        bgGrad: 'linear-gradient(135deg, #4A154B 0%, #1F0826 100%)',
+        text: '#FDE8E8',
+        accent: '#F6AD55',
+        muted: '#D6BCFA',
+        chip: '#ED8936',
+        fontFamily: "'Work Sans', -apple-system, sans-serif",
+        recommended: 'Producers, podcast hosts, music directors, and entertainment agents.',
+        sample: {
+          fullName: 'Maya Santos',
+          role: 'Executive Producer',
+          company: 'Sunset Audio & Film',
+          email: 'maya@sunsetaudio.com',
+          phone: '+1 (555) 321-7654',
+          website: 'https://sunsetaudio.com'
+        }
+      }
+    ];
+
+    function TemplatesPageApp() {
+      // Theme State
+      const [theme, setTheme] = useState(() => localStorage.getItem('inoviq_theme') || 'light');
+      const [selectedTemplate, setSelectedTemplate] = useState(TEMPLATES_CATALOG[0]);
+      const [filterCategory, setFilterCategory] = useState('all');
+      const [searchQuery, setSearchQuery] = useState('');
+      const [isFlipped, setIsFlipped] = useState(false);
+      const [activeFinish, setActiveFinish] = useState('matte'); // matte, linen, foil
+
+      // 3D Tilt Physics State
+      const stageRef = useRef(null);
+      const qrHolderRef = useRef(null);
+      const [tilt, setTilt] = useState({ x: 0, y: 0, degX: 0, degY: 0 });
+
+      // Synchronize Theme
+      useEffect(() => {
+        if (theme === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.removeAttribute('data-theme');
+        }
+        localStorage.setItem('inoviq_theme', theme);
+      }, [theme]);
+
+      const toggleTheme = () => {
+        setTheme(prev => prev === 'light' ? 'dark' : 'light');
+      };
+
+      // Read URL Parameter (?template=...)
+      useEffect(() => {
+        try {
+          const params = new URLSearchParams(window.location.search);
+          const tplParam = params.get('template');
+          if (tplParam) {
+            const match = TEMPLATES_CATALOG.find(t => 
+              t.name.toLowerCase() === tplParam.toLowerCase() ||
+              t.id.toLowerCase() === tplParam.toLowerCase()
+            );
+            if (match) setSelectedTemplate(match);
+          }
+        } catch(e) {}
+      }, []);
+
+      // Re-render QR code on flip or template change
+      useEffect(() => {
+        if (qrHolderRef.current && window.QRCode) {
+          qrHolderRef.current.innerHTML = '';
+          const s = selectedTemplate.sample;
+          const qrData = `MECARD:N:${s.fullName};ORG:${s.company};TEL:${s.phone};EMAIL:${s.email};URL:${s.website};;`;
+          new window.QRCode(qrHolderRef.current, {
+            text: qrData,
+            width: 84,
+            height: 84,
+            colorDark: '#1A2223',
+            colorLight: '#FFFFFF',
+            correctLevel: window.QRCode.CorrectLevel.M
+          });
+        }
+      }, [selectedTemplate, isFlipped]);
+
+      // 3D Mouse Movement Physics
+      const handleMouseMove = (e) => {
+        if (!stageRef.current) return;
+        const rect = stageRef.current.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        setTilt({
+          x: (x * 20),
+          y: (y * -20),
+          degX: y * -24,
+          degY: x * 24
+        });
+      };
+
+      const handleMouseLeave = () => {
+        setTilt({ x: 0, y: 0, degX: 0, degY: 0 });
+      };
+
+      // Filtered Templates
+      const filteredTemplates = TEMPLATES_CATALOG.filter(t => {
+        const matchesCategory = filterCategory === 'all' || t.group === filterCategory;
+        const query = searchQuery.toLowerCase().trim();
+        const matchesSearch = !query || 
+          t.name.toLowerCase().includes(query) ||
+          t.category.toLowerCase().includes(query) ||
+          t.tagline.toLowerCase().includes(query) ||
+          t.recommended.toLowerCase().includes(query);
+        return matchesCategory && matchesSearch;
+      });
+
+      const launchCardStudio = (templateName) => {
+        window.location.href = `create-card.html?template=${encodeURIComponent(templateName || selectedTemplate.name)}`;
+      };
+
+      return (
+        <div>
+          {/* ================================================================
+               FULL LENGTH TOP NAVIGATION BAR (Matching Dashboard & Catalog)
+               ================================================================ */}
+          <header className="nav-header">
+            <div className="nav-topbar">
+              <a href="dashboard.html" className="brand-logo" aria-label="Inoviq Home">
+                <img src="inoviq-logo.svg" alt="Inoviq" className="brand-logo-img" />
+              </a>
+
+              <nav className="nav-links">
+                <a href="dashboard.html">Home</a>
+                <a href="templates.html" className="active">Templates</a>
+                <a href="saved-cards.html">Saved Cards</a>
+                <a href="scan.html">Scan &amp; Import</a>
+              </nav>
+
+              <div className="nav-search-wrap">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.35-4.35" />
+                </svg>
+                <input 
+                  type="text" 
+                  placeholder="Search 12 templates, styles, roles…"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  id="templates-search-input"
+                />
+              </div>
+
+              <div className="nav-actions">
+                <button 
+                  className="theme-toggle-btn" 
+                  onClick={toggleTheme} 
+                  title="Toggle Light / Dark Theme"
+                  id="themeToggle"
+                >
+                  <svg className="theme-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                  </svg>
+                </button>
+
+                <a href="create-card.html" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '7px' }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                  </svg>
+                  <span>Create Blank Card</span>
+                </a>
+              </div>
+            </div>
+          </header>
+
+          {/* ================================================================
+               MAIN TEMPLATES WORKSPACE
+               ================================================================ */}
+          <div className="templates-shell">
+            
+            {/* Banner & Intro */}
+            <div className="templates-banner">
+              <div>
+                <div className="eyebrow">12 CURATED ARCHETYPES · DIGITAL &amp; TACTILE EDITORIAL</div>
+                <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '34px', fontWeight: 600, lineHeight: 1.2 }}>
+                  Ready-Made Design Templates
+                </h1>
+                <p style={{ fontSize: '15px', color: 'var(--ink-muted)', marginTop: '6px', maxWidth: '780px' }}>
+                  Select an archetype. Test physical 3D perspective tilt &amp; specular lighting physics, flip to inspect the QR contact reverse, and launch directly into Card Studio with 1 click.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button 
+                  className="btn-secondary" 
+                  onClick={() => launchCardStudio(selectedTemplate.name)}
+                  style={{ padding: '10px 20px', fontSize: '13.5px' }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                    <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                  </svg>
+                  <span>Customize "{selectedTemplate.name}" in Studio</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Filter Pills Toolbar */}
+            <div className="templates-filter-bar">
+              <div className="category-pills">
+                <button 
+                  className={`category-pill ${filterCategory === 'all' ? 'active' : ''}`}
+                  onClick={() => setFilterCategory('all')}
+                >
+                  All (12)
+                </button>
+                <button 
+                  className={`category-pill ${filterCategory === 'tech' ? 'active' : ''}`}
+                  onClick={() => setFilterCategory('tech')}
+                >
+                  Tech &amp; Founders (3)
+                </button>
+                <button 
+                  className={`category-pill ${filterCategory === 'studio' ? 'active' : ''}`}
+                  onClick={() => setFilterCategory('studio')}
+                >
+                  Studio &amp; Editorial (3)
+                </button>
+                <button 
+                  className={`category-pill ${filterCategory === 'creative' ? 'active' : ''}`}
+                  onClick={() => setFilterCategory('creative')}
+                >
+                  Creative &amp; Agency (2)
+                </button>
+                <button 
+                  className={`category-pill ${filterCategory === 'finance' ? 'active' : ''}`}
+                  onClick={() => setFilterCategory('finance')}
+                >
+                  Finance &amp; Legal (2)
+                </button>
+                <button 
+                  className={`category-pill ${filterCategory === 'craft' ? 'active' : ''}`}
+                  onClick={() => setFilterCategory('craft')}
+                >
+                  Craft &amp; Minimal (2)
+                </button>
+              </div>
+
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--ink-muted)' }}>
+                Showing {filteredTemplates.length} of {TEMPLATES_CATALOG.length}
+              </div>
+            </div>
+
+            {/* ================================================================
+                 FEATURED 3D PERSPECTIVE STAGE & SPECIFICATION HUB
+                 ================================================================ */}
+            <div className="templates-stage-layout">
+              
+              {/* Left Column: Interactive 3D Card Stage with Tilt Physics */}
+              <div 
+                className="stage-viewport" 
+                ref={stageRef}
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+              >
+                <div 
+                  className="stage-card-3d"
+                  style={{
+                    transform: isFlipped 
+                      ? `rotateY(180deg) rotateX(${tilt.degX}deg)`
+                      : `rotateY(${tilt.degY}deg) rotateX(${tilt.degX}deg)`,
+                    boxShadow: isFlipped
+                      ? '0 24px 50px -10px rgba(0,0,0,0.35)'
+                      : `0 24px 50px -10px rgba(0,0,0,0.35), 0 0 25px ${selectedTemplate.accent}25`
+                  }}
+                  onClick={() => setIsFlipped(!isFlipped)}
+                  title="Click to Flip Card Front / Back"
+                >
+                  {/* FRONT FACE */}
+                  <div 
+                    className="stage-card-face"
+                    style={{
+                      background: selectedTemplate.bgGrad,
+                      color: selectedTemplate.text
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ 
+                        fontFamily: 'var(--font-mono)', 
+                        fontSize: '11px', 
+                        letterSpacing: '0.1em', 
+                        textTransform: 'uppercase',
+                        color: selectedTemplate.muted 
+                      }}>
+                        {selectedTemplate.category}
+                      </div>
+                      <div style={{ 
+                        width: '32px', 
+                        height: '32px', 
+                        borderRadius: '8px', 
+                        background: selectedTemplate.chip,
+                        color: '#000',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: 700,
+                        fontSize: '11px',
+                        fontFamily: 'var(--font-mono)'
+                      }}>
+                        {selectedTemplate.num}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div style={{ 
+                        fontFamily: selectedTemplate.fontFamily, 
+                        fontSize: '24px', 
+                        fontWeight: 600,
+                        lineHeight: 1.2,
+                        letterSpacing: '-0.02em',
+                        color: selectedTemplate.text
+                      }}>
+                        {selectedTemplate.sample.fullName}
+                      </div>
+                      <div style={{ 
+                        fontFamily: 'var(--font-sans)', 
+                        fontSize: '13.5px', 
+                        color: selectedTemplate.accent, 
+                        marginTop: '3px' 
+                      }}>
+                        {selectedTemplate.sample.role} &middot; {selectedTemplate.sample.company}
+                      </div>
+                    </div>
+
+                    <div style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      alignItems: 'flex-end',
+                      borderTop: `1px solid ${selectedTemplate.accent}33`,
+                      paddingTop: '10px'
+                    }}>
+                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: selectedTemplate.muted }}>
+                        {selectedTemplate.sample.email}
+                      </div>
+                      <div style={{ 
+                        fontFamily: 'var(--font-mono)', 
+                        fontSize: '10px', 
+                        color: selectedTemplate.accent,
+                        background: 'rgba(0,0,0,0.25)',
+                        padding: '3px 8px',
+                        borderRadius: '6px'
+                      }}>
+                        TOUCH TO FLIP ↺
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* BACK FACE (With live generated QR Code) */}
+                  <div 
+                    className="stage-card-face stage-card-back"
+                    style={{
+                      background: selectedTemplate.bg,
+                      color: selectedTemplate.text
+                    }}
+                  >
+                    <div style={{ fontFamily: 'var(--font-serif)', fontSize: '18px', fontWeight: 600 }}>
+                      Scan to Add Contact
+                    </div>
+                    
+                    <div 
+                      ref={qrHolderRef}
+                      style={{
+                        padding: '8px',
+                        background: '#FFFFFF',
+                        borderRadius: '10px',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+                      }}
+                    ></div>
+
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: selectedTemplate.accent }}>
+                      {selectedTemplate.sample.website}
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* Right Column: Template Specifications & Studio Launch */}
+              <div className="card-spec-panel">
+                <div>
+                  <div className="spec-badge-pill" style={{ background: 'var(--mist, #AEC4D4)', color: '#0A0A0A' }}>
+                    <span>ARCHETYPE {selectedTemplate.num}</span> &middot; <span>{selectedTemplate.category}</span>
+                  </div>
+
+                  <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '28px', fontWeight: 600, marginTop: '12px' }}>
+                    {selectedTemplate.name}
+                  </h2>
+                  <p style={{ fontSize: '14.5px', color: 'var(--ink-muted)', marginTop: '6px', lineHeight: 1.5 }}>
+                    {selectedTemplate.tagline}
+                  </p>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', background: 'var(--bg-main)', padding: '16px', borderRadius: '12px', border: '1px solid var(--border-line)' }}>
+                  <div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--ink-muted)', textTransform: 'uppercase' }}>Typography</div>
+                    <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 600, fontSize: '13px', marginTop: '4px' }}>
+                      {selectedTemplate.fontFamily.split(',')[0].replace(/'/g, '')}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--ink-muted)', textTransform: 'uppercase' }}>Palette Swatches</div>
+                    <div className="spec-palette-dots">
+                      <div className="palette-circle-dot" style={{ background: selectedTemplate.bg }} title={`Base: ${selectedTemplate.bg}`}></div>
+                      <div className="palette-circle-dot" style={{ background: selectedTemplate.accent }} title={`Accent: ${selectedTemplate.accent}`}></div>
+                      <div className="palette-circle-dot" style={{ background: selectedTemplate.text }} title={`Text: ${selectedTemplate.text}`}></div>
+                      <div className="palette-circle-dot" style={{ background: selectedTemplate.chip }} title={`Stamp: ${selectedTemplate.chip}`}></div>
+                    </div>
+                  </div>
+
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--ink-muted)', textTransform: 'uppercase' }}>Best Suited For</div>
+                    <div style={{ fontSize: '13px', color: 'var(--ink-primary)', marginTop: '4px' }}>
+                      {selectedTemplate.recommended}
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                  <button 
+                    className="btn-primary" 
+                    onClick={() => launchCardStudio(selectedTemplate.name)}
+                    style={{ flex: 1, padding: '12px 20px', justifyContent: 'center', fontSize: '14px' }}
+                  >
+                    <span>Use "{selectedTemplate.name}" in Studio</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                    </svg>
+                  </button>
+
+                  <button 
+                    className="btn-ghost" 
+                    onClick={() => setIsFlipped(!isFlipped)}
+                    style={{ padding: '12px 18px', fontSize: '13px' }}
+                  >
+                    {isFlipped ? 'Show Front' : 'Flip to QR Back'}
+                  </button>
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* ================================================================
+                 ALL 12 TEMPLATES GALLERY GRID
+                 ================================================================ */}
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
+                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '22px', fontWeight: 600 }}>
+                  Browse All Archetypes
+                </h3>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--ink-muted)' }}>
+                  Click to inspect in 3D &middot; Double click to launch studio
+                </div>
+              </div>
+
+              <div className="gallery-grid">
+                {filteredTemplates.map(template => (
+                  <div 
+                    key={template.id}
+                    className={`gallery-item-card ${selectedTemplate.id === template.id ? 'is-active' : ''}`}
+                    onClick={() => {
+                      setSelectedTemplate(template);
+                      setIsFlipped(false);
+                      window.scrollTo({ top: 180, behavior: 'smooth' });
+                    }}
+                    onDoubleClick={() => launchCardStudio(template.name)}
+                  >
+                    {/* Visual Card Thumbnail */}
+                    <div 
+                      className="gallery-card-thumb"
+                      style={{ background: template.bgGrad, color: template.text }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: template.muted }}>
+                          {template.num}
+                        </span>
+                        <span style={{ 
+                          width: '16px', 
+                          height: '16px', 
+                          borderRadius: '4px', 
+                          background: template.chip 
+                        }}></span>
+                      </div>
+
+                      <div>
+                        <div style={{ fontFamily: template.fontFamily, fontSize: '16px', fontWeight: 600, color: template.text }}>
+                          {template.name}
+                        </div>
+                        <div style={{ fontFamily: 'var(--font-sans)', fontSize: '11px', color: template.accent }}>
+                          {template.category}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card Info & CTA */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--ink-primary)' }}>
+                          {template.name}
+                        </div>
+                        <div style={{ fontSize: '11.5px', color: 'var(--ink-muted)' }}>
+                          {template.category}
+                        </div>
+                      </div>
+
+                      <button 
+                        className="btn-card-action"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          launchCardStudio(template.name);
+                        }}
+                        style={{ padding: '6px 12px', fontSize: '11.5px', borderRadius: '8px' }}
+                      >
+                        Use &rarr;
+                      </button>
+                    </div>
+
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Site Footer */}
+            <footer className="site-footer">
+              <a href="dashboard.html" className="brand-logo">i<span>noviq</span></a>
+              <div className="footer-tag">Digital visiting cards for people who move fast.</div>
+              <div className="footer-links">
+                <a href="dashboard.html">Home</a>
+                <a href="templates.html">Templates</a>
+                <a href="saved-cards.html">Saved Cards</a>
+                <a href="scan.html">Scan &amp; Import</a>
+                <a href="create-card.html">Create Card</a>
+              </div>
+            </footer>
+
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('templates-root')).render(<TemplatesPageApp />);
+  </script>
+</body>
+
+</html>

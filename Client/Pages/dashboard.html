@@ -27,10 +27,8 @@
 
 <body ng-controller="DashboardController as vm">
 
-  <div class="wrap">
-
-    <!-- ===== NAV HEADER ===== -->
-    <header class="nav-header">
+  <!-- ===== NAV HEADER (Full Length Edge-to-Edge) ===== -->
+  <header class="nav-header">
       <div class="nav-topbar">
         <a href="dashboard.html" class="brand-logo" aria-label="Inoviq Home">
           <img src="inoviq-logo.svg" alt="Inoviq" class="brand-logo-img">
@@ -38,7 +36,7 @@
 
         <!-- Main Navigation Links -->
         <nav class="nav-links">
-          <a href="#templates" class="nav-link-item" ng-click="vm.handleGuestNav('templates', '#templates', $event)">Templates</a>
+          <a href="templates.html" class="nav-link-item">Templates</a>
           <a href="saved-cards.html" class="nav-link-item" ng-click="vm.handleGuestNav('saved cards', 'saved-cards.html', $event)">Saved Cards</a>
           <a href="scan.html" class="nav-link-item" ng-click="vm.handleGuestNav('scan & import', 'scan.html', $event)">Scan &amp; Import</a>
         </nav>
@@ -125,6 +123,8 @@
       </div>
     </header>
 
+  <div class="wrap">
+
     <!-- ===== HERO SECTION ===== -->
     <section class="hero" id="hero">
       <div class="hero-copy">
@@ -134,7 +134,7 @@
           straight into their contacts.</p>
         <div class="cta-row">
           <a href="create-card.html" class="btn-primary btn-lg" id="btn-hero-create" ng-click="vm.handleGuestNav('card builder', 'create-card.html', $event)">Create your card</a>
-          <a href="#templates" class="btn-ghost btn-lg" id="btn-browse" ng-click="vm.handleGuestNav('templates', '#templates', $event)">Browse templates</a>
+          <a href="templates.html" class="btn-ghost btn-lg" id="btn-browse">Browse 12 templates</a>
         </div>
       </div>
 
@@ -274,7 +274,7 @@
           <div class="eyebrow-small">04 of 12 shown</div>
           <div class="catalog-title">Ready-made templates</div>
         </div>
-        <button class="btn-ghost" id="btn-all-tpl" ng-click="vm.handleGuestNav('templates', '#templates', $event)">View all 12 &rarr;</button>
+        <a href="templates.html" class="btn-ghost" id="btn-all-tpl" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">View all 12 templates &rarr;</a>
       </div>
       <div class="rail">
         <div class="tpl" id="tpl-01" ng-click="vm.selectTemplate('Ledger', $event)">
@@ -449,7 +449,7 @@
       </a>
       <div class="footer-tag">Digital visiting cards for people who move fast.</div>
       <div class="footer-links">
-        <a href="#templates">Templates</a>
+        <a href="templates.html">Templates</a>
         <a href="#how-it-works">Scan &amp; Save</a>
         <a href="javascript:void(0)" ng-click="vm.requireAuth('Saved Catalog', 'dashboard.html#my-cards')">Contacts</a>
         <a href="login.html" ng-if="!vm.isLoggedIn">Sign In</a>

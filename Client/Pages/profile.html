@@ -433,10 +433,8 @@
 
 <body ng-controller="ProfileController as vm">
 
-  <div class="profile-shell">
-
-    <!-- ===== NAV HEADER ===== -->
-    <header class="nav-header">
+  <!-- ===== FULL LENGTH EDGE-TO-EDGE TOPBAR ===== -->
+  <header class="nav-header">
       <div class="nav-topbar">
         <a href="dashboard.html" class="brand-logo" aria-label="Inoviq Home">
           <img src="inoviq-logo.svg" alt="Inoviq" class="brand-logo-img">
@@ -444,7 +442,8 @@
 
         <!-- Main Navigation Links -->
         <nav class="nav-links">
-          <a href="dashboard.html" class="nav-link-item">Dashboard</a>
+          <a href="dashboard.html" class="nav-link-item">Home</a>
+          <a href="templates.html" class="nav-link-item">Templates</a>
           <a href="saved-cards.html" class="nav-link-item">Saved Cards</a>
           <a href="scan.html" class="nav-link-item">Scan &amp; Import</a>
           <a href="profile.html" class="nav-link-item active">My Profile</a>
@@ -499,6 +498,8 @@
         </div>
       </div>
     </header>
+
+  <div class="profile-shell">
 
     <!-- ===== LOADING STATE ===== -->
     <div class="profile-loading" ng-if="vm.loading" id="profile-loading">

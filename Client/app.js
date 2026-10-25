@@ -872,12 +872,8 @@
     };
 
     vm.selectTemplate = function (name, $event) {
-      if (!vm.isLoggedIn) {
-        if ($event) $event.preventDefault();
-        vm.requireAuth('templates', 'create-card.html?template=' + encodeURIComponent(name), $event);
-        return;
-      }
-      $window.location.href = 'create-card.html?template=' + encodeURIComponent(name);
+      if ($event) $event.preventDefault();
+      $window.location.href = 'templates.html?template=' + encodeURIComponent(name);
     };
 
     // Edge case check: guest opening protected direct URL or #templates
@@ -938,9 +934,6 @@
       }
     };
 
-    vm.selectTemplate = function (name) {
-      $window.location.href = 'create-card.html?template=' + encodeURIComponent(name);
-    };
 
     vm.getUserInitials = function () {
       if (!vm.currentUser) return 'IN';
@@ -975,6 +968,9 @@
     catalog.currentUser = AuthService.getCurrentUser();
     catalog.searchTerm = '';
     catalog.selectedCategory = 'All';
+    catalog.selectedCompany = 'All';
+    catalog.groupBy = 'none'; // 'none', 'company', 'template', 'alpha'
+    catalog.sortBy = 'newest'; // 'newest', 'alpha-asc', 'alpha-desc', 'company'
     catalog.viewMode = 'grid';
 
     catalog.cards = [];
@@ -1072,10 +1068,59 @@
       catalog.selectedCategory = cat;
     };
 
+    catalog.setGroupBy = function (type) {
+      catalog.groupBy = type;
+    };
+
+    catalog.setSortBy = function (type) {
+      catalog.sortBy = type;
+    };
+
+    catalog.setCompany = function (comp) {
+      catalog.selectedCompany = comp;
+    };
+
+    catalog.clearAllFilters = function () {
+      catalog.searchTerm = '';
+      catalog.selectedCategory = 'All';
+      catalog.selectedCompany = 'All';
+      catalog.sortBy = 'newest';
+      catalog.groupBy = 'none';
+    };
+
+    catalog.isFiltered = function () {
+      return (catalog.searchTerm !== '') ||
+             (catalog.selectedCategory !== 'All') ||
+             (catalog.selectedCompany !== 'All') ||
+             (catalog.sortBy !== 'newest') ||
+             (catalog.groupBy !== 'none');
+    };
+
+    catalog.getCompanies = function () {
+      var map = {};
+      (catalog.cards || []).forEach(function (c) {
+        var comp = (c.company || '').trim();
+        if (comp) map[comp] = true;
+      });
+      return Object.keys(map).sort();
+    };
+
+    catalog.getTemplates = function () {
+      var map = {};
+      (catalog.cards || []).forEach(function (c) {
+        var t = (c.templateLabel || '').trim();
+        if (t) map[t] = true;
+      });
+      return Object.keys(map).sort();
+    };
+
     catalog.filteredCards = function () {
-      return catalog.cards.filter(function (card) {
+      var list = (catalog.cards || []).filter(function (card) {
         var matchCat = (catalog.selectedCategory === 'All') ||
-          (card.templateLabel && card.templateLabel.toLowerCase() === catalog.selectedCategory.toLowerCase());
+          (card.templateLabel && card.templateLabel.toLowerCase().includes(catalog.selectedCategory.toLowerCase()));
+
+        var matchComp = (catalog.selectedCompany === 'All') ||
+          (card.company && card.company.toLowerCase() === catalog.selectedCompany.toLowerCase());
 
         var matchSearch = true;
         if (catalog.searchTerm) {
@@ -1083,11 +1128,63 @@
           matchSearch = (card.fullName && card.fullName.toLowerCase().includes(term)) ||
             (card.jobTitle && card.jobTitle.toLowerCase().includes(term)) ||
             (card.company && card.company.toLowerCase().includes(term)) ||
-            (card.email && card.email.toLowerCase().includes(term));
+            (card.email && card.email.toLowerCase().includes(term)) ||
+            (card.phone && card.phone.toLowerCase().includes(term));
         }
 
-        return matchCat && matchSearch;
+        return matchCat && matchComp && matchSearch;
       });
+
+      // Sorting
+      if (catalog.sortBy === 'alpha-asc') {
+        list.sort(function (a, b) { return (a.fullName || '').localeCompare(b.fullName || ''); });
+      } else if (catalog.sortBy === 'alpha-desc') {
+        list.sort(function (a, b) { return (b.fullName || '').localeCompare(a.fullName || ''); });
+      } else if (catalog.sortBy === 'company') {
+        list.sort(function (a, b) { return (a.company || '').localeCompare(b.company || ''); });
+      }
+
+      return list;
+    };
+
+    catalog.getGroupedCards = function () {
+      var filtered = catalog.filteredCards();
+      var groups = {};
+
+      filtered.forEach(function (card) {
+        var groupKey = '';
+        var groupLabel = '';
+        var groupIcon = '';
+
+        if (catalog.groupBy === 'company') {
+          groupKey = (card.company && card.company.trim()) ? card.company.trim() : 'Independent / Freelance';
+          groupLabel = groupKey;
+          groupIcon = '🏢';
+        } else if (catalog.groupBy === 'template') {
+          groupKey = (card.templateLabel && card.templateLabel.trim()) ? card.templateLabel.trim() : 'Custom Template';
+          groupLabel = groupKey;
+          groupIcon = '🎨';
+        } else if (catalog.groupBy === 'alpha') {
+          var letter = (card.fullName && card.fullName.trim()) ? card.fullName.trim()[0].toUpperCase() : '#';
+          groupKey = letter;
+          groupLabel = 'Index ' + letter;
+          groupIcon = '🔤';
+        }
+
+        if (!groups[groupKey]) {
+          groups[groupKey] = {
+            key: groupKey,
+            label: groupLabel,
+            icon: groupIcon,
+            cards: []
+          };
+        }
+        groups[groupKey].cards.push(card);
+      });
+
+      var groupArray = Object.keys(groups).map(function (k) { return groups[k]; });
+      groupArray.sort(function (a, b) { return a.label.localeCompare(b.label); });
+      return groupArray;
     };
 
     catalog.totalCards = function () {

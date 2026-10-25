@@ -63,16 +63,193 @@
 
     .catalog-filter-bar {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      flex-direction: column;
+      gap: 14px;
       background: var(--paper-card);
       border: 1.5px solid var(--border-line);
-      border-radius: 14px;
-      padding: 10px 16px;
+      border-radius: 16px;
+      padding: 14px 18px;
       margin-bottom: 28px;
       box-shadow: var(--shadow-sm);
+    }
+
+    .filter-main-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       gap: 16px;
       flex-wrap: wrap;
+      width: 100%;
+    }
+
+    .filter-secondary-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-line);
+      width: 100%;
+    }
+
+    .filter-control-cluster {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .control-label-text {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-muted);
+      font-weight: 600;
+    }
+
+    .select-pill-wrap {
+      display: inline-flex;
+      align-items: center;
+      position: relative;
+    }
+
+    .select-pill {
+      appearance: none;
+      -webkit-appearance: none;
+      background: var(--bg-main);
+      border: 1px solid var(--border-line);
+      color: var(--ink-primary);
+      font-family: var(--font-sans);
+      font-size: 12.5px;
+      font-weight: 500;
+      padding: 6px 28px 6px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.18s ease;
+    }
+
+    .select-pill:hover, .select-pill:focus {
+      border-color: var(--mocha, #4B4038);
+      box-shadow: 0 0 0 2px rgba(154, 134, 120, 0.2);
+    }
+
+    .select-pill-arrow {
+      position: absolute;
+      right: 10px;
+      pointer-events: none;
+      color: var(--ink-muted);
+    }
+
+    .groupby-btn-cluster {
+      display: inline-flex;
+      align-items: center;
+      background: var(--bg-main);
+      border: 1px solid var(--border-line);
+      border-radius: 20px;
+      padding: 2px;
+      gap: 2px;
+    }
+
+    .groupby-pill-btn {
+      padding: 5px 12px;
+      border-radius: 16px;
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 500;
+      border: none;
+      background: transparent;
+      color: var(--ink-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .groupby-pill-btn:hover {
+      color: var(--ink-primary);
+    }
+
+    .groupby-pill-btn.active {
+      background: var(--mocha, #4B4038);
+      color: #FFFFFF;
+      font-weight: 600;
+      box-shadow: var(--shadow-sm);
+    }
+
+    [data-theme="dark"] .groupby-pill-btn.active {
+      background: #203B63;
+      color: #F3F5FA;
+    }
+
+    .btn-clear-filters {
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      border: 1px dashed var(--border-dark);
+      background: transparent;
+      color: var(--ink-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-clear-filters:hover {
+      background: rgba(154, 134, 120, 0.15);
+      color: var(--ink-primary);
+      border-style: solid;
+    }
+
+    /* Group Container Blocks */
+    .card-group-block {
+      margin-bottom: 34px;
+    }
+
+    .card-group-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1.5px solid var(--border-line);
+    }
+
+    .group-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .group-icon {
+      font-size: 18px;
+    }
+
+    .group-title {
+      font-family: var(--font-serif);
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--ink-primary);
+      letter-spacing: -0.01em;
+    }
+
+    .group-count-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 12px;
+      background: var(--mist, #AEC4D4);
+      color: #0A0A0A;
+      font-weight: 600;
+    }
+
+    [data-theme="dark"] .group-count-badge {
+      background: #14243B;
+      color: #AFCDE5;
+      border: 1px solid #203653;
     }
 
     .category-pills {
@@ -121,8 +298,15 @@
     }
 
     .view-btn.active {
-      border-color: var(--moss);
-      background: rgba(105, 124, 112, 0.15);
+      border-color: var(--mocha, #4B4038);
+      background: var(--slate-blue, #AEC4D4);
+      color: #0A0A0A;
+    }
+
+    [data-theme="dark"] .view-btn.active {
+      border-color: #35598B;
+      background: #203B63;
+      color: #F3F5FA;
     }
 
     /* Grid Layout for Cards */
@@ -151,7 +335,11 @@
     .saved-card-item:hover {
       transform: translateY(-4px);
       box-shadow: var(--shadow-md);
-      border-color: var(--moss);
+      border-color: var(--mocha, #4B4038);
+    }
+
+    [data-theme="dark"] .saved-card-item:hover {
+      border-color: #35598B;
     }
 
     .card-top-strip {
@@ -165,7 +353,8 @@
       width: 42px;
       height: 42px;
       border-radius: 10px;
-      color: #FFFDF8;
+      background: var(--mocha, #4B4038);
+      color: #FFFFFF;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -173,6 +362,11 @@
       font-weight: 700;
       font-size: 14px;
       box-shadow: var(--shadow-sm);
+    }
+
+    [data-theme="dark"] .card-avatar-chip {
+      background: #203B63;
+      color: #F3F5FA;
     }
 
     .saved-card-name {
@@ -231,13 +425,13 @@
 
     .btn-card-action:hover {
       border-color: var(--border-dark);
-      background: rgba(105, 124, 112, 0.12);
+      background: rgba(154, 134, 120, 0.15);
     }
 
     .btn-card-action.btn-del-action:hover {
-      border-color: #9C3D3D;
-      color: #9C3D3D;
-      background: rgba(156, 61, 61, 0.08);
+      border-color: var(--mocha, #4B4038);
+      color: var(--mocha, #4B4038);
+      background: rgba(154, 134, 120, 0.10);
     }
 
     /* Modal 3D Inspector */
@@ -348,9 +542,9 @@
     }
 
     .add-card-placeholder:hover {
-      border-color: var(--moss);
+      border-color: var(--mocha, #4B4038);
       color: var(--ink-primary);
-      background: rgba(105, 124, 112, 0.06);
+      background: rgba(154, 134, 120, 0.08);
       transform: translateY(-3px);
     }
   </style>
@@ -358,10 +552,8 @@
 
 <body ng-controller="SavedCardsController as catalog">
 
-  <div class="wrap">
-
-    <!-- ===== NAV HEADER ===== -->
-    <header class="nav-header">
+  <!-- ===== FULL LENGTH EDGE-TO-EDGE TOPBAR ===== -->
+  <header class="nav-header">
       <div class="nav-topbar">
         <a href="dashboard.html" class="brand-logo" aria-label="Inoviq Home">
           <img src="inoviq-logo.svg" alt="Inoviq" class="brand-logo-img">
@@ -370,7 +562,7 @@
         <!-- Main Navigation Links -->
         <nav class="nav-links">
           <a href="dashboard.html">Home</a>
-          <a href="dashboard.html#templates">Templates</a>
+          <a href="templates.html">Templates</a>
           <a href="saved-cards.html" class="active">Saved Cards</a>
           <a href="scan.html">Scan &amp; Import</a>
         </nav>
@@ -401,6 +593,8 @@
         </div>
       </div>
     </header>
+
+  <div class="wrap">
 
     <!-- ===== BANNER & ACTIONS ===== -->
     <div class="catalog-top-banner">
@@ -449,108 +643,230 @@
 
     <!-- ===== FILTER & TOOLBAR ===== -->
     <div class="catalog-filter-bar">
-      <!-- Category Pills -->
-      <div class="category-pills">
-        <button class="category-pill" ng-class="{'active': catalog.selectedCategory === 'All'}" ng-click="catalog.setCategory('All')">All ({{ catalog.cards.length }})</button>
-        <button class="category-pill" ng-class="{'active': catalog.selectedCategory === 'Ledger'}" ng-click="catalog.setCategory('Ledger')">Ledger</button>
-        <button class="category-pill" ng-class="{'active': catalog.selectedCategory === 'Midnight Desk'}" ng-click="catalog.setCategory('Midnight Desk')">Midnight Desk</button>
-        <button class="category-pill" ng-class="{'active': catalog.selectedCategory === 'Stamped'}" ng-click="catalog.setCategory('Stamped')">Stamped</button>
-        <button class="category-pill" ng-class="{'active': catalog.selectedCategory === 'Brass Rule'}" ng-click="catalog.setCategory('Brass Rule')">Brass Rule</button>
-        <button class="category-pill" ng-class="{'active': catalog.selectedCategory === 'Scanned'}" ng-click="catalog.setCategory('Scanned')" style="display:inline-flex;align-items:center;gap:5px;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
-          <span>Scanned</span>
-        </button>
+      <!-- Main Row: Category Filter Pills + View Switcher -->
+      <div class="filter-main-row">
+        <!-- Category / Design Style Pills -->
+        <div class="category-pills">
+          <button class="category-pill" ng-class="{'active': catalog.selectedCategory === 'All'}" ng-click="catalog.setCategory('All')">All ({{ catalog.cards.length }})</button>
+          <button class="category-pill" ng-class="{'active': catalog.selectedCategory === 'Ledger'}" ng-click="catalog.setCategory('Ledger')">Ledger</button>
+          <button class="category-pill" ng-class="{'active': catalog.selectedCategory === 'Midnight Desk'}" ng-click="catalog.setCategory('Midnight Desk')">Midnight Desk</button>
+          <button class="category-pill" ng-class="{'active': catalog.selectedCategory === 'Stamped'}" ng-click="catalog.setCategory('Stamped')">Stamped</button>
+          <button class="category-pill" ng-class="{'active': catalog.selectedCategory === 'Brass Rule'}" ng-click="catalog.setCategory('Brass Rule')">Brass Rule</button>
+          <button class="category-pill" ng-class="{'active': catalog.selectedCategory === 'Scanned'}" ng-click="catalog.setCategory('Scanned')" style="display:inline-flex;align-items:center;gap:5px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+            <span>Scanned</span>
+          </button>
+        </div>
+
+        <!-- View Controls -->
+        <div class="view-controls">
+          <button class="view-btn" ng-class="{'active': catalog.viewMode === 'grid'}" ng-click="catalog.viewMode = 'grid'" title="Grid View">⊞ Grid</button>
+          <button class="view-btn" ng-class="{'active': catalog.viewMode === 'list'}" ng-click="catalog.viewMode = 'list'" title="List View"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:4px;"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg><span>List</span></button>
+        </div>
       </div>
 
-      <!-- View Controls -->
-      <div class="view-controls">
-        <button class="view-btn" ng-class="{'active': catalog.viewMode === 'grid'}" ng-click="catalog.viewMode = 'grid'" title="Grid View">⊞ Grid</button>
-        <button class="view-btn" ng-class="{'active': catalog.viewMode === 'list'}" ng-click="catalog.viewMode = 'list'" title="List View"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:4px;"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg><span>List</span></button>
+      <!-- Secondary Row: GroupBy Features & Advanced Filters -->
+      <div class="filter-secondary-row">
+        <!-- GroupBy Control Cluster -->
+        <div class="filter-control-cluster">
+          <span class="control-label-text">Group By:</span>
+          <div class="groupby-btn-cluster">
+            <button class="groupby-pill-btn" ng-class="{'active': catalog.groupBy === 'none'}" ng-click="catalog.setGroupBy('none')" title="Flat list without grouping">None</button>
+            <button class="groupby-pill-btn" ng-class="{'active': catalog.groupBy === 'company'}" ng-click="catalog.setGroupBy('company')" title="Group contacts by Company">🏢 Company</button>
+            <button class="groupby-pill-btn" ng-class="{'active': catalog.groupBy === 'template'}" ng-click="catalog.setGroupBy('template')" title="Group cards by Template style">🎨 Template</button>
+            <button class="groupby-pill-btn" ng-class="{'active': catalog.groupBy === 'alpha'}" ng-click="catalog.setGroupBy('alpha')" title="Group contacts alphabetically A-Z">🔤 A–Z</button>
+          </div>
+        </div>
+
+        <!-- Advanced Filter & Sort Cluster -->
+        <div class="filter-control-cluster">
+          <!-- Filter by Company -->
+          <div class="select-pill-wrap" title="Filter by organization">
+            <span class="control-label-text" style="margin-right: 6px;">Company:</span>
+            <select class="select-pill" ng-model="catalog.selectedCompany">
+              <option value="All">All Companies</option>
+              <option ng-repeat="comp in catalog.getCompanies()" value="{{ comp }}">{{ comp }}</option>
+            </select>
+            <span class="select-pill-arrow">▾</span>
+          </div>
+
+          <!-- Sort By -->
+          <div class="select-pill-wrap" title="Sort contacts">
+            <span class="control-label-text" style="margin-right: 6px;">Sort:</span>
+            <select class="select-pill" ng-model="catalog.sortBy">
+              <option value="newest">Newest First</option>
+              <option value="alpha-asc">Name (A → Z)</option>
+              <option value="alpha-desc">Name (Z → A)</option>
+              <option value="company">Company (A → Z)</option>
+            </select>
+            <span class="select-pill-arrow">▾</span>
+          </div>
+
+          <!-- Clear Filters Button -->
+          <button class="btn-clear-filters" ng-if="catalog.isFiltered()" ng-click="catalog.clearAllFilters()" title="Reset all search, filters and grouping">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <span>Reset</span>
+          </button>
+        </div>
       </div>
     </div>
 
-    <!-- ===== GRID VIEW ===== -->
-    <div class="cards-grid-layout" ng-if="catalog.viewMode === 'grid'">
-      
-      <!-- Card Item -->
-      <div class="saved-card-item" ng-repeat="card in catalog.filteredCards() track by (card._id || card.id)">
-        <div>
-          <div class="card-top-strip">
-            <div class="card-avatar-chip" ng-style="{background: card.color || '#2D3536'}">
-              {{ card.initials || 'CD' }}
+    <!-- ===== GROUPED VIEW (When Group By !== 'none') ===== -->
+    <div ng-if="catalog.groupBy !== 'none'">
+      <div class="card-group-block" ng-repeat="group in catalog.getGroupedCards() track by group.key">
+        <div class="card-group-header">
+          <div class="group-title-wrap">
+            <span class="group-icon">{{ group.icon }}</span>
+            <h3 class="group-title">{{ group.label }}</h3>
+            <span class="group-count-badge">{{ group.cards.length }} {{ group.cards.length === 1 ? 'card' : 'cards' }}</span>
+          </div>
+        </div>
+
+        <!-- Group Cards in Grid View -->
+        <div class="cards-grid-layout" ng-if="catalog.viewMode === 'grid'">
+          <div class="saved-card-item" ng-repeat="card in group.cards track by (card._id || card.id)">
+            <div>
+              <div class="card-top-strip">
+                <div class="card-avatar-chip" ng-style="{background: card.color || '#2D3536'}">
+                  {{ card.initials || 'CD' }}
+                </div>
+                <span class="sample-tag-badge">{{ card.templateLabel || 'LEDGER' }}</span>
+              </div>
+              <div class="saved-card-name">{{ card.fullName }}</div>
+              <div class="saved-card-role">{{ card.jobTitle }} &middot; {{ card.company }}</div>
+              <div class="saved-card-contacts">
+                <div ng-if="card.email" style="display:flex;align-items:center;gap:5px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg><span>{{ card.email }}</span></div>
+                <div ng-if="card.phone" style="display:flex;align-items:center;gap:5px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>{{ card.phone }}</span></div>
+                <div ng-if="card.website" style="display:flex;align-items:center;gap:5px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg><span>{{ card.website }}</span></div>
+              </div>
             </div>
-            <span class="sample-tag-badge">{{ card.templateLabel || 'LEDGER' }}</span>
-          </div>
-
-          <div class="saved-card-name">{{ card.fullName }}</div>
-          <div class="saved-card-role">{{ card.jobTitle }} &middot; {{ card.company }}</div>
-
-          <div class="saved-card-contacts">
-            <div ng-if="card.email" style="display:flex;align-items:center;gap:5px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg><span>{{ card.email }}</span></div>
-            <div ng-if="card.phone" style="display:flex;align-items:center;gap:5px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>{{ card.phone }}</span></div>
-            <div ng-if="card.website" style="display:flex;align-items:center;gap:5px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg><span>{{ card.website }}</span></div>
+            <div class="saved-card-actions">
+              <button class="btn-card-action" ng-click="catalog.openInspectModal(card)" title="3D Card Preview">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:4px;"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg><span>Inspect 3D</span>
+              </button>
+              <button class="btn-card-action" ng-click="catalog.downloadVCard(card)" title="Export vCard">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:4px;"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>.VCF</span>
+              </button>
+              <a ng-href="create-card.html?id={{ card._id || card.id }}" class="btn-card-action" title="Edit Card">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:4px;"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg><span>Edit</span>
+              </a>
+              <button class="btn-card-action btn-del-action" ng-click="catalog.deleteCard(card)" title="Delete Card"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>
+            </div>
           </div>
         </div>
 
-        <div class="saved-card-actions">
-          <button class="btn-card-action" ng-click="catalog.openInspectModal(card)" title="3D Card Preview">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:4px;"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg><span>Inspect 3D</span>
-          </button>
-          <button class="btn-card-action" ng-click="catalog.downloadVCard(card)" title="Export vCard">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:4px;"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>.VCF</span>
-          </button>
-          <a ng-href="create-card.html?id={{ card._id || card.id }}" class="btn-card-action" title="Edit Card">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:4px;"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg><span>Edit</span>
-          </a>
-          <button class="btn-card-action btn-del-action" ng-click="catalog.deleteCard(card)" title="Delete Card"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>
+        <!-- Group Cards in List View -->
+        <div class="cards-list" ng-if="catalog.viewMode === 'list'">
+          <div class="card-row" ng-repeat="card in group.cards track by (card._id || card.id)">
+            <div class="row-chip" ng-style="{background: card.color || '#2D3536'}">{{ card.initials }}</div>
+            <div class="row-info">
+              <div class="row-name">{{ card.fullName }}</div>
+              <div class="row-role">{{ card.jobTitle }} &middot; {{ card.company }} &middot; {{ card.email }}</div>
+            </div>
+            <div class="row-badge">{{ card.templateLabel || 'Ledger' }}</div>
+            <div class="row-actions">
+              <button class="btn-icon" ng-click="catalog.openInspectModal(card)" title="Inspect 3D Card"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+              <button class="btn-icon" ng-click="catalog.downloadVCard(card)" title="Download vCard"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></button>
+              <button class="btn-icon btn-del" ng-click="catalog.deleteCard(card)" title="Delete Card">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Empty state for logged-in users with no real cards yet -->
-      <div ng-if="catalog.isLoggedIn && catalog.cards.length === 0" style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: var(--ink-muted);">
-        <div style="display:flex;justify-content:center;margin-bottom:12px;opacity:0.6;"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/><line x1="2" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="22" y2="16"/></svg></div>
-        <div style="font-family: var(--font-serif); font-size: 20px; font-weight: 600; color: var(--ink-primary); margin-bottom: 8px;">Your vault is empty</div>
-        <div style="font-family: var(--font-mono); font-size: 12px; line-height: 1.6;">Create your first digital visiting card or scan a physical card to get started.</div>
+      <!-- No cards in grouped search -->
+      <div ng-if="catalog.getGroupedCards().length === 0" style="text-align: center; padding: 40px 20px; color: var(--ink-muted);">
+        <div style="font-family: var(--font-serif); font-size: 20px; font-weight: 600; color: var(--ink-primary); margin-bottom: 8px;">No matching cards found</div>
+        <div style="font-family: var(--font-mono); font-size: 12px;">Try adjusting your company, template, or search keyword.</div>
       </div>
-
-      <!-- Guest notice: clarify these are demo cards -->
-      <div ng-if="!catalog.isLoggedIn" style="grid-column: 1 / -1; text-align: center; padding: 4px 0 12px;">
-        <span style="font-family: var(--font-mono); font-size: 11px; color: var(--ink-muted); background: var(--paper-card); border: 1px solid var(--border-line); border-radius: 20px; padding: 4px 14px;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:5px;"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.89A2 2 0 0 1 15 10.77V6a3 3 0 0 0-6 0v4.77a2 2 0 0 1-1.11 1.79l-1.78.89A2 2 0 0 0 5 15.24Z"/></svg>These are sample cards — <a href="login.html" style="color: var(--moss);">sign in</a> to see your real catalog
-        </span>
-      </div>
-
-      <!-- Add New Card Action Box -->
-      <a href="create-card.html" class="add-card-placeholder">
-        <div style="display:flex;justify-content:center;margin-bottom:8px;opacity:0.8;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
-        <div style="font-weight: 600; font-size: 15px;">Create New Visiting Card</div>
-        <div style="font-size: 12px; margin-top: 4px;">Custom layout, 3D physics &amp; QR</div>
-      </a>
-
-      <!-- Scan & Import Action Box -->
-      <a href="scan.html" class="add-card-placeholder">
-        <div style="display:flex;justify-content:center;margin-bottom:8px;opacity:0.8;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></div>
-        <div style="font-weight: 600; font-size: 15px;">Scan &amp; Import Physical Card</div>
-        <div style="font-size: 12px; margin-top: 4px;">Camera OCR &amp; QR decoder</div>
-      </a>
-
     </div>
 
-    <!-- ===== LIST VIEW ===== -->
-    <div class="cards-list" ng-if="catalog.viewMode === 'list'">
-      <div class="card-row" ng-repeat="card in catalog.filteredCards() track by (card._id || card.id)">
-        <div class="row-chip" ng-style="{background: card.color || '#2D3536'}">{{ card.initials }}</div>
-        <div class="row-info">
-          <div class="row-name">{{ card.fullName }}</div>
-          <div class="row-role">{{ card.jobTitle }} &middot; {{ card.company }} &middot; {{ card.email }}</div>
+    <!-- ===== STANDARD UNGROUPED VIEW (When Group By === 'none') ===== -->
+    <div ng-if="catalog.groupBy === 'none'">
+      <!-- GRID VIEW -->
+      <div class="cards-grid-layout" ng-if="catalog.viewMode === 'grid'">
+        
+        <!-- Card Item -->
+        <div class="saved-card-item" ng-repeat="card in catalog.filteredCards() track by (card._id || card.id)">
+          <div>
+            <div class="card-top-strip">
+              <div class="card-avatar-chip" ng-style="{background: card.color || '#2D3536'}">
+                {{ card.initials || 'CD' }}
+              </div>
+              <span class="sample-tag-badge">{{ card.templateLabel || 'LEDGER' }}</span>
+            </div>
+
+            <div class="saved-card-name">{{ card.fullName }}</div>
+            <div class="saved-card-role">{{ card.jobTitle }} &middot; {{ card.company }}</div>
+
+            <div class="saved-card-contacts">
+              <div ng-if="card.email" style="display:flex;align-items:center;gap:5px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg><span>{{ card.email }}</span></div>
+              <div ng-if="card.phone" style="display:flex;align-items:center;gap:5px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>{{ card.phone }}</span></div>
+              <div ng-if="card.website" style="display:flex;align-items:center;gap:5px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg><span>{{ card.website }}</span></div>
+            </div>
+          </div>
+
+          <div class="saved-card-actions">
+            <button class="btn-card-action" ng-click="catalog.openInspectModal(card)" title="3D Card Preview">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:4px;"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg><span>Inspect 3D</span>
+            </button>
+            <button class="btn-card-action" ng-click="catalog.downloadVCard(card)" title="Export vCard">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:4px;"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>.VCF</span>
+            </button>
+            <a ng-href="create-card.html?id={{ card._id || card.id }}" class="btn-card-action" title="Edit Card">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:4px;"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg><span>Edit</span>
+            </a>
+            <button class="btn-card-action btn-del-action" ng-click="catalog.deleteCard(card)" title="Delete Card"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>
+          </div>
         </div>
-        <div class="row-badge">{{ card.templateLabel || 'Ledger' }}</div>
-        <div class="row-actions">
-          <button class="btn-icon" ng-click="catalog.openInspectModal(card)" title="Inspect 3D Card"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
-          <button class="btn-icon" ng-click="catalog.downloadVCard(card)" title="Download vCard"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></button>
-          <button class="btn-icon btn-del" ng-click="catalog.deleteCard(card)" title="Delete Card">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </button>
+
+        <!-- Empty state for logged-in users with no real cards yet -->
+        <div ng-if="catalog.isLoggedIn && catalog.cards.length === 0" style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: var(--ink-muted);">
+          <div style="display:flex;justify-content:center;margin-bottom:12px;opacity:0.6;"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/><line x1="2" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="22" y2="16"/></svg></div>
+          <div style="font-family: var(--font-serif); font-size: 20px; font-weight: 600; color: var(--ink-primary); margin-bottom: 8px;">Your vault is empty</div>
+          <div style="font-family: var(--font-mono); font-size: 12px; line-height: 1.6;">Create your first digital visiting card or scan a physical card to get started.</div>
+        </div>
+
+        <!-- Guest notice: clarify these are demo cards -->
+        <div ng-if="!catalog.isLoggedIn" style="grid-column: 1 / -1; text-align: center; padding: 4px 0 12px;">
+          <span style="font-family: var(--font-mono); font-size: 11px; color: var(--ink-muted); background: var(--paper-card); border: 1px solid var(--border-line); border-radius: 20px; padding: 4px 14px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:5px;"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.89A2 2 0 0 1 15 10.77V6a3 3 0 0 0-6 0v4.77a2 2 0 0 1-1.11 1.79l-1.78.89A2 2 0 0 0 5 15.24Z"/></svg>These are sample cards — <a href="login.html" style="color: var(--moss);">sign in</a> to see your real catalog
+          </span>
+        </div>
+
+        <!-- Add New Card Action Box -->
+        <a href="create-card.html" class="add-card-placeholder">
+          <div style="display:flex;justify-content:center;margin-bottom:8px;opacity:0.8;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+          <div style="font-weight: 600; font-size: 15px;">Create New Visiting Card</div>
+          <div style="font-size: 12px; margin-top: 4px;">Custom layout, 3D physics &amp; QR</div>
+        </a>
+
+        <!-- Scan & Import Action Box -->
+        <a href="scan.html" class="add-card-placeholder">
+          <div style="display:flex;justify-content:center;margin-bottom:8px;opacity:0.8;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></div>
+          <div style="font-weight: 600; font-size: 15px;">Scan &amp; Import Physical Card</div>
+          <div style="font-size: 12px; margin-top: 4px;">Camera OCR &amp; QR decoder</div>
+        </a>
+
+      </div>
+
+      <!-- LIST VIEW -->
+      <div class="cards-list" ng-if="catalog.viewMode === 'list'">
+        <div class="card-row" ng-repeat="card in catalog.filteredCards() track by (card._id || card.id)">
+          <div class="row-chip" ng-style="{background: card.color || '#2D3536'}">{{ card.initials }}</div>
+          <div class="row-info">
+            <div class="row-name">{{ card.fullName }}</div>
+            <div class="row-role">{{ card.jobTitle }} &middot; {{ card.company }} &middot; {{ card.email }}</div>
+          </div>
+          <div class="row-badge">{{ card.templateLabel || 'Ledger' }}</div>
+          <div class="row-actions">
+            <button class="btn-icon" ng-click="catalog.openInspectModal(card)" title="Inspect 3D Card"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+            <button class="btn-icon" ng-click="catalog.downloadVCard(card)" title="Download vCard"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></button>
+            <button class="btn-icon btn-del" ng-click="catalog.deleteCard(card)" title="Delete Card">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -561,7 +877,7 @@
       <div class="footer-tag">Digital visiting cards for people who move fast.</div>
       <div class="footer-links">
         <a href="dashboard.html">Home</a>
-        <a href="dashboard.html#templates">Templates</a>
+        <a href="templates.html">Templates</a>
         <a href="saved-cards.html">Saved Cards</a>
         <a href="scan.html">Scan &amp; Import</a>
         <a href="create-card.html">Create Card</a>
