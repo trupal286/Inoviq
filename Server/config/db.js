@@ -31,8 +31,8 @@ const connectDB = async () => {
       console.error(`  ✘  Local MongoDB also unavailable.`);
     }
 
-    console.error(`\n  💡 Fix: Make sure MongoDB is running or your IP is whitelisted on Atlas.\n`);
-    process.exit(1);
+    console.error(`\n  💡 Notice: Running in standalone/offline mode. MongoDB features will be queued until connection is established.`);
+    console.error(`  ➜  To enable Atlas: Whitelist your current IP address in Atlas Network Access.\n`);
   }
 };
 

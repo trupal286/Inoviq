@@ -214,6 +214,13 @@
     function InoviqStudioApp() {
       // Theme State (Inherits or sets document theme)
       const [theme, setTheme] = useState(() => localStorage.getItem('inoviq_theme') || 'light');
+      const [editingCardId, setEditingCardId] = useState(() => {
+        try {
+          return new URLSearchParams(window.location.search).get('id') || null;
+        } catch (e) {
+          return null;
+        }
+      });
 
       // Auth Guard: redirect to login if not authenticated
       useEffect(() => {
@@ -221,10 +228,10 @@
         if (!token) {
           window.location.href = 'login.html?redirect=create-card.html';
         } else {
-          // Optionally pre-fill name/email from stored user
+          // Optionally pre-fill name/email from stored user if not editing
           try {
             const user = JSON.parse(localStorage.getItem('inoviq_user') || 'null');
-            if (user) {
+            if (user && !new URLSearchParams(window.location.search).get('id')) {
               setCardData(prev => ({
                 ...prev,
                 fullName: prev.fullName || ((user.firstName || '') + ' ' + (user.lastName || '')).trim(),
@@ -264,33 +271,50 @@
 
           const idParam = params.get('id');
           if (idParam) {
+            setEditingCardId(idParam);
             const token = localStorage.getItem('inoviq_token');
             if (token) {
               fetch('/api/cards/' + idParam, {
                 headers: { 'Authorization': 'Bearer ' + token }
               })
-              .then(res => res.json())
+              .then(res => {
+                if (res.status === 401) {
+                  localStorage.removeItem('inoviq_token');
+                  localStorage.removeItem('inoviq_user');
+                  localStorage.removeItem('inoviq_logged_in');
+                  if (confirm('Session expired. Please log in again.')) {
+                    window.location.href = 'login.html?redirect=create-card.html?id=' + idParam;
+                  }
+                  return null;
+                }
+                return res.json();
+              })
               .then(data => {
-                if (data.success && data.card) {
+                if (data && data.success && data.card) {
                   const c = data.card;
                   setCardData(prev => ({
                     ...prev,
-                    fullName: c.fullName || prev.fullName,
-                    jobTitle: c.jobTitle || prev.jobTitle,
-                    company: c.company || prev.company,
-                    email: c.email || prev.email,
-                    phone: c.phone || prev.phone,
-                    website: c.website || prev.website,
-                    bio: c.bio || prev.bio
+                    fullName: c.fullName || '',
+                    jobTitle: c.jobTitle || '',
+                    company: c.company || '',
+                    email: c.email || '',
+                    phone: c.phone || '',
+                    website: c.website || '',
+                    bio: c.bio || ''
                   }));
-                  if (c.color) {
+                  if (c.color || c.bgGradient) {
                     setCardProps(prev => ({
                       ...prev,
-                      bgColor: c.color,
+                      paletteName: c.templateLabel || prev.paletteName,
+                      bgColor: c.color || prev.bgColor,
+                      bgGrad: c.bgGradient || prev.bgGrad,
                       accentColor: c.accentColor || prev.accentColor
                     }));
                   }
-                  triggerToast(`Loaded card: ${c.fullName}`);
+                  if (c.avatar) {
+                    setUploadedImage(c.avatar);
+                  }
+                  triggerToast(`Editing card: ${c.fullName}`);
                 }
               })
               .catch(() => {});
@@ -682,7 +706,7 @@
         }, 120);
       };
 
-      // Save to Mongo API
+      // Save to Mongo API (Supports both Create POST and Edit PUT)
       const saveCard = () => {
         const token = localStorage.getItem('inoviq_token');
         if (!token) {
@@ -693,31 +717,52 @@
         }
 
         setIsSaving(true);
-        fetch('/api/cards', {
-          method: 'POST',
+        const isEdit = Boolean(editingCardId);
+        const endpoint = isEdit ? (`/api/cards/${editingCardId}`) : '/api/cards';
+        const method = isEdit ? 'PUT' : 'POST';
+
+        fetch(endpoint, {
+          method: method,
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({
             fullName: cardData.fullName || 'Your Name',
-            jobTitle: cardData.jobTitle || 'Your Job Title',
-            company: cardData.company || 'Your Company',
+            jobTitle: cardData.jobTitle || '',
+            company: cardData.company || 'Independent',
             phone: cardData.phone || '',
             email: cardData.email || '',
             website: cardData.website || '',
             bio: cardData.bio || '',
             color: cardProps.bgColor,
             accentColor: cardProps.accentColor,
+            bgGradient: cardProps.bgGrad,
             templateLabel: `${cardFormat.toUpperCase()} (${cardProps.paletteName})`,
             avatar: uploadedImage || ''
           })
         })
-        .then(res => res.json())
+        .then(res => {
+          if (res.status === 401) {
+            localStorage.removeItem('inoviq_token');
+            localStorage.removeItem('inoviq_user');
+            localStorage.removeItem('inoviq_logged_in');
+            setIsSaving(false);
+            if (confirm('Your session has expired. Please log in again.')) {
+              window.location.href = 'login.html?redirect=create-card.html';
+            }
+            return null;
+          }
+          return res.json();
+        })
         .then(data => {
+          if (!data) return;
           setIsSaving(false);
           if (data.success) {
-            triggerToast('Card published to your Inoviq Catalog!');
+            triggerToast(isEdit ? 'Card changes updated in your catalog!' : 'Card published to your Inoviq Catalog!');
+            setTimeout(() => {
+              window.location.href = 'saved-cards.html';
+            }, 1200);
           } else {
             alert(data.message || 'Failed to save card.');
           }
@@ -743,6 +788,11 @@
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
                 <span>Browse 12 Templates</span>
               </a>
+              {editingCardId && (
+                <span style={{ fontSize: '11.5px', fontFamily: 'var(--font-mono)', padding: '3px 10px', borderRadius: '12px', background: 'rgba(56, 189, 248, 0.15)', color: 'var(--ink-primary)', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
+                  Editing Saved Card
+                </span>
+              )}
             </div>
 
             {/* Mode Switcher: Edit Mode vs 3D Preview (2 options on create card) */}
@@ -839,7 +889,7 @@
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
                   <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
-                <span>{isSaving ? 'Saving…' : 'Save to Catalog'}</span>
+                <span>{isSaving ? 'Saving…' : (editingCardId ? 'Save Changes' : 'Save to Catalog')}</span>
               </button>
             </div>
           </header>

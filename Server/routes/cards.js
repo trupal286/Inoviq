@@ -40,6 +40,36 @@ router.get('/', async (req, res) => {
 });
 
 /* ──────────────────────────────────────────────────────────
+   GET /api/cards/:id — Get a single card by ID
+   ────────────────────────────────────────────────────────── */
+router.get('/:id', async (req, res) => {
+  try {
+    const card = await Card.findOne({
+      _id: req.params.id,
+      userId: req.user.id
+    });
+
+    if (!card) {
+      return res.status(404).json({
+        success: false,
+        message: 'Card not found.'
+      });
+    }
+
+    res.json({
+      success: true,
+      card
+    });
+  } catch (err) {
+    console.error('Get card error:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch card.'
+    });
+  }
+});
+
+/* ──────────────────────────────────────────────────────────
    POST /api/cards — Create a new card
    ────────────────────────────────────────────────────────── */
 router.post('/', async (req, res) => {
@@ -47,30 +77,31 @@ router.post('/', async (req, res) => {
     const {
       fullName, jobTitle, company, email, phone,
       website, bio, templateStyle, templateLabel,
-      color, accentColor, bgGradient
+      color, accentColor, bgGradient, avatar
     } = req.body;
 
-    if (!fullName || !company) {
+    if (!fullName || !fullName.trim()) {
       return res.status(400).json({
         success: false,
-        message: 'Card holder name and company are required.'
+        message: 'Cardholder name is required.'
       });
     }
 
     const card = await Card.create({
       userId: req.user.id,
-      fullName,
-      jobTitle: jobTitle || '',
-      company,
-      email: email || '',
-      phone: phone || '',
-      website: website || '',
-      bio: bio || '',
+      fullName: fullName.trim(),
+      jobTitle: jobTitle ? jobTitle.trim() : '',
+      company: company && company.trim() ? company.trim() : 'Independent',
+      email: email ? email.trim() : '',
+      phone: phone ? phone.trim() : '',
+      website: website ? website.trim() : '',
+      bio: bio ? bio.trim() : '',
       templateStyle: templateStyle || 'Dark Charcoal',
       templateLabel: templateLabel || 'Ledger',
       color: color || '#2D3536',
       accentColor: accentColor || '#B1D4D0',
-      bgGradient: bgGradient || 'linear-gradient(135deg, #2D3536 0%, #1A2223 100%)'
+      bgGradient: bgGradient || 'linear-gradient(135deg, #2D3536 0%, #1A2223 100%)',
+      avatar: avatar || ''
     });
 
     res.status(201).json({
@@ -118,7 +149,7 @@ router.put('/:id', async (req, res) => {
     const allowedFields = [
       'fullName', 'jobTitle', 'company', 'email', 'phone',
       'website', 'bio', 'templateStyle', 'templateLabel',
-      'color', 'accentColor', 'bgGradient'
+      'color', 'accentColor', 'bgGradient', 'avatar'
     ];
 
     allowedFields.forEach(function (field) {

@@ -66,7 +66,15 @@ app.get('/create-card', (req, res) => {
   res.sendFile(path.join(__dirname, '../Client/Pages/create-card.html'));
 });
 
+app.get('/create-card.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../Client/Pages/create-card.html'));
+});
+
 app.get('/scan', (req, res) => {
+  res.sendFile(path.join(__dirname, '../Client/Pages/scan.html'));
+});
+
+app.get('/scan.html', (req, res) => {
   res.sendFile(path.join(__dirname, '../Client/Pages/scan.html'));
 });
 
@@ -74,7 +82,15 @@ app.get('/saved-cards', (req, res) => {
   res.sendFile(path.join(__dirname, '../Client/Pages/saved-cards.html'));
 });
 
+app.get('/saved-cards.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../Client/Pages/saved-cards.html'));
+});
+
 app.get('/profile', (req, res) => {
+  res.sendFile(path.join(__dirname, '../Client/Pages/profile.html'));
+});
+
+app.get('/profile.html', (req, res) => {
   res.sendFile(path.join(__dirname, '../Client/Pages/profile.html'));
 });
 

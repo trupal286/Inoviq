@@ -20,9 +20,13 @@ const cardSchema = new mongoose.Schema({
   },
   company: {
     type: String,
-    required: [true, 'Company name is required'],
     trim: true,
+    default: 'Independent',
     maxlength: 100
+  },
+  avatar: {
+    type: String,
+    default: ''
   },
   email: {
     type: String,

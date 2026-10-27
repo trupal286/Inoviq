@@ -603,6 +603,18 @@
             </div>
           </div>
 
+          <!-- Camera LAN / Permission Error Notice -->
+          <div ng-if="scan.cameraError" style="margin-top: 12px; padding: 12px 14px; border-radius: 8px; background: rgba(239, 68, 68, 0.12); border: 1.5px solid rgba(239, 68, 68, 0.35); color: var(--ink-primary); font-size: 12.5px; line-height: 1.45;">
+            <div style="font-weight: 700; color: #DC2626; display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span>Live Camera Notice</span>
+            </div>
+            <p style="margin: 0 0 8px; font-size: 12px;">{{ scan.cameraError }}</p>
+            <button type="button" class="btn-primary" style="font-size: 11.5px; padding: 6px 14px; border-radius: 6px;" ng-click="scan.setTab('upload')">
+              Switch to Upload / Native Photo Capture →
+            </button>
+          </div>
+
           <!-- Quick Test Preset Cards -->
           <div style="margin-top: 18px;">
             <div class="scan-label" style="margin-bottom: 8px;">Quick Test Demos (Simulate Scan):</div>
@@ -636,7 +648,7 @@
 
         <!-- IMAGE UPLOAD / OCR PANEL -->
         <div class="scan-panel" ng-show="scan.activeTab === 'upload'">
-          <div class="scan-label" style="margin-bottom: 10px;">Drag &amp; Drop Card Image</div>
+          <div class="scan-label" style="margin-bottom: 10px;">Drag &amp; Drop Card Image or Snap Photo</div>
           <div class="dropzone-box" id="imageDropzone" ng-click="scan.triggerFileInput()">
             <div class="dropzone-icon">
               <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -646,8 +658,8 @@
               </svg>
             </div>
             <div class="dropzone-text">Click to browse or drop card image here</div>
-            <div class="dropzone-sub">Supports JPG, PNG, WEBP, QR Code Images</div>
-            <input type="file" id="cardFileInput" accept="image/*" style="display: none;" onchange="angular.element(this).scope().scan.handleFileSelect(event)">
+            <div class="dropzone-sub">Supports Camera Snap, JPG, PNG, WEBP, QR Code Images</div>
+            <input type="file" id="cardFileInput" accept="image/*" capture="environment" style="display: none;" onchange="angular.element(this).scope().scan.handleFileSelect(event)">
           </div>
 
           <div style="margin-top: 14px;" ng-if="scan.isAnalyzing">
