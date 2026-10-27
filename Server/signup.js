@@ -29,7 +29,7 @@ function checkStrength(val) {
 
   var levels = ['weak', 'fair', 'good', 'strong'];
   var colors = { weak: '#C0392B', fair: '#E67E22', good: 'var(--moss)', strong: '#27AE60' };
-  var texts = { weak: 'Weak', fair: 'Fair', good: 'Good', strong: 'Strong 💪' };
+  var texts = { weak: 'Weak', fair: 'Fair', good: 'Good', strong: 'Strong' };
 
   if (score === 0) return;
   var level = levels[score - 1];
@@ -108,10 +108,10 @@ document.addEventListener('DOMContentLoaded', function () {
   function applyTheme(theme) {
     if (theme === 'dark') {
       document.documentElement.setAttribute('data-theme', 'dark');
-      if (themeBtn) themeBtn.textContent = '☀️';
+      if (themeBtn) themeBtn.setAttribute('title', 'Switch to Light Mode');
     } else {
       document.documentElement.removeAttribute('data-theme');
-      if (themeBtn) themeBtn.textContent = '🌙';
+      if (themeBtn) themeBtn.setAttribute('title', 'Switch to Dark Mode');
     }
     localStorage.setItem('inoviq_theme', theme);
   }

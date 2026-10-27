@@ -106,6 +106,16 @@ app.get('/contacts', (req, res) => {
   res.sendFile(path.join(__dirname, '../Client/Pages/saved-cards.html'));
 });
 
+app.get('/favicon.ico', (req, res) => {
+  res.type('image/svg+xml');
+  res.sendFile(path.join(__dirname, '../Client/inoviq-logo.svg'));
+});
+
+app.get('/favicon.svg', (req, res) => {
+  res.type('image/svg+xml');
+  res.sendFile(path.join(__dirname, '../Client/inoviq-logo.svg'));
+});
+
 /* ── Serve static files from Client ── */
 app.use(express.static(path.join(__dirname, '../Client'), { etag: false, maxAge: 0, index: false }));
 app.use(express.static(path.join(__dirname, '../Client/Pages'), { etag: false, maxAge: 0, index: false }));
@@ -132,9 +142,9 @@ connectDB().then(() => {
     console.log(`\n  ╔══════════════════════════════════════════════════════╗`);
     console.log(`  ║              INOVIQ SERVER — v2.0.0                  ║`);
     console.log(`  ╠══════════════════════════════════════════════════════╣`);
-    console.log(`  ║  ➜  Local:    http://127.0.0.1:${PORT}                  ║`);
-    console.log(`  ║  ➜  On Phone: http://${netIP}:${PORT}               ║`);
-    console.log(`  ║  ➜  API:      http://127.0.0.1:${PORT}/api              ║`);
+    console.log(`  ║  -> Local:    http://127.0.0.1:${PORT}                  ║`);
+    console.log(`  ║  -> On Phone: http://${netIP}:${PORT}               ║`);
+    console.log(`  ║  -> API:      http://127.0.0.1:${PORT}/api              ║`);
     console.log(`  ╚══════════════════════════════════════════════════════╝\n`);
   });
 });

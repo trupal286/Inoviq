@@ -1044,20 +1044,31 @@
 
 @media (max-width: 768px) {
   .studio-react-shell {
-    height: 100vh !important;
-    max-height: 100vh !important;
-    overflow: hidden !important;
+    min-height: 100dvh !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
     max-width: 100vw !important;
   }
 
   .studio-topbar {
-    height: 48px !important;
-    padding: 0 8px !important;
-    gap: 6px !important;
+    height: 52px !important;
+    padding: 0 10px !important;
+    gap: 8px !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 50 !important;
+    background: var(--paper-card) !important;
+    border-bottom: 1px solid var(--border-line) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
   }
 
   .studio-brand-badge .brand-logo-img {
-    height: 24px !important;
+    height: 28px !important;
     max-width: 80px !important;
   }
 
@@ -1069,10 +1080,11 @@
   .studio-mode-toggle {
     padding: 2px !important;
     gap: 2px !important;
+    border-radius: 20px !important;
   }
 
   .studio-mode-btn {
-    padding: 4px 8px !important;
+    padding: 5px 8px !important;
     font-size: 11px !important;
     border-radius: 14px !important;
   }
@@ -1082,12 +1094,12 @@
   }
 
   .topbar-actions {
-    gap: 4px !important;
+    gap: 5px !important;
     flex: initial !important;
   }
 
   .btn-theme-switcher {
-    padding: 5px 8px !important;
+    padding: 6px 9px !important;
     font-size: 11px !important;
     border-radius: 16px !important;
   }
@@ -1096,7 +1108,7 @@
   }
 
   .btn-secondary-action {
-    padding: 5px 8px !important;
+    padding: 6px 9px !important;
     font-size: 11px !important;
     border-radius: 16px !important;
   }
@@ -1105,74 +1117,105 @@
   }
 
   .btn-primary-action {
-    padding: 5px 10px !important;
-    font-size: 11.5px !important;
+    padding: 6px 12px !important;
+    font-size: 12px !important;
     border-radius: 16px !important;
     gap: 4px !important;
+    font-weight: 600 !important;
   }
 
-  /* Studio Workspace & Canvas on Mobile */
+  /* Studio Workspace & Canvas on Mobile: Natural Vertical Flow */
   .studio-workspace {
+    display: flex !important;
+    flex-direction: column !important;
     grid-template-columns: 1fr !important;
-    grid-template-rows: 230px 1fr !important;
-    height: calc(100vh - 48px) !important;
-    overflow: hidden !important;
+    grid-template-rows: auto !important;
+    height: auto !important;
+    min-height: calc(100dvh - 52px) !important;
+    overflow: visible !important;
   }
 
   .studio-canvas {
-    height: 230px !important;
+    height: auto !important;
     min-height: 230px !important;
-    max-height: 230px !important;
-    padding: 6px !important;
+    max-height: none !important;
+    padding: 16px 8px !important;
     overflow: hidden !important;
     background-color: var(--bg-main) !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    border-bottom: 1.5px solid var(--border-line) !important;
+    flex-shrink: 0 !important;
   }
 
-  /* Scale down the 3D card canvas smoothly so it fits completely on any Android screen without overflow */
+  /* Scale down the 3D card canvas smoothly to fit any phone width cleanly */
   .canvas-viewport {
-    transform: scale(0.56) !important;
+    transform: scale(min(0.72, calc((100vw - 32px) / 440))) !important;
     transform-origin: center center !important;
+    margin: 0 auto !important;
+    width: 440px !important;
+    height: 250px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
-  /* Studio Editor Panel Drawer Below Canvas */
+  /* Studio Editor Panel Below Canvas */
   .studio-editor-panel {
     border-left: none !important;
-    border-top: 1.5px solid var(--border-line) !important;
-    height: 100% !important;
-    overflow-y: auto !important;
-    padding-bottom: 24px !important;
+    border-top: none !important;
+    height: auto !important;
+    min-height: 400px !important;
+    overflow: visible !important;
+    padding-bottom: 60px !important;
+    background: var(--paper-card) !important;
+    flex: 1 !important;
   }
 
   .studio-nav-tabs {
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch !important;
     scrollbar-width: none !important;
+    position: sticky !important;
+    top: 52px !important;
+    z-index: 40 !important;
+    background: var(--paper-card) !important;
+    border-bottom: 1.5px solid var(--border-line) !important;
+    padding: 0 8px !important;
   }
   .studio-nav-tabs::-webkit-scrollbar {
     display: none !important;
   }
 
   .studio-tab-item {
-    font-size: 12px !important;
-    padding: 10px 12px !important;
+    font-size: 13px !important;
+    padding: 12px 14px !important;
     white-space: nowrap !important;
     flex-shrink: 0 !important;
   }
 
   .studio-panel-body {
-    padding: 14px 12px !important;
+    padding: 18px 16px !important;
   }
 
   .studio-section {
-    padding-bottom: 14px !important;
-    margin-bottom: 14px !important;
+    padding-bottom: 16px !important;
+    margin-bottom: 16px !important;
   }
 
-  .studio-input {
-    font-size: 13px !important;
-    padding: 8px 12px !important;
+  /* 16px font-size prevents mobile Safari/Chrome from forced viewport zooming on tap */
+  .studio-input,
+  .studio-select,
+  textarea.studio-input {
+    font-size: 16px !important;
+    padding: 11px 14px !important;
+    border-radius: 10px !important;
+  }
+
+  .format-pill-btn {
+    padding: 5px 10px !important;
+    font-size: 11px !important;
   }
 }
+

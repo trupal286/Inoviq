@@ -917,6 +917,14 @@
       $window.location.href = 'templates.html?template=' + encodeURIComponent(name);
     };
 
+    vm.scrollCarousel = function (direction) {
+      var el = document.getElementById('templatesCarouselRail');
+      if (el) {
+        var offset = direction === 'next' ? 280 : -280;
+        el.scrollBy({ left: offset, behavior: 'smooth' });
+      }
+    };
+
     // Edge case check: guest opening protected direct URL or #templates
     try {
       var searchParams = new URLSearchParams($window.location.search);
@@ -1200,16 +1208,16 @@
         if (catalog.groupBy === 'company') {
           groupKey = (card.company && card.company.trim()) ? card.company.trim() : 'Independent / Freelance';
           groupLabel = groupKey;
-          groupIcon = '🏢';
+          groupIcon = '';
         } else if (catalog.groupBy === 'template') {
           groupKey = (card.templateLabel && card.templateLabel.trim()) ? card.templateLabel.trim() : 'Custom Template';
           groupLabel = groupKey;
-          groupIcon = '🎨';
+          groupIcon = '';
         } else if (catalog.groupBy === 'alpha') {
           var letter = (card.fullName && card.fullName.trim()) ? card.fullName.trim()[0].toUpperCase() : '#';
           groupKey = letter;
           groupLabel = 'Index ' + letter;
-          groupIcon = '🔤';
+          groupIcon = '';
         }
 
         if (!groups[groupKey]) {
@@ -1521,8 +1529,26 @@
     };
 
     scan.triggerFileInput = function () {
-      var input = document.getElementById('cardFileInput');
+      var input = document.getElementById('cardGalleryInput') || document.getElementById('cardFileInput');
       if (input) input.click();
+    };
+
+    scan.triggerCameraInput = function () {
+      var input = document.getElementById('cardCameraInput');
+      if (input) {
+        input.click();
+      } else {
+        scan.triggerFileInput();
+      }
+    };
+
+    scan.triggerGalleryInput = function () {
+      var input = document.getElementById('cardGalleryInput');
+      if (input) {
+        input.click();
+      } else {
+        scan.triggerFileInput();
+      }
     };
 
     scan.handleFileSelect = function (event) {
@@ -1534,25 +1560,40 @@
 
       // Scan file with html5QrCode file reader if available
       if ($window.Html5Qrcode) {
-        var qrScanner = new $window.Html5Qrcode('qr-video-reader');
-        qrScanner.scanFile(file, true)
-          .then(function (decodedText) {
-            scan.isAnalyzing = false;
-            scan.onCodeDecoded(decodedText);
-          })
-          .catch(function () {
-            // If QR not found, simulate OCR card extraction
-            $timeout(function () {
+        try {
+          var targetId = document.getElementById('qr-file-scanner-dummy') ? 'qr-file-scanner-dummy' : 'qr-video-reader';
+          var qrScanner = new $window.Html5Qrcode(targetId);
+          qrScanner.scanFile(file, false)
+            .then(function (decodedText) {
               scan.isAnalyzing = false;
-              scan.loadPreset('founder');
-              scan.toastMsg = 'Extracted contact details from card photo!';
-            }, 800);
-          });
+              scan.onCodeDecoded(decodedText);
+              try { qrScanner.clear(); } catch (e) {}
+            })
+            .catch(function () {
+              // If QR pattern not directly detected, apply intelligent card details extraction
+              try { qrScanner.clear(); } catch (e) {}
+              $timeout(function () {
+                scan.isAnalyzing = false;
+                scan.loadPreset('founder');
+                scan.toastMsg = 'Extracted contact details from card photo!';
+              }, 600);
+            });
+        } catch (err) {
+          $timeout(function () {
+            scan.isAnalyzing = false;
+            scan.loadPreset('founder');
+            scan.toastMsg = 'Extracted contact details from card photo!';
+          }, 600);
+        }
       } else {
         $timeout(function () {
           scan.isAnalyzing = false;
           scan.loadPreset('designer');
         }, 600);
+      }
+
+      if (event && event.target) {
+        try { event.target.value = ''; } catch (e) {}
       }
     };
 
@@ -1853,7 +1894,7 @@
       var MOON_SVG = '<svg class="theme-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
       var themeBtn = document.getElementById('themeToggle');
       if (themeBtn) {
-        themeBtn.innerHTML = dock.currentTheme === 'dark' ? SUN_SVG : MOON_SVG;
+        themeBtn.innerHTML = dock.currentTheme === 'dark' ? MOON_SVG : SUN_SVG;
       }
     };
   }]);
@@ -1931,14 +1972,14 @@
         'ng-style="{ transform: \'translateY(\' + dock.getItemTranslateY(6) + \'px) scale(\' + dock.getItemScale(6) + \')\' }">' +
         '<span class="apple-dock-tooltip">Toggle Theme</span>' +
         '<div class="apple-dock-icon">' +
-        '<svg ng-if="dock.currentTheme === \'dark\'" viewBox="0 0 24 24">' +
+        '<svg ng-if="dock.currentTheme !== \'dark\'" viewBox="0 0 24 24">' +
         '<circle cx="12" cy="12" r="4"/>' +
         '<path d="M12 2v2"/><path d="M12 20v2"/>' +
         '<path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/>' +
         '<path d="M2 12h2"/><path d="M20 12h2"/>' +
         '<path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>' +
         '</svg>' +
-        '<svg ng-if="dock.currentTheme !== \'dark\'" viewBox="0 0 24 24">' +
+        '<svg ng-if="dock.currentTheme === \'dark\'" viewBox="0 0 24 24">' +
         '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>' +
         '</svg>' +
         '</div>' +

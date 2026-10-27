@@ -15,24 +15,24 @@ const connectDB = async () => {
     const conn = await mongoose.connect(mongoURI, {
       serverSelectionTimeoutMS: 5000
     });
-    console.log(`  ✔  MongoDB connected: ${conn.connection.host}/${conn.connection.name}`);
+    console.log(`  [OK] MongoDB connected: ${conn.connection.host}/${conn.connection.name}`);
   } catch (err) {
-    console.error(`\n  ✘  MongoDB connection error: ${err.message}`);
+    console.error(`\n  [ERROR] MongoDB connection error: ${err.message}`);
     
     // Fallback to local MongoDB so the development server stays alive
     try {
-      console.log(`  ➜  Attempting fallback to local MongoDB (127.0.0.1:27017)...`);
+      console.log(`  -> Attempting fallback to local MongoDB (127.0.0.1:27017)...`);
       const fallbackConn = await mongoose.connect('mongodb://127.0.0.1:27017/inoviq', {
         serverSelectionTimeoutMS: 3000
       });
-      console.log(`  ✔  MongoDB fallback connected: ${fallbackConn.connection.host}/${fallbackConn.connection.name}`);
+      console.log(`  [OK] MongoDB fallback connected: ${fallbackConn.connection.host}/${fallbackConn.connection.name}`);
       return;
     } catch (fallbackErr) {
-      console.error(`  ✘  Local MongoDB also unavailable.`);
+      console.error(`  [ERROR] Local MongoDB also unavailable.`);
     }
 
-    console.error(`\n  💡 Notice: Running in standalone/offline mode. MongoDB features will be queued until connection is established.`);
-    console.error(`  ➜  To enable Atlas: Whitelist your current IP address in Atlas Network Access.\n`);
+    console.error(`\n  Notice: Running in standalone/offline mode. MongoDB features will be queued until connection is established.`);
+    console.error(`  -> To enable Atlas: Whitelist your current IP address in Atlas Network Access.\n`);
   }
 };
 

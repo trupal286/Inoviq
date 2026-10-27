@@ -44,7 +44,6 @@
                'ng-click="vm.onBackdropClick($event)">' +
             '<div class="auth-gate-card" ng-click="$event.stopPropagation()">' +
               '<button type="button" class="auth-gate-close" aria-label="Close" ng-click="vm.close()">&times;</button>' +
-              '<div class="auth-gate-badge">MEMBER ACCESS</div>' +
               '<h3 class="auth-gate-title">{{ vm.title }}</h3>' +
               '<p class="auth-gate-text">{{ vm.description }}</p>' +
               '<div class="auth-gate-actions">' +

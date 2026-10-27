@@ -16,7 +16,7 @@ async function seedAdmin() {
   if (admin) {
     admin.password = adminPassword;
     await admin.save();
-    console.log('✔ Admin password updated successfully!');
+    console.log('[OK] Admin password updated successfully!');
   } else {
     admin = await User.create({
       firstName: 'Admin',
@@ -26,11 +26,11 @@ async function seedAdmin() {
       phone: '+1 800-555-INOVIQ',
       password: adminPassword
     });
-    console.log('✔ Default Admin user created successfully!');
+    console.log('[OK] Default Admin user created successfully!');
   }
 
   console.log('\n=======================================');
-  console.log('🔑 ADMIN LOGIN CREDENTIALS:');
+  console.log('[AUTH] ADMIN LOGIN CREDENTIALS:');
   console.log('   Email / Username : admin@inoviq.com (or "admin")');
   console.log('   Password         : AdminPassword123!');
   console.log('=======================================\n');

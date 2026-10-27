@@ -15,6 +15,8 @@
     href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..800;1,9..144,300..800&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
     rel="stylesheet">
 
+  <link rel="icon" type="image/svg+xml" href="inoviq-logo.svg">
+
   <!-- Core Inoviq Stylesheets -->
   <link rel="stylesheet" href="../Style/style.css?v=6.0">
   <link rel="stylesheet" href="../Style/studio.css?v=6.0">
@@ -28,9 +30,9 @@
     })();
   </script>
 
-  <!-- React 18, Babel & QR Code Engines -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <!-- React 18 Production Builds (Fast phone loading, zero dev overhead & warnings) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
@@ -290,6 +292,34 @@
 </head>
 
 <body>
+  <!-- Instant Branded Preloader for Phone & Desktop -->
+  <div id="inoviq-page-loader" class="inoviq-loader-curtain" aria-label="Loading Templates Catalog...">
+    <div class="inoviq-loader-card">
+      <div class="inoviq-loader-logo-wrap">
+        <img src="inoviq-logo.svg" alt="Inoviq" class="inoviq-loader-logo-img">
+      </div>
+      <div class="inoviq-loader-title">Templates Catalog</div>
+      <div class="inoviq-loader-subtitle">Loading 12 Archetypes…</div>
+      <div class="inoviq-loader-track">
+        <div class="inoviq-loader-bar"></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function() {
+      function dismiss() {
+        var el = document.getElementById('inoviq-page-loader');
+        if (el && !el.classList.contains('is-loaded')) {
+          el.classList.add('is-loaded');
+          setTimeout(function() { if (el && el.parentNode) el.parentNode.removeChild(el); }, 380);
+        }
+      }
+      window.dismissInoviqLoader = dismiss;
+      window.addEventListener('load', function() { setTimeout(dismiss, 120); });
+      setTimeout(dismiss, 1400);
+    })();
+  </script>
+
   <div id="templates-root"></div>
 
   <script type="text/babel">
@@ -596,10 +626,44 @@
       const [isFlipped, setIsFlipped] = useState(false);
       const [activeFinish, setActiveFinish] = useState('matte'); // matte, linen, foil
 
+      // User Auth State
+      const [currentUser, setCurrentUser] = useState(() => {
+        try {
+          const raw = localStorage.getItem('inoviq_user');
+          return raw ? JSON.parse(raw) : null;
+        } catch (e) { return null; }
+      });
+      const [isLoggedIn, setIsLoggedIn] = useState(() => {
+        return localStorage.getItem('inoviq_logged_in') === 'true' && Boolean(localStorage.getItem('inoviq_token'));
+      });
+      const [showAccountMenu, setShowAccountMenu] = useState(false);
+
       // 3D Tilt Physics State
       const stageRef = useRef(null);
       const qrHolderRef = useRef(null);
       const [tilt, setTilt] = useState({ x: 0, y: 0, degX: 0, degY: 0 });
+
+      // Close account menu on window click
+      useEffect(() => {
+        const closeMenu = () => setShowAccountMenu(false);
+        window.addEventListener('click', closeMenu);
+        return () => window.removeEventListener('click', closeMenu);
+      }, []);
+
+      const handleLogout = () => {
+        localStorage.removeItem('inoviq_token');
+        localStorage.removeItem('inoviq_user');
+        localStorage.removeItem('inoviq_logged_in');
+        setIsLoggedIn(false);
+        setCurrentUser(null);
+        setShowAccountMenu(false);
+        window.location.href = 'dashboard.html';
+      };
+
+      const getUserInitials = () => {
+        if (!currentUser || !currentUser.name) return 'U';
+        return currentUser.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+      };
 
       // Synchronize Theme
       useEffect(() => {
@@ -615,7 +679,7 @@
         setTheme(prev => prev === 'light' ? 'dark' : 'light');
       };
 
-      // Read URL Parameter (?template=...)
+      // Read URL Parameter (?template=...) and Dismiss Preloader
       useEffect(() => {
         try {
           const params = new URLSearchParams(window.location.search);
@@ -628,6 +692,7 @@
             if (match) setSelectedTemplate(match);
           }
         } catch(e) {}
+        if (window.dismissInoviqLoader) window.dismissInoviqLoader();
       }, []);
 
       // Re-render QR code on flip or template change
@@ -717,20 +782,101 @@
                 <button 
                   className="theme-toggle-btn" 
                   onClick={toggleTheme} 
-                  title="Toggle Light / Dark Theme"
+                  title={theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
                   id="themeToggle"
+                  type="button"
+                  aria-label="Toggle Theme"
                 >
-                  <svg className="theme-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-                  </svg>
+                  {theme === 'dark' ? (
+                    <svg className="theme-icon-svg theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                    </svg>
+                  ) : (
+                    <svg className="theme-icon-svg theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="5" fill="#E2A03F" stroke="#B87D28"/>
+                      <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+                      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                      <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+                      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                  )}
                 </button>
 
                 <a href="create-card.html" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '7px' }}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
                   </svg>
-                  <span>Create Blank Card</span>
+                  <span>Create Card</span>
                 </a>
+
+                {/* Account Navigation Dropdown or Guest Pill */}
+                {isLoggedIn ? (
+                  <div className="account-menu-container" style={{ position: 'relative' }}>
+                    <button 
+                      className="user-pill" 
+                      onClick={(e) => { e.stopPropagation(); setShowAccountMenu(prev => !prev); }} 
+                      id="btn-account-user"
+                      type="button"
+                    >
+                      <div className="avatar-circle" title={currentUser?.name || 'User'}>
+                        {getUserInitials()}
+                      </div>
+                      <span>{currentUser?.name || 'Account'}</span>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path d="m6 9 6 6 6-6" />
+                      </svg>
+                    </button>
+
+                    {showAccountMenu && (
+                      <div className="account-dropdown-menu" onClick={(e) => e.stopPropagation()}>
+                        <div className="account-dropdown-header">
+                          <div className="user-name">{currentUser?.name || 'Inoviq User'}</div>
+                          <div className="user-email">{currentUser?.email || ''}</div>
+                        </div>
+                        <div className="account-dropdown-divider"></div>
+                        <a href="profile.html" className="account-dropdown-item" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+                          <span>My Profile</span>
+                        </a>
+                        <a href="dashboard.html" className="account-dropdown-item" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                          <span>Dashboard</span>
+                        </a>
+                        <a href="saved-cards.html" className="account-dropdown-item" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                          <span>Saved Cards</span>
+                        </a>
+                        <a href="scan.html" className="account-dropdown-item" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+                          <span>Scan &amp; Import</span>
+                        </a>
+                        <a href="create-card.html" className="account-dropdown-item" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                          <span>Create Card</span>
+                        </a>
+                        <div className="account-dropdown-divider"></div>
+                        <button type="button" className="account-dropdown-item btn-logout-item" onClick={handleLogout}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" y1="12" x2="9" y2="12" />
+                          </svg>
+                          <span>Log Out</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <a href="login.html?redirect=templates.html" className="user-pill guest-pill" id="btn-account-guest">
+                    <div className="avatar-circle guest-avatar">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="8" r="4" />
+                        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+                      </svg>
+                    </div>
+                    <span>Log In / Sign Up</span>
+                  </a>
+                )}
               </div>
             </div>
           </header>

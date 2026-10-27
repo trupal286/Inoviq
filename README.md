@@ -21,7 +21,7 @@
 
 ---
 
-## 📖 Overview
+##  Overview
 
 **INOVIQ** reimagines how professionals network and exchange contact details. Traditional paper visiting cards get lost, torn, or misplaced. INOVIQ provides a tactile, interactive digital card experience that feels as tangible as real paper stock, enriched with:
 
@@ -33,56 +33,56 @@
 
 ---
 
-## ✨ Features
+##  Features
 
-### 🎴 1. Interactive 3D Card Studio (`/create-card`)
+###  1. Interactive 3D Card Studio (`/create-card`)
 - **React 18 Engine:** High-performance, reactive canvas with zero layout lag.
 - **Dual Studio Modes:**
-  - **✏️ Edit Mode:** Keeps the card flat and motionless for easy typing, uploading, and positioning.
-  - **👁️ 3D Preview Mode:** Engages dynamic 3D cursor-following tilt and specular glare reflections.
+  - ** Edit Mode:** Keeps the card flat and motionless for easy typing, uploading, and positioning.
+  - ** 3D Preview Mode:** Engages dynamic 3D cursor-following tilt and specular glare reflections.
 - **Freeform Drag & Resize:** Reposition or scale your QR code and custom logo directly on the card canvas.
 - **Curated Tactile Palettes:** Choose from signature finishes like *Inoviq Soot & Mist*, *Plaster Paper Light*, *Cyberpunk Monolith*, *Emerald Executive*, and *Midnight Hologram*.
 - **Editorial Typography System:** Powered by `Fraunces` editorial serif, `Work Sans`, and `IBM Plex Mono`.
 - **One-Click High-Res PNG Export:** Render 3x resolution print-ready digital cards using `html2canvas`.
 
-### 🗃️ 2. Digital Card Catalog & Vault (`/saved-cards.html`)
+###  2. Digital Card Catalog & Vault (`/saved-cards.html`)
 - Categorize your personal collection into business, science, sports, and creative folders.
 - Search cards in real-time by name, company, or job role.
 - 3D Inspect Modal: Click any card to pop up an interactive 3D flip card with front identity and live back QR code.
 
-### 📷 3. Camera Scanner & Import (`/scan.html`)
+###  3. Camera Scanner & Import (`/scan.html`)
 - Live camera stream integration via `html5-qrcode`.
 - Scan QR codes or physical cards to capture contact information on the fly.
 - Auto-formats vCard payloads directly into your personal catalog.
 
-### 🔐 4. Secure Authentication & Profile (`/login.html`, `/signup.html`, `/profile.html`)
+###  4. Secure Authentication & Profile (`/login.html`, `/signup.html`, `/profile.html`)
 - User registration and login powered by **JWT (JSON Web Tokens)** and **bcryptjs** password hashing.
 - Token management via HTTP-only / secure cookie sessions.
 - Profile dashboard to edit details, manage account credentials, and inspect card statistics.
 
-### 🌓 5. Tactile Light / Dark Mode
+###  5. Tactile Light / Dark Mode
 - Seamless theme switching between warm **Plaster Paper** and deep **Soot Charcoal** modes.
 - Instant, flash-free theme hydration stored in `localStorage`.
 
 ---
 
-## 🎨 Tactile Design System & Palette
+##  Tactile Design System & Palette
 
 INOVIQ is styled with a bespoke, human-crafted tactile design system inspired by architectural stationery and matte printmaking:
 
 | Swatch | Color Name | Hex Code | Purpose |
 |:---:|:---|:---:|:---|
-| 🟢 | **Eucalyptus** | `#98AA9D` | Secondary accents, status pills |
-| 🌫️ | **Mist** | `#B3C9D6` | Subtle highlight borders & hover fills |
-| 📜 | **Plaster** | `#F2EFE2` | Light mode canvas background |
-| ⬛ | **Soot** | `#2D3536` | Dark mode base & deep ink text |
-| 🌿 | **Moss** | `#697C70` | Active folder tabs & primary accents |
-| 🩵 | **Baby Blue** | `#B1D4D0` | Aurora glows & ambient lighting |
-| ☕ | **Espresso** | `#52352D` | Primary action buttons & contrast stamps |
+|  | **Eucalyptus** | `#98AA9D` | Secondary accents, status pills |
+|  | **Mist** | `#B3C9D6` | Subtle highlight borders & hover fills |
+|  | **Plaster** | `#F2EFE2` | Light mode canvas background |
+|  | **Soot** | `#2D3536` | Dark mode base & deep ink text |
+|  | **Moss** | `#697C70` | Active folder tabs & primary accents |
+|  | **Baby Blue** | `#B1D4D0` | Aurora glows & ambient lighting |
+|  | **Espresso** | `#52352D` | Primary action buttons & contrast stamps |
 
 ---
 
-## 🛠️ Technology Stack
+##  Technology Stack
 
 - **Frontend:**
   - **HTML5 & Vanilla CSS3:** Custom tactile design system, CSS 3D transforms (`perspective`, `rotateX`, `rotateY`), custom properties.
@@ -97,7 +97,7 @@ INOVIQ is styled with a bespoke, human-crafted tactile design system inspired by
 
 ---
 
-## 📂 Project Structure
+##  Project Structure
 
 ```
 Inoviq/
@@ -134,7 +134,7 @@ Inoviq/
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) (v16 or higher recommended)
@@ -177,7 +177,7 @@ Inoviq/
 
 ---
 
-## 🔌 API Endpoints Summary
+##  API Endpoints Summary
 
 | Method | Endpoint | Description | Auth Required |
 |:---:|:---|:---|:---:|
@@ -192,6 +192,6 @@ Inoviq/
 
 ---
 
-## 📄 License
+##  License
 
 This project is licensed under the **MIT License**.

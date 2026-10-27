@@ -15,6 +15,7 @@
     rel="stylesheet">
 
   <link rel="stylesheet" href="../Style/style.css?v=6.0">
+  <link rel="icon" type="image/svg+xml" href="inoviq-logo.svg">
 
   <!-- Apply saved theme before paint -->
   <script>
@@ -477,6 +478,36 @@
 </head>
 
 <body ng-controller="ScanController as scan">
+  <!-- Instant Branded Preloader for Phone & Desktop -->
+  <div id="inoviq-page-loader" class="inoviq-loader-curtain" aria-label="Loading Scan & Import...">
+    <div class="inoviq-loader-card">
+      <div class="inoviq-loader-logo-wrap">
+        <img src="inoviq-logo.svg" alt="Inoviq" class="inoviq-loader-logo-img">
+      </div>
+      <div class="inoviq-loader-title">Scan &amp; Import</div>
+      <div class="inoviq-loader-subtitle">Loading optical engine…</div>
+      <div class="inoviq-loader-track">
+        <div class="inoviq-loader-bar"></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function() {
+      function dismiss() {
+        var el = document.getElementById('inoviq-page-loader');
+        if (el && !el.classList.contains('is-loaded')) {
+          el.classList.add('is-loaded');
+          setTimeout(function() { if (el && el.parentNode) el.parentNode.removeChild(el); }, 380);
+        }
+      }
+      window.dismissInoviqLoader = dismiss;
+      window.addEventListener('load', function() { setTimeout(dismiss, 100); });
+      setTimeout(dismiss, 1200);
+    })();
+  </script>
+
+  <!-- Dedicated non-visual file scanning sandbox to eliminate camera conflicts -->
+  <div id="qr-file-scanner-dummy" style="display: none;" aria-hidden="true"></div>
 
   <!-- ===== FULL LENGTH EDGE-TO-EDGE TOPBAR ===== -->
   <header class="nav-header">
@@ -494,7 +525,18 @@
         </nav>
 
         <div class="nav-actions">
-          <button class="theme-toggle-btn" id="themeToggle" title="Toggle Light / Dark Theme" aria-label="Toggle Theme"><svg class="theme-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+          <button class="theme-toggle-btn" id="themeToggle" title="Toggle Light / Dark Theme" aria-label="Toggle Theme">
+            <svg class="theme-icon-svg theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5" fill="#E2A03F" stroke="#B87D28"/>
+              <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+            <svg class="theme-icon-svg theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+          </button>
           <a href="create-card.html" class="btn-primary" id="btn-create-top" style="display: inline-flex; align-items: center; gap: 6px;">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
@@ -648,23 +690,56 @@
 
         <!-- IMAGE UPLOAD / OCR PANEL -->
         <div class="scan-panel" ng-show="scan.activeTab === 'upload'">
-          <div class="scan-label" style="margin-bottom: 10px;">Drag &amp; Drop Card Image or Snap Photo</div>
-          <div class="dropzone-box" id="imageDropzone" ng-click="scan.triggerFileInput()">
+          <div class="scan-label" style="margin-bottom: 12px;">Choose Upload Method: Take Photo or Pick from Gallery</div>
+
+          <!-- Dual Action Buttons: Camera vs Gallery -->
+          <div class="upload-options-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px;">
+            <button type="button" class="upload-action-tile" ng-click="scan.triggerCameraInput()" style="background: var(--bg-main); border: 1.5px solid var(--border-line); border-radius: 14px; padding: 16px 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: all 0.2s ease; text-align: center;">
+              <div style="width: 44px; height: 44px; border-radius: 50%; background: rgba(154, 134, 120, 0.18); display: flex; align-items: center; justify-content: center; color: var(--ink-primary);">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
+                  <circle cx="12" cy="13" r="3"/>
+                </svg>
+              </div>
+              <div style="font-weight: 600; font-size: 13.5px; color: var(--ink-primary);">Take Photo</div>
+              <div style="font-size: 11px; color: var(--ink-light);">Snap live with phone camera</div>
+            </button>
+
+            <button type="button" class="upload-action-tile" ng-click="scan.triggerGalleryInput()" style="background: var(--bg-main); border: 1.5px solid var(--border-line); border-radius: 14px; padding: 16px 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: all 0.2s ease; text-align: center;">
+              <div style="width: 44px; height: 44px; border-radius: 50%; background: rgba(154, 134, 120, 0.18); display: flex; align-items: center; justify-content: center; color: var(--ink-primary);">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                  <circle cx="9" cy="9" r="2"/>
+                  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                </svg>
+              </div>
+              <div style="font-weight: 600; font-size: 13.5px; color: var(--ink-primary);">Photo Gallery</div>
+              <div style="font-size: 11px; color: var(--ink-light);">Pick from albums or files</div>
+            </button>
+          </div>
+
+          <!-- Drag and Drop Dropzone -->
+          <div class="dropzone-box" id="imageDropzone" ng-click="scan.triggerGalleryInput()">
             <div class="dropzone-icon">
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                 <polyline points="17 8 12 3 7 8"/>
                 <line x1="12" y1="3" x2="12" y2="15"/>
               </svg>
             </div>
-            <div class="dropzone-text">Click to browse or drop card image here</div>
-            <div class="dropzone-sub">Supports Camera Snap, JPG, PNG, WEBP, QR Code Images</div>
-            <input type="file" id="cardFileInput" accept="image/*" capture="environment" style="display: none;" onchange="angular.element(this).scope().scan.handleFileSelect(event)">
+            <div class="dropzone-text">Or drag &amp; drop card image here</div>
+            <div class="dropzone-sub">Supports JPG, PNG, WEBP, QR Code Images</div>
           </div>
+
+          <!-- Native Hidden Inputs: Camera capture vs Gallery selection -->
+          <input type="file" id="cardCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="angular.element(this).scope().scan.handleFileSelect(event)">
+          <input type="file" id="cardGalleryInput" accept="image/*" style="display: none;" onchange="angular.element(this).scope().scan.handleFileSelect(event)">
+          <input type="file" id="cardFileInput" accept="image/*" style="display: none;" onchange="angular.element(this).scope().scan.handleFileSelect(event)">
 
           <div style="margin-top: 14px;" ng-if="scan.isAnalyzing">
             <div style="font-family: var(--font-mono); font-size: 12px; color: var(--moss); display: flex; align-items: center; gap: 8px;">
-              <span>⏳ Analyzing image with intelligent OCR &amp; QR detector…</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation: spin 0.8s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+              <span>Analyzing image with intelligent OCR &amp; QR detector…</span>
             </div>
           </div>
         </div>
@@ -821,13 +896,16 @@
       var themeBtn = document.getElementById('themeToggle');
       var currentTheme = localStorage.getItem('inoviq_theme') || 'light';
 
+      var SUN_SVG = '<svg class="theme-icon-svg theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5" fill="#E2A03F" stroke="#B87D28"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+      var MOON_SVG = '<svg class="theme-icon-svg theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+
       function applyTheme(theme) {
         if (theme === 'dark') {
           document.documentElement.setAttribute('data-theme', 'dark');
-          if (themeBtn) themeBtn.innerHTML = '<svg class="theme-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="5" fill="#FFB800"/><line x1="12" y1="2" x2="12" y2="4.5" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/><line x1="12" y1="19.5" x2="12" y2="22" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/><line x1="2" y1="12" x2="4.5" y2="12" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/><line x1="19.5" y1="12" x2="22" y2="12" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/><line x1="4.93" y1="4.93" x2="6.7" y2="6.7" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/><line x1="17.3" y1="17.3" x2="19.07" y2="19.07" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/><line x1="4.93" y1="19.07" x2="6.7" y2="17.3" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/><line x1="17.3" y1="6.7" x2="19.07" y2="4.93" stroke="#FFB800" stroke-width="2.4" stroke-linecap="round"/></svg>';
+          if (themeBtn) themeBtn.innerHTML = MOON_SVG;
         } else {
           document.documentElement.removeAttribute('data-theme');
-          if (themeBtn) themeBtn.innerHTML = '<svg class="theme-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+          if (themeBtn) themeBtn.innerHTML = SUN_SVG;
         }
       }
       applyTheme(currentTheme);
