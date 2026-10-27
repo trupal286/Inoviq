@@ -9,8 +9,7 @@
     "test": "jest --verbose",
     "test:coverage": "jest --coverage --verbose",
     "cocomo": ".\\scc.exe --exclude-dir node_modules,coverage,References,tests --exclude-ext json,md --not-match jest.config --cocomo-project-type organic .",
-    "cocomo:calc": "node scripts/cocomo-calculator.js",
-    "tunnel": "npx localtunnel --port 3000"
+    "cocomo:calc": "node scripts/cocomo-calculator.js"
   },
   "devDependencies": {
     "http-server": "^14.1.1",
