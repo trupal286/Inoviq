@@ -8,16 +8,16 @@
     content="Inoviq Card Studio — Interactive React 3D Card Studio with physical perspective tilt, specular lighting physics, drag-and-transform elements, and tactile editorial templates.">
   <title>Card Studio — Inoviq</title>
 
-  <!-- Typography: Uniform Work Sans across entire Inoviq system -->
+  <!-- Typography: Uniform Fraunces brand font across entire Inoviq system -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..800;1,9..144,300..800&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
     rel="stylesheet">
 
   <!-- Core Inoviq Stylesheet (Master Design System) + Studio CSS (Cache Busted) -->
-  <link rel="stylesheet" href="../Style/style.css?v=5.3">
-  <link rel="stylesheet" href="../Style/studio.css?v=5.3">
+  <link rel="stylesheet" href="../Style/style.css?v=6.0">
+  <link rel="stylesheet" href="../Style/studio.css?v=6.0">
 
   <style>
     /* Clean studio topbar controls */
@@ -25,7 +25,7 @@
     .btn-theme-switcher,
     .btn-secondary-action,
     .btn-primary-action {
-      font-family: var(--font-sans) !important;
+      font-family: var(--font-serif) !important;
     }
   </style>
 
@@ -802,7 +802,7 @@
                 className={`studio-mode-btn ${studioMode === 'edit' ? 'active' : ''}`}
                 onClick={() => setMode('edit')}
                 id="btn-mode-edit"
-                style={{ fontFamily: "'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif", fontSize: '13.5px', fontWeight: studioMode === 'edit' ? 600 : 500, letterSpacing: '-0.01em' }}
+                style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: '13.5px', fontWeight: studioMode === 'edit' ? 600 : 500, letterSpacing: '-0.01em' }}
                 title="Edit Mode: Card stays still and flat for precise editing"
               >
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
@@ -817,7 +817,7 @@
                 className={`studio-mode-btn ${studioMode === 'preview' ? 'active' : ''}`}
                 onClick={() => setMode('preview')}
                 id="btn-mode-preview"
-                style={{ fontFamily: "'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif", fontSize: '13.5px', fontWeight: studioMode === 'preview' ? 600 : 500, letterSpacing: '-0.01em' }}
+                style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: '13.5px', fontWeight: studioMode === 'preview' ? 600 : 500, letterSpacing: '-0.01em' }}
                 title="3D Preview: Card tilts dynamically with 3D physics on mouse move"
               >
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
@@ -836,7 +836,7 @@
                 onClick={toggleTheme}
                 title="Toggle Theme"
                 id="btn-theme-toggle"
-                style={{ fontFamily: "'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif", fontSize: '13.5px', fontWeight: 500, letterSpacing: '-0.01em' }}
+                style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: '13.5px', fontWeight: 500, letterSpacing: '-0.01em' }}
               >
                 {theme === 'light' ? (
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
@@ -868,7 +868,7 @@
                 className="btn-secondary-action"
                 onClick={exportPNG}
                 id="btn-export-png"
-                style={{ fontFamily: "'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif", fontSize: '13.5px', fontWeight: 500, letterSpacing: '-0.01em' }}
+                style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: '13.5px', fontWeight: 500, letterSpacing: '-0.01em' }}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -884,7 +884,7 @@
                 onClick={saveCard}
                 disabled={isSaving}
                 id="btn-save-catalog"
-                style={{ fontFamily: "'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif", fontSize: '13.5px', fontWeight: 600, letterSpacing: '-0.01em' }}
+                style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: '13.5px', fontWeight: 600, letterSpacing: '-0.01em' }}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
                   <polyline points="20 6 9 17 4 12"></polyline>

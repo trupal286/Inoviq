@@ -155,7 +155,7 @@
   background: var(--paper-card);
   border: 1px solid var(--border-line);
   color: var(--ink-primary);
-  font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-family: 'Fraunces', Georgia, serif !important;
   font-size: 13.5px !important;
   font-weight: 500 !important;
   letter-spacing: -0.01em !important;
@@ -182,7 +182,7 @@
   background: var(--paper-card);
   border: 1px solid var(--border-line);
   color: var(--ink-primary);
-  font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-family: 'Fraunces', Georgia, serif !important;
   font-size: 13.5px !important;
   font-weight: 500 !important;
   letter-spacing: -0.01em !important;
@@ -209,7 +209,7 @@
   background: var(--espresso);
   color: var(--plaster);
   border: 1px solid var(--espresso);
-  font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-family: 'Fraunces', Georgia, serif !important;
   font-size: 13.5px !important;
   font-weight: 600 !important;
   letter-spacing: -0.01em !important;

@@ -17,9 +17,9 @@
    ========================================================================== */
 
 :root {
-  --auth-modal-font-serif: 'Instrument Serif', 'Fraunces', Georgia, serif;
-  --auth-modal-font-sans: 'Manrope', 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --auth-modal-font-mono: 'Space Mono', 'IBM Plex Mono', monospace;
+  --auth-modal-font-serif: 'Fraunces', Georgia, serif;
+  --auth-modal-font-sans:  'Fraunces', Georgia, serif;
+  --auth-modal-font-mono:  'Fraunces', Georgia, serif;
   --auth-modal-charcoal: #EFEFEF;
   --auth-modal-surface: #FFFFFF;
   --auth-modal-surface-border: rgba(154, 134, 120, 0.35);
