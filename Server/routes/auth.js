@@ -112,10 +112,24 @@ router.post('/login', async (req, res) => {
   try {
     const { identifier, password } = req.body;
 
-    if (!identifier || !password) {
+    if (!identifier && !password) {
       return res.status(400).json({
         success: false,
         message: 'Please enter your email/username and password.'
+      });
+    }
+
+    if (!identifier) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please enter your email or username.'
+      });
+    }
+
+    if (!password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please enter your password.'
       });
     }
 
@@ -130,7 +144,7 @@ router.post('/login', async (req, res) => {
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid credentials. Check your email and password.'
+        message: 'Invalid credentials. Check your email.'
       });
     }
 
@@ -139,7 +153,7 @@ router.post('/login', async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid credentials. Check your email and password.'
+        message: 'Invalid credentials. Check password.'
       });
     }
 

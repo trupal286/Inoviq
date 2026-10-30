@@ -29,18 +29,23 @@
       var isAuth = false;
 
       if (flag && token) {
-        try {
-          var parts = token.split('.');
-          if (parts.length === 3) {
-            var payload = JSON.parse(atob(parts[1]));
-            if (!payload.exp || payload.exp * 1000 > Date.now()) {
-              isAuth = true;
-            }
-          } else if (token.indexOf('mock') !== -1) {
-            isAuth = true;
-          }
-        } catch (e) {
+        if (token.indexOf('mock') !== -1) {
+          localStorage.removeItem('inoviq_logged_in');
+          localStorage.removeItem('inoviq_token');
+          localStorage.removeItem('inoviq_user');
           isAuth = false;
+        } else {
+          try {
+            var parts = token.split('.');
+            if (parts.length === 3) {
+              var payload = JSON.parse(atob(parts[1]));
+              if (!payload.exp || payload.exp * 1000 > Date.now()) {
+                isAuth = true;
+              }
+            }
+          } catch (e) {
+            isAuth = false;
+          }
         }
       }
 

@@ -94,47 +94,41 @@
         var idStr = typeof identifierOrUser === 'string' ? identifierOrUser : (identifierOrUser && (identifierOrUser.email || identifierOrUser.username));
         var passStr = password || (identifierOrUser && identifierOrUser.password);
 
-        if (idStr && passStr) {
-          return $http.post(API + '/login', {
-            identifier: idStr,
-            password: passStr
-          }).then(function (res) {
-            if (res.data && res.data.success) {
-              saveAuth(res.data.token, res.data.user);
-              return res.data;
-            }
-            return res.data;
-          }).catch(function (err) {
-            if (err && err.status === 401 && err.data && err.data.message) {
-              return $q.reject(err);
-            }
-            var userData = typeof identifierOrUser === 'object' ? identifierOrUser : { email: idStr };
-            if (!userData.firstName) userData.firstName = (idStr.indexOf('@') !== -1 ? idStr.split('@')[0] : idStr);
-            if (!userData.lastName) userData.lastName = 'Member';
-            var token = createMockToken(userData);
-            saveAuth(token, userData);
-            return $q.resolve({ success: true, token: token, user: userData });
+        if (!idStr || !idStr.trim()) {
+          return $q.reject({
+            status: 400,
+            data: { success: false, message: 'Please enter your email or username.' }
           });
         }
 
-        var userData = {};
-        if (typeof identifierOrUser === 'object' && identifierOrUser !== null) {
-          userData = identifierOrUser;
-        } else {
-          var id = identifierOrUser || 'demo@inoviq.io';
-          userData = {
-            email: id,
-            firstName: id.indexOf('@') !== -1 ? id.split('@')[0] : id,
-            lastName: 'Member',
-            username: id
-          };
+        if (!passStr || !passStr.trim()) {
+          return $q.reject({
+            status: 400,
+            data: { success: false, message: 'Please enter your password.' }
+          });
         }
-        if (!userData.firstName) userData.firstName = 'Elena';
-        if (!userData.lastName) userData.lastName = 'Rostova';
 
-        var token = createMockToken(userData);
-        saveAuth(token, userData);
-        return $q.resolve({ success: true, token: token, user: userData });
+        return $http.post(API + '/login', {
+          identifier: idStr.trim(),
+          password: passStr
+        }).then(function (res) {
+          if (res.data && res.data.success) {
+            saveAuth(res.data.token, res.data.user);
+            return res.data;
+          }
+          return $q.reject({ data: { message: (res.data && res.data.message) || 'Login failed.' } });
+        }).catch(function (err) {
+          if (err && err.data && err.data.message) {
+            return $q.reject(err);
+          }
+          if (err && err.status === 401) {
+            return $q.reject({ data: { message: 'Invalid credentials. Check your email and password.' } });
+          }
+          if (err && err.status === 400) {
+            return $q.reject({ data: { message: 'Please enter your email/username and password.' } });
+          }
+          return $q.reject({ data: { message: 'Server error or network failure. Please try again.' } });
+        });
       },
 
       logout: function () {
@@ -420,13 +414,25 @@
     /* ── Login ── */
     auth.login = function () {
       auth.errorMsg = '';
+      auth.successMsg = '';
+
+      if (!auth.identifier || !auth.identifier.trim()) {
+        auth.errorMsg = 'Please enter your email or username.';
+        auth.loading = false;
+        return;
+      }
+
+      if (!auth.password || !auth.password.trim()) {
+        auth.errorMsg = 'Please enter your password.';
+        auth.loading = false;
+        return;
+      }
+
       auth.loading = true;
 
       var userObj = {
-        email: auth.identifier || 'demo@inoviq.io',
-        firstName: (auth.identifier && auth.identifier.indexOf('@') !== -1) ? auth.identifier.split('@')[0] : (auth.identifier || 'Elena'),
-        lastName: 'Member',
-        username: auth.identifier || 'elena',
+        email: auth.identifier.trim(),
+        username: auth.identifier.trim(),
         password: auth.password
       };
 
@@ -445,7 +451,7 @@
         })
         .catch(function (err) {
           auth.loading = false;
-          auth.errorMsg = (err && err.data && err.data.message) || 'Login failed. Please try again.';
+          auth.errorMsg = (err && err.data && err.data.message) || (err && err.message) || 'Check your email and password, then try again.';
           $scope.$applyAsync();
         });
     };

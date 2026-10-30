@@ -76,8 +76,18 @@
        * Log in with a user object or credentials
        * Persists state to localStorage so it survives page reloads
        */
-      login: function (user) {
+      login: function (user, password) {
         var userData = user || {};
+        var pass = password || (typeof userData === 'object' ? userData.password : '');
+        var id = (typeof userData === 'string') ? userData : (userData.email || userData.username || '');
+
+        if (!id || !id.trim()) {
+          return $q.reject({ status: 400, data: { success: false, message: 'Please enter your email or username.' } });
+        }
+        if (!pass || !pass.trim()) {
+          return $q.reject({ status: 400, data: { success: false, message: 'Please enter your password.' } });
+        }
+
         if (typeof userData === 'string') {
           userData = { email: userData, firstName: userData.split('@')[0] || 'Member' };
         }
